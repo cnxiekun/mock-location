@@ -41,6 +41,22 @@ When `AppFeature.MAP_FLOATING` is enabled, the floating map's FAB column include
   - **Pause / Resume** — toggles replay pause state.
 - **Settings gate**: `enabledMapFeatures` flows through `MapSharedState` so the floating map respects the same visibility toggle as the main map screen.
 
+## Group Sync Button
+
+When the device is a Group Sync follower with follower mode enabled
+(`GroupRepository.groupState`), the widget panel shows a group-sync icon
+button:
+
+- **Shown when**: `groupState.role == GroupRole.FOLLOWER && groupState.followerModeEnabled`.
+- **Hidden**: for `GroupRole.LEADER` and `GroupRole.NONE`.
+- **Expand control**: tapping the icon expands one inline button to the right —
+  **Teleport to leader now** — which sends `ACTION_FOLLOWER_TELEPORT` to
+  `MockLocationService`, the same action the Group Sync screen's own
+  "Teleport to leader now" button sends (see @docs/features/group-sync.md).
+- **Auto-collapse**: the button (and its inline teleport action) disappears
+  entirely once the device stops being an enabled follower — nothing is left
+  on screen for the expand state to affect.
+
 ## Edge Cases
 
 - No items configured → show placeholder.

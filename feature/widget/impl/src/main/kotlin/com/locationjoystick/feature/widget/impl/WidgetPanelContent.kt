@@ -80,6 +80,10 @@ internal fun WidgetPanel(
     isTapToWalkEnabled: Boolean = false,
     isTapToWalkActive: Boolean = false,
     onTapToWalkClicked: () -> Unit = {},
+    isGroupSyncButtonVisible: Boolean = false,
+    isGroupSyncExpanded: Boolean = false,
+    onGroupSyncClicked: () -> Unit = {},
+    onTeleportToLeaderClicked: () -> Unit = {},
     onDrag: (dx: Float, dy: Float) -> Unit,
 ) {
     Column(horizontalAlignment = Alignment.Start) {
@@ -246,6 +250,44 @@ internal fun WidgetPanel(
                         tint = crosshairTint,
                         modifier = Modifier.size(UiConstants.FAB_ICON_SIZE),
                     )
+                }
+            }
+            if (isGroupSyncButtonVisible) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier =
+                            Modifier
+                                .padding(4.dp)
+                                .size(UiConstants.FAB_CONTAINER_SIZE)
+                                .background(Color.Black, CircleShape)
+                                .clickable { onGroupSyncClicked() },
+                    ) {
+                        Icon(
+                            imageVector = LjIcons.Group,
+                            contentDescription = "Group sync",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(UiConstants.FAB_ICON_SIZE),
+                        )
+                    }
+                    if (isGroupSyncExpanded) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier =
+                                Modifier
+                                    .padding(4.dp)
+                                    .size(UiConstants.FAB_CONTAINER_SIZE)
+                                    .background(Color.Black, CircleShape)
+                                    .clickable { onTeleportToLeaderClicked() },
+                        ) {
+                            Icon(
+                                imageVector = LjIcons.MyLocation,
+                                contentDescription = "Teleport to leader now",
+                                tint = LjSuccess,
+                                modifier = Modifier.size(UiConstants.FAB_ICON_SIZE),
+                            )
+                        }
+                    }
                 }
             }
         }

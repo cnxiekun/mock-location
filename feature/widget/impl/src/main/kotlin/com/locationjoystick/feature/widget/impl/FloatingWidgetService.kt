@@ -19,6 +19,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.data.ActivityStateRepository
+import com.locationjoystick.core.data.GroupRepository
 import com.locationjoystick.core.data.LocationRepository
 import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.designsystem.LjBg
@@ -30,6 +31,8 @@ import com.locationjoystick.core.location.MockLocationIntentBuilder
 import com.locationjoystick.core.location.MockLocationService
 import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.FavoriteLocation
+import com.locationjoystick.core.model.GroupRole
+import com.locationjoystick.core.model.GroupState
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
@@ -104,6 +107,8 @@ class FloatingWidgetService :
 
     @Inject lateinit var compassHeadingSource: CompassHeadingSource
 
+    @Inject lateinit var groupRepository: GroupRepository
+
     private var composeView: ComposeView? = null
 
     // Joystick state
@@ -114,6 +119,9 @@ class FloatingWidgetService :
 
     // Activity state — driven entirely by locationRepository.currentMode via isActivityActive/isActivityPausable
     private val routeExpandedFlow = MutableStateFlow(false)
+
+    // Group sync button expand/collapse
+    private val groupSyncExpandedFlow = MutableStateFlow(false)
 
     // Master panel expand/collapse
     private val isPanelExpandedFlow = MutableStateFlow(false)
@@ -289,6 +297,8 @@ class FloatingWidgetService :
             val hasPendingCompletion by pendingCompletionFlow.collectAsStateWithLifecycle()
             val isTapToWalkEnabled by settingsRepository.getTapToWalkOverlayEnabled().collectAsStateWithLifecycle(initialValue = false)
             val isTapToWalkActive by isTapToWalkActiveFlow.collectAsStateWithLifecycle()
+            val groupState by groupRepository.groupState.collectAsStateWithLifecycle(initialValue = GroupState())
+            val isGroupSyncExpanded by groupSyncExpandedFlow.collectAsStateWithLifecycle()
 
             LjTheme {
                 WidgetPanel(
@@ -305,6 +315,10 @@ class FloatingWidgetService :
                     isTapToWalkEnabled = isTapToWalkEnabled,
                     isTapToWalkActive = isTapToWalkActive,
                     onTapToWalkClicked = { onTapToWalkClicked() },
+                    isGroupSyncButtonVisible = groupState.role == GroupRole.FOLLOWER && groupState.followerModeEnabled,
+                    isGroupSyncExpanded = isGroupSyncExpanded,
+                    onGroupSyncClicked = { groupSyncExpandedFlow.value = !groupSyncExpandedFlow.value },
+                    onTeleportToLeaderClicked = { teleportToLeaderNow() },
                     onToggleMaster = {
                         if (!isPanelExpandedFlow.value) pendingCompletionFlow.value = false
                         isPanelExpandedFlow.value = !isPanelExpandedFlow.value
@@ -443,6 +457,14 @@ class FloatingWidgetService :
             MockMode.WALK_TO -> mapController.stopWalk()
             else -> mapController.stopRouteReplay()
         }
+    }
+
+    private fun teleportToLeaderNow() {
+        val intent =
+            Intent(this, MockLocationService::class.java).apply {
+                action = AppConstants.ServiceConstants.ACTION_FOLLOWER_TELEPORT
+            }
+        startService(intent)
     }
 
     private fun toggleJoystick() {

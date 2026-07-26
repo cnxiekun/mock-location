@@ -25,6 +25,7 @@ import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.DragHandle
 import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Hiking
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
@@ -72,6 +73,7 @@ object LjIcons {
     val FavoriteBorder = Icons.Outlined.FavoriteBorder
     val FileDownload = Icons.Outlined.FileDownload
     val FileUpload = Icons.Outlined.FileUpload
+    val Group = Icons.Rounded.Group
     val Hiking = Icons.Rounded.Hiking
     val Home = Icons.Rounded.Home
     val Info = Icons.Rounded.Info
