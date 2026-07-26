@@ -161,5 +161,12 @@ class MapControllerWalkCancellationTest {
                 MockMode.WALK_TO,
                 locationRepository.currentMode.value,
             )
+
+            val walkMode = mapController.sharedState.value.walkMode
+            assertTrue(
+                "walkMode must be the new Walking state after walkTo(target2), not left over " +
+                    "from the cancelled ephemeral replay",
+                walkMode is WalkMode.Walking && walkMode.target == target2,
+            )
         }
 }

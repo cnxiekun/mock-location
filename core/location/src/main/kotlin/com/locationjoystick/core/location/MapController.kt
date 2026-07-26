@@ -318,6 +318,7 @@ class MapController
             if (_state.value.ephemeralWaypoints.isNotEmpty()) {
                 context.startService(MockLocationIntentBuilder.cancelRouteReplay(context))
                 ephemeralReplayController.clearPendingWaypoints()
+                _state.update { it.copy(walkMode = WalkMode.Idle) }
             }
         }
 

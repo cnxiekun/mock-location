@@ -125,7 +125,8 @@ internal fun MapFloatingView(
     val isRoaming = mockMode == MockMode.ROAMING
     val isRouteReplay = mockMode == MockMode.ROUTE_REPLAY
     val isRoutePaused = isRouteReplay && mockLocationState == MockLocationState.PAUSED
-    val isWalkActive = walkTarget != null || isRouteReplay
+    val isEphemeralReplayActive = ephemeralWaypoints?.isNotEmpty() == true
+    val isWalkActive = walkTarget != null || isRouteReplay || isEphemeralReplayActive
     val context = LocalContext.current
     var roamingPreviewWaypoints by remember { mutableStateOf<List<com.locationjoystick.core.model.LatLng>?>(null) }
     var showRoamingSheet by remember { mutableStateOf(false) }
@@ -475,7 +476,7 @@ internal fun MapFloatingView(
             TapActionPanel(
                 tap = tap,
                 isRouteReplay = isRouteReplay,
-                isEphemeralReplay = ephemeralWaypoints?.isNotEmpty() == true,
+                isEphemeralReplay = isEphemeralReplayActive,
                 isWalkActive = isWalkActive,
                 walkStart = walkStart,
                 walkTarget = walkTarget,
