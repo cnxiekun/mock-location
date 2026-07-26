@@ -130,6 +130,31 @@ class OsrmClientTest {
         }
 
     @Test
+    fun `getRoute request path has no double slash even when base URL has a trailing slash`() =
+        runTest {
+            val body =
+                """
+                {
+                  "code": "Ok",
+                  "routes": [{
+                    "geometry": {"type": "LineString", "coordinates": [[2.3522, 48.8566], [2.356, 48.86]]},
+                    "distance": 100.0,
+                    "duration": 60.0
+                  }]
+                }
+                """.trimIndent()
+            server.enqueue(MockResponse().setResponseCode(200).setBody(body))
+
+            testClient.getRoute(
+                profile = "foot",
+                waypoints = listOf(LatLng(48.8566, 2.3522), LatLng(48.8600, 2.3560)),
+            )
+
+            val request = server.takeRequest()
+            assertTrue("Path should start with a single slash before 'route'", request.path!!.startsWith("/route/"))
+        }
+
+    @Test
     fun `getRoute retries with driving profile when foot profile fails`() =
         runTest {
             val okBody =

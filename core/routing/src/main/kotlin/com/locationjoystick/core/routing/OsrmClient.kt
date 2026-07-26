@@ -210,7 +210,7 @@ class OsrmClient
         @Inject
         constructor() : this(AppConstants.OsrmConstants.BASE_URL)
 
-        private val baseUrl: String = baseUrl
+        private val baseUrl: String = baseUrl.trimEnd('/')
         private val okHttpClient: OkHttpClient =
             OkHttpClient
                 .Builder()
