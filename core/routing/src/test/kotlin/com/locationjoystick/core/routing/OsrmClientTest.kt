@@ -377,9 +377,13 @@ class OsrmClientTest {
                     assertTrue("Expected failure once the bisection budget is exceeded", result.isFailure)
                 }
 
+            // Pins enforcement to the 2s budget itself, not a loose bound that would also pass if
+            // cancellation silently failed and the call instead ran to the 4s mock delay (the old
+            // blocking-execute() regression) or the 30s callTimeout.
             assertTrue(
-                "Expected the call to return near the 2s budget, not the 30s call timeout (took ${elapsedMs}ms)",
-                elapsedMs < 10_000,
+                "Expected the call to return near the 2s budget, not the 4s mock delay or 30s call " +
+                    "timeout (took ${elapsedMs}ms)",
+                elapsedMs < 3_000,
             )
         }
 

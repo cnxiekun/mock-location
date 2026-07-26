@@ -10,16 +10,37 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.Serializable
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+
+/**
+ * Like [kotlin.runCatching], but rethrows [kotlinx.coroutines.CancellationException] instead of
+ * wrapping it into a [Result.failure] — swallowing it here would let a coroutine cancelled by
+ * [kotlinx.coroutines.withTimeoutOrNull] (e.g. the bisection budget) keep running instead of
+ * unwinding, defeating the cancellation this call site relies on.
+ */
+private inline fun <T> runCatchingCancellable(block: () -> T): Result<T> =
+    try {
+        Result.success(block())
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Throwable) {
+        Result.failure(e)
+    }
 
 private const val TAG = "OsrmClient"
 private const val NO_SEGMENT = "NoSegment"
@@ -131,6 +152,42 @@ fun osrmFailureMessage(reason: OsrmFailureReason): String =
 
 private fun isRetryable(reason: OsrmFailureReason): Boolean =
     reason is OsrmFailureReason.Timeout || reason is OsrmFailureReason.ServerError || reason is OsrmFailureReason.NetworkUnavailable
+
+/**
+ * Suspends until [Call] completes, parsing the response via [parse] (which runs on OkHttp's own
+ * callback thread, inside the response body's lifetime — this is what lets cancellation interrupt
+ * a slow body read, not just the connect phase). Cancelling the calling coroutine cancels the
+ * underlying OkHttp call. Unlike [Call.execute], this respects coroutine cancellation and routes
+ * through the OkHttp dispatcher's per-host concurrency cap.
+ */
+private suspend fun <T> Call.await(parse: (Response) -> T): T =
+    suspendCancellableCoroutine { continuation ->
+        enqueue(
+            object : Callback {
+                override fun onResponse(
+                    call: Call,
+                    response: Response,
+                ) {
+                    if (!continuation.isActive) return
+                    runCatching { response.use(parse) }
+                        .fold(
+                            onSuccess = { continuation.resume(it) },
+                            onFailure = { continuation.resumeWithException(it) },
+                        )
+                }
+
+                override fun onFailure(
+                    call: Call,
+                    e: IOException,
+                ) {
+                    if (continuation.isActive) continuation.resumeWithException(e)
+                }
+            },
+        )
+        continuation.invokeOnCancellation {
+            cancel()
+        }
+    }
 
 /**
  * HTTP client for OSRM routing API using OkHttp and kotlinx.serialization.
@@ -348,7 +405,7 @@ class OsrmClient
             waypoints: List<LatLng>,
         ): List<LatLng> =
             waypoints.map { point ->
-                runCatching {
+                runCatchingCancellable {
                     val coordinate = "${point.longitude},${point.latitude}"
                     val url = "$baseUrl/nearest/v1/$profile/$coordinate"
                     val request =
@@ -356,11 +413,10 @@ class OsrmClient
                             .Builder()
                             .url(url)
                             .build()
-                    val response = okHttpClient.newCall(request).execute()
-                    response.use {
-                        val body = it.body?.string() ?: error("OSRM nearest response body is null")
+                    okHttpClient.newCall(request).await { response ->
+                        val body = response.body?.string() ?: error("OSRM nearest response body is null")
                         val parsed = AppJson.decodeFromString<OsrmNearestResponse>(body)
-                        if (!it.isSuccessful || parsed.code != "Ok") error("OSRM nearest returned ${parsed.code}")
+                        if (!response.isSuccessful || parsed.code != "Ok") error("OSRM nearest returned ${parsed.code}")
                         val location =
                             parsed.waypoints?.firstOrNull()?.location
                                 ?: error("OSRM nearest returned no waypoints")
@@ -376,7 +432,7 @@ class OsrmClient
             profile: String,
             waypoints: List<LatLng>,
         ): Result<OsrmRoute> =
-            runCatching {
+            runCatchingCancellable {
                 require(waypoints.size >= 2) { "At least 2 waypoints required" }
 
                 val coordinates = waypoints.joinToString(";") { "${it.longitude},${it.latitude}" }
@@ -389,15 +445,13 @@ class OsrmClient
                         .Builder()
                         .url(url)
                         .build()
-                val response = okHttpClient.newCall(request).execute()
-
-                response.use {
-                    if (!it.isSuccessful) {
-                        throw OsrmHttpException(it.code, "OSRM HTTP ${it.code}: ${it.message}")
+                okHttpClient.newCall(request).await { response ->
+                    if (!response.isSuccessful) {
+                        throw OsrmHttpException(response.code, "OSRM HTTP ${response.code}: ${response.message}")
                     }
 
                     val body =
-                        it.body?.string()
+                        response.body?.string()
                             ?: error("OSRM response body is null")
 
                     val parsed = AppJson.decodeFromString<OsrmRouteResponse>(body)
