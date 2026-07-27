@@ -101,9 +101,15 @@ object AppConstants {
         const val OVERVIEW = "full"
         const val GEOMETRIES = "geojson"
 
-        /** Max retry attempts for transient failures (timeout/5xx/network). Matches [RETRY_BACKOFF_MS] size. */
-        const val RETRY_COUNT = 2
-        val RETRY_BACKOFF_MS: List<Long> = listOf(400L, 1_000L)
+        /** Max retry attempts for transient failures (timeout/5xx/429/network). Matches [RETRY_BACKOFF_MS] size. */
+        const val RETRY_COUNT = 3
+        val RETRY_BACKOFF_MS: List<Long> = listOf(400L, 1_200L, 3_000L)
+
+        /** Random jitter (±) applied to [RETRY_BACKOFF_MS] to avoid thundering herd against the shared demo server. */
+        const val RETRY_JITTER_MS = 100L
+
+        /** Wait for a 429 (rate limited) response with no `Retry-After` header. */
+        const val RATE_LIMIT_BACKOFF_MS = 5_000L
 
         /** Only legs longer than this are eligible for bisection on failure. */
         const val BISECTION_MIN_DISTANCE_METERS = 2_500.0

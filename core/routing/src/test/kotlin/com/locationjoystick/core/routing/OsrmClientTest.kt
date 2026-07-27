@@ -88,9 +88,9 @@ class OsrmClientTest {
     @Test
     fun `getRoute returns failure on HTTP error`() =
         runTest {
-            // HTTP errors are classified ServerError and retried (RETRY_COUNT=2) on both the foot
-            // profile and its driving-profile fallback: 3 attempts each = 6 requests total.
-            repeat(6) { server.enqueue(MockResponse().setResponseCode(400).setBody("Bad Request")) }
+            // HTTP errors are classified ServerError and retried (RETRY_COUNT=3) on both the foot
+            // profile and its driving-profile fallback: 4 attempts each = 8 requests total.
+            repeat(8) { server.enqueue(MockResponse().setResponseCode(400).setBody("Bad Request")) }
 
             val result =
                 testClient.getRoute(
@@ -99,7 +99,7 @@ class OsrmClientTest {
                 )
 
             assertTrue("Expected failure on HTTP 400", result.isFailure)
-            assertEquals("Expected 3 retried foot attempts + 3 retried driving attempts", 6, server.requestCount)
+            assertEquals("Expected 4 retried foot attempts + 4 retried driving attempts", 8, server.requestCount)
         }
 
     @Test
@@ -252,6 +252,102 @@ class OsrmClientTest {
             assertTrue("Expected success on third (final retry) attempt", result.isSuccess)
             assertEquals("Expected exactly 2 retries (3 attempts total)", 3, server.requestCount)
         }
+
+    @Test
+    fun `getRoute retries a third time and succeeds on the fourth attempt`() =
+        runTest {
+            val okBody =
+                """
+                {
+                  "code": "Ok",
+                  "routes": [{
+                    "geometry": {"type": "LineString", "coordinates": [[2.3522, 48.8566], [2.356, 48.86]]},
+                    "distance": 100.0,
+                    "duration": 60.0
+                  }]
+                }
+                """.trimIndent()
+            server.enqueue(MockResponse().setResponseCode(500).setBody("error"))
+            server.enqueue(MockResponse().setResponseCode(500).setBody("error"))
+            server.enqueue(MockResponse().setResponseCode(500).setBody("error"))
+            server.enqueue(MockResponse().setResponseCode(200).setBody(okBody))
+
+            val result =
+                testClient.getRoute(
+                    profile = "foot",
+                    waypoints = listOf(LatLng(48.8566, 2.3522), LatLng(48.8600, 2.3560)),
+                )
+
+            assertTrue("RETRY_COUNT=3 must allow a 4th attempt to succeed", result.isSuccess)
+            assertEquals("Expected exactly 3 retries (4 attempts total)", 4, server.requestCount)
+        }
+
+    @Test
+    fun `getRoute retries a 429 response and eventually succeeds`() =
+        runTest {
+            val okBody =
+                """
+                {
+                  "code": "Ok",
+                  "routes": [{
+                    "geometry": {"type": "LineString", "coordinates": [[2.3522, 48.8566], [2.356, 48.86]]},
+                    "distance": 100.0,
+                    "duration": 60.0
+                  }]
+                }
+                """.trimIndent()
+            server.enqueue(MockResponse().setResponseCode(429).setBody("rate limited"))
+            server.enqueue(MockResponse().setResponseCode(200).setBody(okBody))
+
+            val result =
+                testClient.getRoute(
+                    profile = "foot",
+                    waypoints = listOf(LatLng(48.8566, 2.3522), LatLng(48.8600, 2.3560)),
+                )
+
+            assertTrue("429 must be retried rather than failing immediately", result.isSuccess)
+            assertEquals(2, server.requestCount)
+        }
+
+    @Test
+    fun `getRoute honors a numeric Retry-After header on 429`() =
+        runTest {
+            val okBody =
+                """
+                {
+                  "code": "Ok",
+                  "routes": [{
+                    "geometry": {"type": "LineString", "coordinates": [[2.3522, 48.8566], [2.356, 48.86]]},
+                    "distance": 100.0,
+                    "duration": 60.0
+                  }]
+                }
+                """.trimIndent()
+            server.enqueue(MockResponse().setResponseCode(429).setHeader("Retry-After", "7").setBody("rate limited"))
+            server.enqueue(MockResponse().setResponseCode(200).setBody(okBody))
+
+            val result =
+                testClient.getRoute(
+                    profile = "foot",
+                    waypoints = listOf(LatLng(48.8566, 2.3522), LatLng(48.8600, 2.3560)),
+                )
+
+            assertTrue("429 with Retry-After must still succeed after one retry", result.isSuccess)
+            assertEquals(2, server.requestCount)
+        }
+
+    @Test
+    fun `classifyOsrmFailure classifies 429 as RateLimited distinct from generic ServerError, honoring Retry-After`() {
+        val rateLimited = classifyOsrmFailure(OsrmHttpException(429, "OSRM HTTP 429", retryAfterMs = 7_000L))
+        assertTrue("429 must classify as RateLimited, not ServerError", rateLimited is OsrmFailureReason.RateLimited)
+        assertEquals(7_000L, (rateLimited as OsrmFailureReason.RateLimited).retryAfterMs)
+
+        val noHeader = classifyOsrmFailure(OsrmHttpException(429, "OSRM HTTP 429"))
+        assertEquals(null, (noHeader as OsrmFailureReason.RateLimited).retryAfterMs)
+
+        val serverError = classifyOsrmFailure(OsrmHttpException(500, "OSRM HTTP 500"))
+        assertTrue("Non-429 errors must remain generic ServerError", serverError is OsrmFailureReason.ServerError)
+    }
 
     @Test
     fun `getRoute does not retry NoRouteFound failures`() =

@@ -26,6 +26,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.random.Random
 
 /**
  * Like [kotlin.runCatching], but rethrows [kotlinx.coroutines.CancellationException] instead of
@@ -44,6 +45,7 @@ private inline fun <T> runCatchingCancellable(block: () -> T): Result<T> =
 
 private const val TAG = "OsrmClient"
 private const val NO_SEGMENT = "NoSegment"
+private const val HTTP_TOO_MANY_REQUESTS = 429
 
 // ---------------------------------------------------------------------------
 // Response data classes (kotlinx.serialization)
@@ -106,12 +108,21 @@ class OsrmRouteException(
         if (code == NO_SEGMENT) OsrmFailureReason.Unknown else OsrmFailureReason.NoRouteFound
 }
 
-/** Thrown when the OSRM HTTP response is non-2xx, carrying the status code for callers to branch on. */
+/**
+ * Thrown when the OSRM HTTP response is non-2xx, carrying the status code for callers to branch on.
+ * [retryAfterMs] is populated from a numeric `Retry-After` header on a 429 response, if present.
+ */
 class OsrmHttpException(
     val httpCode: Int,
     message: String,
+    retryAfterMs: Long? = null,
 ) : Exception(message) {
-    val reason: OsrmFailureReason = OsrmFailureReason.ServerError(httpCode)
+    val reason: OsrmFailureReason =
+        if (httpCode == HTTP_TOO_MANY_REQUESTS) {
+            OsrmFailureReason.RateLimited(retryAfterMs)
+        } else {
+            OsrmFailureReason.ServerError(httpCode)
+        }
 }
 
 /** Classified reason an OSRM request failed, used to build accurate user-facing messages and retry decisions. */
@@ -120,6 +131,11 @@ sealed class OsrmFailureReason {
 
     data class ServerError(
         val code: Int,
+    ) : OsrmFailureReason()
+
+    /** HTTP 429. [retryAfterMs] is the server-requested wait, if it sent a numeric `Retry-After` header. */
+    data class RateLimited(
+        val retryAfterMs: Long?,
     ) : OsrmFailureReason()
 
     object NoRouteFound : OsrmFailureReason()
@@ -145,13 +161,20 @@ fun osrmFailureMessage(reason: OsrmFailureReason): String =
     when (reason) {
         is OsrmFailureReason.Timeout -> "Routing server timed out"
         is OsrmFailureReason.ServerError -> "Routing server unavailable"
+        is OsrmFailureReason.RateLimited -> "Routing server is rate-limiting requests"
         is OsrmFailureReason.NoRouteFound -> "No road route found"
         is OsrmFailureReason.NetworkUnavailable -> "No network connection"
         is OsrmFailureReason.Unknown -> "Road routing unavailable"
     }
 
+/** Parses a numeric (seconds-form) `Retry-After` header into milliseconds; null if absent or an HTTP-date. */
+private fun parseRetryAfterMs(response: Response): Long? = response.header("Retry-After")?.toLongOrNull()?.times(1_000L)
+
 private fun isRetryable(reason: OsrmFailureReason): Boolean =
-    reason is OsrmFailureReason.Timeout || reason is OsrmFailureReason.ServerError || reason is OsrmFailureReason.NetworkUnavailable
+    reason is OsrmFailureReason.Timeout ||
+        reason is OsrmFailureReason.ServerError ||
+        reason is OsrmFailureReason.NetworkUnavailable ||
+        reason is OsrmFailureReason.RateLimited
 
 /**
  * Suspends until [Call] completes, parsing the response via [parse] (which runs on OkHttp's own
@@ -283,9 +306,11 @@ class OsrmClient
             }
 
         /**
-         * Retries [requestRoute] up to [maxRetries] times with a fixed backoff
-         * ([AppConstants.OsrmConstants.RETRY_BACKOFF_MS]), but only for retryable reasons
-         * ([isRetryable]) — a genuinely-no-route response is never retried.
+         * Retries [requestRoute] up to [maxRetries] times, but only for retryable reasons
+         * ([isRetryable]) — a genuinely-no-route response is never retried. Backoff is
+         * [AppConstants.OsrmConstants.RETRY_BACKOFF_MS] (±[AppConstants.OsrmConstants.RETRY_JITTER_MS]
+         * jitter) for generic transient failures, or the longer, `Retry-After`-aware wait from
+         * [backoffFor] for a 429 (rate limited) response.
          */
         private suspend fun requestRouteWithRetry(
             profile: String,
@@ -297,12 +322,25 @@ class OsrmClient
             while (attempt < maxRetries) {
                 val reason = classifyOsrmFailure(result.exceptionOrNull() ?: return result)
                 if (!isRetryable(reason)) break
-                delay(AppConstants.OsrmConstants.RETRY_BACKOFF_MS[attempt])
+                delay(backoffFor(reason, attempt))
                 attempt++
                 result = requestRoute(profile, waypoints)
             }
             return result
         }
+
+        /** Backoff for retry [attempt] (0-indexed) given the classified failure [reason]. */
+        private fun backoffFor(
+            reason: OsrmFailureReason,
+            attempt: Int,
+        ): Long =
+            if (reason is OsrmFailureReason.RateLimited) {
+                reason.retryAfterMs ?: AppConstants.OsrmConstants.RATE_LIMIT_BACKOFF_MS
+            } else {
+                val base = AppConstants.OsrmConstants.RETRY_BACKOFF_MS[attempt]
+                val jitter = AppConstants.OsrmConstants.RETRY_JITTER_MS
+                base + Random.nextLong(-jitter, jitter)
+            }
 
         /**
          * Bisects a failed single-leg ([waypoints].size == 2) request beyond
@@ -447,7 +485,8 @@ class OsrmClient
                         .build()
                 okHttpClient.newCall(request).await { response ->
                     if (!response.isSuccessful) {
-                        throw OsrmHttpException(response.code, "OSRM HTTP ${response.code}: ${response.message}")
+                        val retryAfterMs = if (response.code == HTTP_TOO_MANY_REQUESTS) parseRetryAfterMs(response) else null
+                        throw OsrmHttpException(response.code, "OSRM HTTP ${response.code}: ${response.message}", retryAfterMs)
                     }
 
                     val body =
