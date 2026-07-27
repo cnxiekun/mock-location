@@ -79,8 +79,6 @@ object AppConstants {
         const val ALTITUDE_HUMAN_OFFSET_CLAMP_FACTOR = 0.5
     }
 
-    object PedometerConstants
-
     object RoamingConstants {
         const val DEFAULT_RADIUS_METERS = 2000.0
         const val OSRM_PROFILE_FOOT = "foot"
@@ -277,8 +275,6 @@ object AppConstants {
         const val OUTER_ALPHA = 80
     }
 
-    object WidgetConstants
-
     object RouteConstants {
         const val WAYPOINT_SNAP_THRESHOLD_METERS = 1.0
     }
@@ -299,8 +295,6 @@ object AppConstants {
             lon: Double,
         ) = "https://$DEEP_LINK_HOST/?lat=$lat&lon=$lon"
     }
-
-    object UnitConversionConstants
 
     object AnimationConstants {
         const val SPRING_DAMPING_RATIO = 0.85f
