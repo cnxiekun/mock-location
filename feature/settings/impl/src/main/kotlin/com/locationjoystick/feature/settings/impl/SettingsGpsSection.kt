@@ -162,7 +162,6 @@ internal fun GpsJitterSection(
 @Composable
 internal fun GpsRealismSection(
     uiState: SettingsUiState,
-    isRooted: Boolean,
     onAction: (SettingsAction) -> Unit,
 ) {
     Text("GPS Realism", style = MaterialTheme.typography.headlineSmall)
@@ -214,19 +213,5 @@ internal fun GpsRealismSection(
             "Briefly pauses the fake location signal every ~10 seconds, like a real GPS dropping signal momentarily. " +
                 "Off by default — the pauses cause visible freezes in most apps. " +
                 "Skipped automatically during route replay.",
-    )
-    LjCheckboxRow(
-        checked = uiState.realismPedometerMockingEnabled,
-        onCheckedChange = { onAction(SettingsAction.SetRealismPedometerMockingEnabled(it)) },
-        enabled = isRooted,
-        title = "Fake step counter",
-        description =
-            if (isRooted) {
-                "Fakes step counts that match your movement speed. " +
-                    "Some apps cross-check GPS movement against step data to detect fake locations. " +
-                    "Steps are only faked while walking or running (not while using the bike profile)."
-            } else {
-                "Fakes step counts that match your movement speed. Requires root access."
-            },
     )
 }

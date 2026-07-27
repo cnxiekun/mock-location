@@ -67,7 +67,6 @@ object AppConstants {
         const val WARMUP_INITIAL_ACCURACY_METERS = 50.0f
         const val WARMUP_ENABLED_DEFAULT = false
         const val SUSPENDED_MOCKING_ENABLED_DEFAULT = false
-        const val PEDOMETER_MOCKING_ENABLED_DEFAULT = false
         const val SUSPENDED_PUSH_DURATION_MS = 8_000L
         const val SUSPENDED_PAUSE_DURATION_MS = 2_000L
         const val SUSPENDED_PAUSE_JITTER_MS = 800L

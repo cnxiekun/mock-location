@@ -16,5 +16,4 @@ data class AppSettings(
     val warmupEnabled: Boolean = false,
     val satelliteExtrasEnabled: Boolean = true,
     val suspendedMockingEnabled: Boolean = false,
-    val pedometerMockingEnabled: Boolean = false,
 )

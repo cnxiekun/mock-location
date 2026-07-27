@@ -391,7 +391,6 @@ internal class SaveTestPreferencesDataSource : PreferencesDataSource {
                 realismWarmupEnabled = false,
                 realismSatelliteExtrasEnabled = true,
                 realismSuspendedMockingEnabled = false,
-                realismPedometerMockingEnabled = false,
                 jitterSpeedIdleVariationPct = AppPreferencesDataSource.DEFAULT_JITTER_SPEED_IDLE_VARIATION_PCT,
                 jitterSpeedMovingVariationPct = AppPreferencesDataSource.DEFAULT_JITTER_SPEED_MOVING_VARIATION_PCT,
                 hotLocationsEnabled = false,
@@ -534,8 +533,6 @@ internal class SaveTestPreferencesDataSource : PreferencesDataSource {
 
     override fun getRealismSuspendedMockingEnabled(): Flow<Boolean> = flowOf(false)
 
-    override fun getRealismPedometerMockingEnabled(): Flow<Boolean> = flowOf(false)
-
     override suspend fun setRealismBearingHoldIdle(enabled: Boolean) = Unit
 
     override suspend fun setRealismAltitudeEnabled(enabled: Boolean) = Unit
@@ -545,8 +542,6 @@ internal class SaveTestPreferencesDataSource : PreferencesDataSource {
     override suspend fun setRealismSatelliteExtrasEnabled(enabled: Boolean) = Unit
 
     override suspend fun setRealismSuspendedMockingEnabled(enabled: Boolean) = Unit
-
-    override suspend fun setRealismPedometerMockingEnabled(enabled: Boolean) = Unit
 
     override fun getRecentSearches(): Flow<List<RecentSearch>> = flowOf(emptyList())
 

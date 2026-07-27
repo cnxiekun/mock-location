@@ -767,25 +767,6 @@ class SettingsRepositoryTest {
             }
         }
 
-    @Test
-    fun `getRealismPedometerMockingEnabled returns default false`() =
-        runTest {
-            repository.getRealismPedometerMockingEnabled().test {
-                assertFalse(awaitItem())
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `setRealismPedometerMockingEnabled persists true`() =
-        runTest {
-            repository.setRealismPedometerMockingEnabled(true)
-            repository.getRealismPedometerMockingEnabled().test {
-                assertTrue(awaitItem())
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
     // sort prefs
 
     @Test
@@ -1073,7 +1054,6 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
     private val realismWarmupEnabledFlow = MutableStateFlow(AppConstants.RealismConstants.WARMUP_ENABLED_DEFAULT)
     private val realismSatelliteExtrasEnabledFlow = MutableStateFlow(AppConstants.RealismConstants.SATELLITE_EXTRAS_ENABLED_DEFAULT)
     private val realismSuspendedMockingEnabledFlow = MutableStateFlow(AppConstants.RealismConstants.SUSPENDED_MOCKING_ENABLED_DEFAULT)
-    private val realismPedometerMockingEnabledFlow = MutableStateFlow(false)
 
     override fun getRealismBearingHoldIdle(): Flow<Boolean> = realismBearingHoldIdleFlow
 
@@ -1084,8 +1064,6 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
     override fun getRealismSatelliteExtrasEnabled(): Flow<Boolean> = realismSatelliteExtrasEnabledFlow
 
     override fun getRealismSuspendedMockingEnabled(): Flow<Boolean> = realismSuspendedMockingEnabledFlow
-
-    override fun getRealismPedometerMockingEnabled(): Flow<Boolean> = realismPedometerMockingEnabledFlow
 
     override suspend fun setRealismBearingHoldIdle(enabled: Boolean) {
         realismBearingHoldIdleFlow.value = enabled
@@ -1105,10 +1083,6 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
 
     override suspend fun setRealismSuspendedMockingEnabled(enabled: Boolean) {
         realismSuspendedMockingEnabledFlow.value = enabled
-    }
-
-    override suspend fun setRealismPedometerMockingEnabled(enabled: Boolean) {
-        realismPedometerMockingEnabledFlow.value = enabled
     }
 
     private val routesSortNewestFirstFlow = MutableStateFlow(true)
@@ -1230,7 +1204,6 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
                 realismWarmupEnabled = false,
                 realismSatelliteExtrasEnabled = true,
                 realismSuspendedMockingEnabled = false,
-                realismPedometerMockingEnabled = false,
                 jitterSpeedIdleVariationPct = AppPreferencesDataSource.DEFAULT_JITTER_SPEED_IDLE_VARIATION_PCT,
                 jitterSpeedMovingVariationPct = AppPreferencesDataSource.DEFAULT_JITTER_SPEED_MOVING_VARIATION_PCT,
                 hotLocationsEnabled = false,

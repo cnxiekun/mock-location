@@ -181,9 +181,6 @@ class SettingsViewModelDraftTest {
             viewModel.setRealismSuspendedMockingEnabled(true)
             assertTrue(viewModel.uiState.value.realismSuspendedMockingEnabled)
 
-            viewModel.setRealismPedometerMockingEnabled(true)
-            assertTrue(viewModel.uiState.value.realismPedometerMockingEnabled)
-
             assertTrue(viewModel.uiState.value.isDirty)
         }
 

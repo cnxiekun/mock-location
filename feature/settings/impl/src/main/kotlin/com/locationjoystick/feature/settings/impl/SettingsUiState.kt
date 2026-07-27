@@ -24,7 +24,6 @@ data class SettingsUiState(
     val realismWarmupEnabled: Boolean = AppConstants.RealismConstants.WARMUP_ENABLED_DEFAULT,
     val realismSatelliteExtrasEnabled: Boolean = AppConstants.RealismConstants.SATELLITE_EXTRAS_ENABLED_DEFAULT,
     val realismSuspendedMockingEnabled: Boolean = AppConstants.RealismConstants.SUSPENDED_MOCKING_ENABLED_DEFAULT,
-    val realismPedometerMockingEnabled: Boolean = AppConstants.RealismConstants.PEDOMETER_MOCKING_ENABLED_DEFAULT,
     val jitterSpeedIdleVariationPct: Int = AppConstants.JitterConstants.SPEED_IDLE_VARIATION_PCT_DEFAULT,
     val jitterSpeedMovingVariationPct: Int = AppConstants.JitterConstants.SPEED_MOVING_VARIATION_PCT_DEFAULT,
     val hotLocationsEnabled: Boolean = false,

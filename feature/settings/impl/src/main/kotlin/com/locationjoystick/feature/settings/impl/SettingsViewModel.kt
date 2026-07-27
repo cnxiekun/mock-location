@@ -116,7 +116,6 @@ class SettingsViewModel
             val realismWarmupEnabled: Boolean? = null,
             val realismSatelliteExtrasEnabled: Boolean? = null,
             val realismSuspendedMockingEnabled: Boolean? = null,
-            val realismPedometerMockingEnabled: Boolean? = null,
             val jitterSpeedIdleVariationPct: Int? = null,
             val jitterSpeedMovingVariationPct: Int? = null,
             val hotLocationsEnabled: Boolean? = null,
@@ -187,7 +186,6 @@ class SettingsViewModel
                     realismWarmupEnabled = draftState.realismWarmupEnabled ?: snapshot.realismWarmupEnabled,
                     realismSatelliteExtrasEnabled = draftState.realismSatelliteExtrasEnabled ?: snapshot.realismSatelliteExtrasEnabled,
                     realismSuspendedMockingEnabled = draftState.realismSuspendedMockingEnabled ?: snapshot.realismSuspendedMockingEnabled,
-                    realismPedometerMockingEnabled = draftState.realismPedometerMockingEnabled ?: snapshot.realismPedometerMockingEnabled,
                     jitterSpeedIdleVariationPct = draftState.jitterSpeedIdleVariationPct ?: snapshot.jitterSpeedIdleVariationPct,
                     jitterSpeedMovingVariationPct = draftState.jitterSpeedMovingVariationPct ?: snapshot.jitterSpeedMovingVariationPct,
                     hotLocationsEnabled = draftState.hotLocationsEnabled ?: snapshot.hotLocationsEnabled,
@@ -287,10 +285,6 @@ class SettingsViewModel
 
         fun setRealismSuspendedMockingEnabled(v: Boolean) {
             mutableDraft.update { it.copy(realismSuspendedMockingEnabled = v) }
-        }
-
-        fun setRealismPedometerMockingEnabled(v: Boolean) {
-            mutableDraft.update { it.copy(realismPedometerMockingEnabled = v) }
         }
 
         fun setJitterSpeedIdleVariationPct(pct: Int) {
@@ -424,7 +418,6 @@ class SettingsViewModel
                             realismWarmupEnabled = state.realismWarmupEnabled,
                             realismSatelliteExtrasEnabled = state.realismSatelliteExtrasEnabled,
                             realismSuspendedMockingEnabled = state.realismSuspendedMockingEnabled,
-                            realismPedometerMockingEnabled = state.realismPedometerMockingEnabled,
                             jitterSpeedIdleVariationPct = state.jitterSpeedIdleVariationPct,
                             jitterSpeedMovingVariationPct = state.jitterSpeedMovingVariationPct,
                             hotLocationsEnabled = state.hotLocationsEnabled,
@@ -519,7 +512,6 @@ class SettingsViewModel
                     warmupEnabled = state.realismWarmupEnabled,
                     satelliteExtrasEnabled = state.realismSatelliteExtrasEnabled,
                     suspendedMockingEnabled = state.realismSuspendedMockingEnabled,
-                    pedometerMockingEnabled = state.realismPedometerMockingEnabled,
                 )
             return ExportData(
                 schemaVersion = AppConstants.ExportConstants.SCHEMA_VERSION,
@@ -718,7 +710,6 @@ class SettingsViewModel
                     realismWarmupEnabled = data.settings.warmupEnabled,
                     realismSatelliteExtrasEnabled = data.settings.satelliteExtrasEnabled,
                     realismSuspendedMockingEnabled = data.settings.suspendedMockingEnabled,
-                    realismPedometerMockingEnabled = data.settings.pedometerMockingEnabled,
                     jitterSpeedIdleVariationPct = data.jitterSpeedIdleVariationPct,
                     jitterSpeedMovingVariationPct = data.jitterSpeedMovingVariationPct,
                     hotLocationsEnabled = data.hotLocationsEnabled,

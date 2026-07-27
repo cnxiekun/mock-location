@@ -38,7 +38,6 @@ import com.locationjoystick.core.model.SpeedUnit
 @Composable
 internal fun SettingsGpsSubScreen(
     uiState: SettingsUiState,
-    isRooted: Boolean,
     onNavigateBack: () -> Unit,
     isSpoofing: Boolean,
     onToggleSpoofing: () -> Unit,
@@ -77,7 +76,7 @@ internal fun SettingsGpsSubScreen(
                         Spacer(modifier = Modifier.height(24.dp))
                         GpsJitterSection(uiState, isMph, onAction)
                         Spacer(modifier = Modifier.height(24.dp))
-                        GpsRealismSection(uiState, isRooted, onAction)
+                        GpsRealismSection(uiState, onAction)
                         Spacer(modifier = Modifier.height(24.dp))
                         Text("Location Memory", style = MaterialTheme.typography.headlineSmall)
                         Spacer(modifier = Modifier.height(4.dp))

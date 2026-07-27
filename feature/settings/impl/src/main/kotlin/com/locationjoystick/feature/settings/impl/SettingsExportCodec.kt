@@ -80,7 +80,6 @@ internal object SettingsExportCodec {
         settingsObj.put("realismWarmupEnabled", data.settings.warmupEnabled)
         settingsObj.put("realismSatelliteExtrasEnabled", data.settings.satelliteExtrasEnabled)
         settingsObj.put("realismSuspendedMockingEnabled", data.settings.suspendedMockingEnabled)
-        settingsObj.put("realismPedometerMockingEnabled", data.settings.pedometerMockingEnabled)
         val roamingObj = JSONObject()
         roamingObj.put("radiusMeters", data.settings.roamingDefaults.radiusMeters)
         roamingObj.put("distanceMeters", data.settings.roamingDefaults.distanceMeters)
@@ -206,11 +205,6 @@ internal object SettingsExportCodec {
                 "realismSuspendedMockingEnabled",
                 AppConstants.RealismConstants.SUSPENDED_MOCKING_ENABLED_DEFAULT,
             )
-        val pedometerMockingEnabled =
-            settingsObj.optBoolean(
-                "realismPedometerMockingEnabled",
-                AppConstants.RealismConstants.PEDOMETER_MOCKING_ENABLED_DEFAULT,
-            )
         val roamingDefaultsObj = settingsObj.optJSONObject("roamingDefaults")
         val roamingDefaults =
             if (roamingDefaultsObj != null) {
@@ -240,7 +234,6 @@ internal object SettingsExportCodec {
                 warmupEnabled = warmupEnabled,
                 satelliteExtrasEnabled = satelliteExtrasEnabled,
                 suspendedMockingEnabled = suspendedMockingEnabled,
-                pedometerMockingEnabled = pedometerMockingEnabled,
                 roamingDefaults = roamingDefaults,
             )
 

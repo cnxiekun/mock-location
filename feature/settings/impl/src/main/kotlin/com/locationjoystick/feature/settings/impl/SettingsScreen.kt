@@ -316,10 +316,6 @@ fun SettingsRoute(
                     viewModel.setRealismSuspendedMockingEnabled(action.enabled)
                 }
 
-                is SettingsAction.SetRealismPedometerMockingEnabled -> {
-                    viewModel.setRealismPedometerMockingEnabled(action.enabled)
-                }
-
                 is SettingsAction.SetJitterSpeedIdleVariationPct -> {
                     viewModel.setJitterSpeedIdleVariationPct(action.pct)
                 }
@@ -470,7 +466,6 @@ internal fun SettingsScreen(
         SettingsSection.GPS -> {
             SettingsGpsSubScreen(
                 uiState = uiState,
-                isRooted = isRooted,
                 onNavigateBack = { currentSection = null },
                 isSpoofing = isSpoofing,
                 onToggleSpoofing = onToggleSpoofing,
