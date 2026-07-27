@@ -6,19 +6,28 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
+import com.locationjoystick.core.data.GroupRepository
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
 
 @HiltAndroidTest
 class GroupSyncSmokeTest : BaseSmokeTest() {
+    @Inject lateinit var groupRepository: GroupRepository
+
     @get:Rule(order = -1)
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     @Before
     override fun setup() {
         super.setup()
+        // GroupRepository is backed by real DataStore (see docs/testing.md), so state from a
+        // prior manual run or test can persist across runs. Reset to NONE so the screen always
+        // starts on NoGroupContent, matching what every test in this suite asserts.
+        runBlocking { groupRepository.leaveGroup() }
         composeRule.waitForIdleScreen()
         composeRule.navigateViaDrawer("Group Sync")
     }
