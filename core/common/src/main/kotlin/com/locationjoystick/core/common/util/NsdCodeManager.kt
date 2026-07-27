@@ -3,6 +3,7 @@ package com.locationjoystick.core.common.util
 import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import android.net.wifi.WifiManager
 import android.util.Log
 import com.locationjoystick.core.common.constants.AppConstants
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,6 +28,30 @@ class NsdCodeManager
     ) {
         private val nsdManager = context.getSystemService(Context.NSD_SERVICE) as NsdManager
         private var registrationListener: NsdManager.RegistrationListener? = null
+
+        // Some OEM Wi-Fi drivers filter incoming multicast unless a lock is held, silently
+        // breaking mDNS advertise/discovery. Reference-counted: advertising and discovery
+        // can overlap.
+        private val multicastLock =
+            (context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager)
+                .createMulticastLock(TAG)
+                .apply { setReferenceCounted(true) }
+
+        private fun acquireMulticastLock() {
+            try {
+                multicastLock.acquire()
+            } catch (e: Exception) {
+                Log.w(TAG, "Multicast lock acquire failed", e)
+            }
+        }
+
+        private fun releaseMulticastLock() {
+            try {
+                if (multicastLock.isHeld) multicastLock.release()
+            } catch (e: Exception) {
+                Log.w(TAG, "Multicast lock release failed", e)
+            }
+        }
 
         fun startAdvertising(
             code: String,
@@ -63,6 +88,7 @@ class NsdCodeManager
                     }
                 }
             registrationListener = listener
+            acquireMulticastLock()
             try {
                 nsdManager.registerService(info, NsdManager.PROTOCOL_DNS_SD, listener)
             } catch (e: Exception) {
@@ -78,6 +104,7 @@ class NsdCodeManager
                     Log.w(TAG, "NSD unregister error", e)
                 }
                 registrationListener = null
+                releaseMulticastLock()
             }
         }
 
@@ -85,7 +112,16 @@ class NsdCodeManager
          * Discovers the NSD service with the given [code] and resolves it to a host:port pair.
          * Returns null if not found within [AppConstants.SyncConstants.NSD_DISCOVERY_TIMEOUT_MS].
          */
-        suspend fun discoverByCode(code: String): Pair<String, Int>? =
+        suspend fun discoverByCode(code: String): Pair<String, Int>? {
+            acquireMulticastLock()
+            try {
+                return discoverByCodeLocked(code)
+            } finally {
+                releaseMulticastLock()
+            }
+        }
+
+        private suspend fun discoverByCodeLocked(code: String): Pair<String, Int>? =
             withTimeoutOrNull(AppConstants.SyncConstants.NSD_DISCOVERY_TIMEOUT_MS) {
                 suspendCancellableCoroutine { cont ->
                     var discoveryListener: NsdManager.DiscoveryListener? = null
