@@ -81,6 +81,7 @@ object AppConstants {
     object RoamingConstants {
         const val DEFAULT_RADIUS_METERS = 2000.0
         const val OSRM_PROFILE_FOOT = "foot"
+        const val OSRM_PROFILE_BIKE = "bike"
         const val OSRM_PROFILE_DRIVING = "driving"
         const val DEFAULT_DISTANCE_METERS = 1_000.0
         const val DEFAULT_FOLLOW_ROADS = true
@@ -94,27 +95,33 @@ object AppConstants {
     }
 
     object OsrmConstants {
+        /** OSRM demo server — single car-ish graph regardless of the profile in the URL. */
         const val BASE_URL = "https://router.project-osrm.org/"
+
+        /** FOSSGIS OSRM instances — separate real foot/bike/car graphs at `/routed-{foot|bike|car}`. */
+        const val FOSSGIS_BASE_URL = "https://routing.openstreetmap.de"
         const val OVERVIEW = "full"
         const val GEOMETRIES = "geojson"
 
-        /** Max retry attempts for transient failures (timeout/5xx/429/network). Matches [RETRY_BACKOFF_MS] size. */
-        const val RETRY_COUNT = 3
-        val RETRY_BACKOFF_MS: List<Long> = listOf(400L, 1_200L, 3_000L)
+        /** Wait before ladder slot N+1 after slot N fails (see OsrmClient ladder). Size = max slots − 1. */
+        val LADDER_BACKOFF_MS: List<Long> = listOf(200L, 400L, 700L, 1_000L, 1_500L)
 
-        /** Random jitter (±) applied to [RETRY_BACKOFF_MS] to avoid thundering herd against the shared demo server. */
+        /** Random jitter (±) applied to [LADDER_BACKOFF_MS] to avoid thundering herd against shared servers. */
         const val RETRY_JITTER_MS = 100L
 
         /** Wait for a 429 (rate limited) response with no `Retry-After` header. */
         const val RATE_LIMIT_BACKOFF_MS = 5_000L
 
+        /** Hard cap on one route resolution (all ladder slots + waits + snap), enforced by cancellation. */
+        const val TOTAL_TIME_BUDGET_MS = 10_000L
+
+        /** Per-HTTP-attempt call timeout — a server slower than this is treated as down. */
+        const val ATTEMPT_TIMEOUT_MS = 2_500L
+
         /** Only legs longer than this are eligible for bisection on failure. */
         const val BISECTION_MIN_DISTANCE_METERS = 2_500.0
         const val BISECTION_MAX_DEPTH = 5
         const val BISECTION_TIME_BUDGET_MS = 2_000L
-
-        /** Bisection leaves at or below this depth get [RETRY_COUNT] retries; deeper leaves are one-shot. */
-        const val BISECTION_RETRY_DEPTH_CUTOFF = 1
     }
 
     object MapConstants {

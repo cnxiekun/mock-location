@@ -170,6 +170,44 @@ fun osrmFailureMessage(reason: OsrmFailureReason): String =
 /** Parses a numeric (seconds-form) `Retry-After` header into milliseconds; null if absent or an HTTP-date. */
 private fun parseRetryAfterMs(response: Response): Long? = response.header("Retry-After")?.toLongOrNull()?.times(1_000L)
 
+/** Profile escalation order: prefer walking routes, fall back to bike then driving routing. */
+private val PROFILE_ESCALATION =
+    listOf(
+        AppConstants.RoamingConstants.OSRM_PROFILE_FOOT,
+        AppConstants.RoamingConstants.OSRM_PROFILE_BIKE,
+        AppConstants.RoamingConstants.OSRM_PROFILE_DRIVING,
+    )
+
+/**
+ * One OSRM-compatible routing server. [singleGraph] marks servers that serve the same graph for
+ * every profile (the demo server) — a non-transient failure there is final for all profiles, so
+ * the ladder skips that server's remaining slots.
+ */
+internal class OsrmBackend(
+    val singleGraph: Boolean,
+    private val resolveBase: (String) -> String,
+) {
+    fun baseUrlFor(profile: String): String = resolveBase(profile)
+}
+
+/** FOSSGIS community OSRM instances — separate real foot/bike/car graphs, one per URL path. */
+internal val FossgisBackend =
+    OsrmBackend(singleGraph = false) { profile ->
+        val graph =
+            when (profile) {
+                AppConstants.RoamingConstants.OSRM_PROFILE_BIKE -> "bike"
+                AppConstants.RoamingConstants.OSRM_PROFILE_DRIVING -> "car"
+                else -> "foot"
+            }
+        "${AppConstants.OsrmConstants.FOSSGIS_BASE_URL}/routed-$graph"
+    }
+
+/** OSRM demo server — no SLA, single car-ish graph regardless of the profile in the URL. */
+internal val DemoBackend =
+    OsrmBackend(singleGraph = true) {
+        AppConstants.OsrmConstants.BASE_URL.trimEnd('/')
+    }
+
 private fun isRetryable(reason: OsrmFailureReason): Boolean =
     reason is OsrmFailureReason.Timeout ||
         reason is OsrmFailureReason.ServerError ||
@@ -215,31 +253,35 @@ private suspend fun <T> Call.await(parse: (Response) -> T): T =
 /**
  * HTTP client for OSRM routing API using OkHttp and kotlinx.serialization.
  *
- * Provides road-following routes between two points using OSRM public demo server.
- * Falls back to straight-line routes on network failure.
+ * Resolves routes via a slot ladder spanning two public servers (FOSSGIS, then the OSRM demo
+ * server) and three profiles (foot → bike → driving), bounded by a hard time budget.
+ * Falls back to straight-line routes when the whole ladder fails.
  *
- * @see AppConstants.OsrmConstants for base URL and configuration
- * @see AppConstants.RoamingConstants for profile constants (foot/driving)
+ * @see AppConstants.OsrmConstants for base URLs, backoffs, and budgets
+ * @see AppConstants.RoamingConstants for profile constants (foot/bike/driving)
  */
 @Singleton
 class OsrmClient
     internal constructor(
-        baseUrl: String,
+        private val backends: List<OsrmBackend>,
     ) {
         companion object {
             const val PROFILE_FOOT = AppConstants.RoamingConstants.OSRM_PROFILE_FOOT
         }
 
         @Inject
-        constructor() : this(AppConstants.OsrmConstants.BASE_URL)
+        constructor() : this(listOf(FossgisBackend, DemoBackend))
 
-        private val baseUrl: String = baseUrl.trimEnd('/')
+        internal constructor(baseUrl: String) : this(
+            listOf(OsrmBackend(singleGraph = false) { baseUrl.trimEnd('/') }),
+        )
+
         private val okHttpClient: OkHttpClient =
             OkHttpClient
                 .Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .callTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(AppConstants.OsrmConstants.ATTEMPT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+                .readTimeout(AppConstants.OsrmConstants.ATTEMPT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+                .callTimeout(AppConstants.OsrmConstants.ATTEMPT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
                 .build()
 
         suspend fun getRoute(
@@ -266,15 +308,9 @@ class OsrmClient
             }
 
         /**
-         * Requests a route for [profile]. Transient failures (timeout/5xx/network) are retried up to
-         * [AppConstants.OsrmConstants.RETRY_COUNT] times before any of the fallback chains below run.
-         *
-         * If the failure is [NO_SEGMENT] (a waypoint is too far from any road), snaps every waypoint
-         * to its nearest road node and retries once before falling back further. If [profile] is
-         * [PROFILE_FOOT] and the request still fails, retries once with
-         * [AppConstants.RoamingConstants.OSRM_PROFILE_DRIVING] — the app should always prefer walking
-         * directions, falling back to driving only when walking routing is unavailable (e.g. a
-         * self-hosted OSRM instance without a foot profile graph).
+         * Resolves a route via [runLadder] under the hard
+         * [AppConstants.OsrmConstants.TOTAL_TIME_BUDGET_MS] budget (enforced by cancellation — a
+         * polled elapsed-time check could not bound an in-flight call or a long `Retry-After` wait).
          *
          * As a last resort for a single long A→B leg (exactly 2 waypoints, beyond
          * [AppConstants.OsrmConstants.BISECTION_MIN_DISTANCE_METERS]), bisects the leg and resolves
@@ -285,59 +321,84 @@ class OsrmClient
             waypoints: List<LatLng>,
         ): Result<OsrmRoute> =
             withContext(Dispatchers.IO) {
-                requestRouteWithRetry(profile, waypoints)
+                val ladderResult =
+                    withTimeoutOrNull(AppConstants.OsrmConstants.TOTAL_TIME_BUDGET_MS) {
+                        runLadder(profile, waypoints)
+                    } ?: Result.failure(SocketTimeoutException("OSRM total time budget exceeded"))
+                ladderResult
                     .recoverCatching { e ->
-                        if (e is OsrmRouteException && e.code == NO_SEGMENT) {
-                            Log.w(TAG, "OSRM route failed (NoSegment), snapping waypoints to nearest road", e)
-                            val snapped = snapToRoad(profile, waypoints)
-                            requestRouteWithRetry(profile, snapped).getOrThrow()
-                        } else {
-                            throw e
-                        }
-                    }.recoverCatching { e ->
-                        if (profile != PROFILE_FOOT) throw e
-                        Log.w(TAG, "OSRM foot route failed, retrying with driving profile", e)
-                        requestRouteWithRetry(AppConstants.RoamingConstants.OSRM_PROFILE_DRIVING, waypoints).getOrThrow()
-                    }.recoverCatching { e ->
                         bisectIfEligible(profile, waypoints, e)
                     }.onFailure { e ->
                         Log.e(TAG, "OSRM route request failed — will fall back to straight-line", e)
                     }
             }
 
+        private data class LadderSlot(
+            val backend: OsrmBackend,
+            val profile: String,
+        )
+
         /**
-         * Retries [requestRoute] up to [maxRetries] times, but only for retryable reasons
-         * ([isRetryable]) — a genuinely-no-route response is never retried. Backoff is
-         * [AppConstants.OsrmConstants.RETRY_BACKOFF_MS] (±[AppConstants.OsrmConstants.RETRY_JITTER_MS]
-         * jitter) for generic transient failures, or the longer, `Retry-After`-aware wait from
-         * [backoffFor] for a 429 (rate limited) response.
+         * One slot per (backend, profile) pair: every profile from [profile] onward in
+         * [PROFILE_ESCALATION] on the first backend, then the same profiles on the next.
          */
-        private suspend fun requestRouteWithRetry(
-            profile: String,
-            waypoints: List<LatLng>,
-            maxRetries: Int = AppConstants.OsrmConstants.RETRY_COUNT,
-        ): Result<OsrmRoute> {
-            var result = requestRoute(profile, waypoints)
-            var attempt = 0
-            while (attempt < maxRetries) {
-                val reason = classifyOsrmFailure(result.exceptionOrNull() ?: return result)
-                if (!isRetryable(reason)) break
-                delay(backoffFor(reason, attempt))
-                attempt++
-                result = requestRoute(profile, waypoints)
-            }
-            return result
+        private fun ladderSlots(profile: String): List<LadderSlot> {
+            val escalation = PROFILE_ESCALATION.dropWhile { it != profile }.ifEmpty { listOf(profile) }
+            return backends.flatMap { backend -> escalation.map { LadderSlot(backend, it) } }
         }
 
-        /** Backoff for retry [attempt] (0-indexed) given the classified failure [reason]. */
+        /**
+         * Walks [ladderSlots] until one succeeds. Any failure — transient or NoRoute — advances to
+         * the next slot after a [backoffFor] wait: consecutive slots differ in profile (covers
+         * NoRoute) and eventually in backend (covers outages). Special cases:
+         * - First [NO_SEGMENT] failure snaps waypoints to the nearest road and retries the same slot.
+         * - A non-transient failure on a [OsrmBackend.singleGraph] backend skips that backend's
+         *   remaining slots — the same graph cannot answer differently for another profile.
+         */
+        private suspend fun runLadder(
+            profile: String,
+            waypoints: List<LatLng>,
+        ): Result<OsrmRoute> {
+            val slots = ladderSlots(profile)
+            var points = waypoints
+            var snappedToRoad = false
+            var lastError: Throwable? = null
+            var index = 0
+            var waits = 0
+            while (index < slots.size) {
+                val slot = slots[index]
+                val result = requestRoute(slot.backend, slot.profile, points)
+                val error = result.exceptionOrNull() ?: return result
+                lastError = error
+                if (!snappedToRoad && error is OsrmRouteException && error.code == NO_SEGMENT) {
+                    Log.w(TAG, "OSRM route failed (NoSegment), snapping waypoints to nearest road", error)
+                    snappedToRoad = true
+                    points = snapToRoad(slot.profile, points)
+                    continue
+                }
+                val reason = classifyOsrmFailure(error)
+                index++
+                if (slot.backend.singleGraph && !isRetryable(reason)) {
+                    while (index < slots.size && slots[index].backend === slot.backend) index++
+                }
+                if (index < slots.size) {
+                    delay(backoffFor(reason, waits))
+                    waits++
+                }
+            }
+            return Result.failure(lastError ?: IllegalStateException("OSRM ladder had no slots"))
+        }
+
+        /** Backoff before the slot following failure number [waits] (0-indexed) with classified [reason]. */
         private fun backoffFor(
             reason: OsrmFailureReason,
-            attempt: Int,
+            waits: Int,
         ): Long =
             if (reason is OsrmFailureReason.RateLimited) {
                 reason.retryAfterMs ?: AppConstants.OsrmConstants.RATE_LIMIT_BACKOFF_MS
             } else {
-                val base = AppConstants.OsrmConstants.RETRY_BACKOFF_MS[attempt]
+                val backoffs = AppConstants.OsrmConstants.LADDER_BACKOFF_MS
+                val base = backoffs[waits.coerceAtMost(backoffs.size - 1)]
                 val jitter = AppConstants.OsrmConstants.RETRY_JITTER_MS
                 base + Random.nextLong(-jitter, jitter)
             }
@@ -371,27 +432,18 @@ class OsrmClient
         }
 
         /**
-         * Resolves one bisection leg: a single one-shot/retried request, recursively splitting on
-         * failure up to [AppConstants.OsrmConstants.BISECTION_MAX_DEPTH]. Leaves beyond
-         * [AppConstants.OsrmConstants.BISECTION_RETRY_DEPTH_CUTOFF] skip retry to keep total request
-         * volume bounded — depth 5 with retries at every level could reach ~96 HTTP calls for one tap
-         * against a shared, no-SLA demo server.
+         * Resolves one bisection leg: one attempt per backend (no waits — the whole bisection runs
+         * under its own time budget), recursively splitting on failure up to
+         * [AppConstants.OsrmConstants.BISECTION_MAX_DEPTH]. No per-leaf retries — with up to 2^5
+         * leaves, retrying each would multiply request volume against shared, no-SLA servers.
          */
         private suspend fun bisectLeg(
             profile: String,
             from: LatLng,
             to: LatLng,
             depth: Int,
-        ): OsrmRoute {
-            val retries =
-                if (depth <=
-                    AppConstants.OsrmConstants.BISECTION_RETRY_DEPTH_CUTOFF
-                ) {
-                    AppConstants.OsrmConstants.RETRY_COUNT
-                } else {
-                    0
-                }
-            return requestRouteWithRetry(profile, listOf(from, to), retries).getOrElse { e ->
+        ): OsrmRoute =
+            requestRouteAnyBackend(profile, listOf(from, to)).getOrElse { e ->
                 if (depth >= AppConstants.OsrmConstants.BISECTION_MAX_DEPTH) {
                     Log.w(TAG, "Bisection leg failed at max depth, using straight-line fallback", e)
                     straightLineSubRoute(from, to)
@@ -404,6 +456,18 @@ class OsrmClient
                     }
                 }
             }
+
+        /** Tries [requestRoute] on each backend in order, returning the first success or the last failure. */
+        private suspend fun requestRouteAnyBackend(
+            profile: String,
+            waypoints: List<LatLng>,
+        ): Result<OsrmRoute> {
+            var result: Result<OsrmRoute> = Result.failure(IllegalStateException("No routing backends configured"))
+            for (backend in backends) {
+                result = requestRoute(backend, profile, waypoints)
+                if (result.isSuccess) return result
+            }
+            return result
         }
 
         private fun straightLineSubRoute(
@@ -435,7 +499,7 @@ class OsrmClient
             )
 
         /**
-         * Snaps each waypoint to its nearest road node via the OSRM nearest service.
+         * Snaps each waypoint to its nearest road node via the primary backend's nearest service.
          * A waypoint that fails to snap is passed through unchanged.
          */
         private suspend fun snapToRoad(
@@ -445,7 +509,7 @@ class OsrmClient
             waypoints.map { point ->
                 runCatchingCancellable {
                     val coordinate = "${point.longitude},${point.latitude}"
-                    val url = "$baseUrl/nearest/v1/$profile/$coordinate"
+                    val url = "${backends.first().baseUrlFor(profile)}/nearest/v1/$profile/$coordinate"
                     val request =
                         okhttp3.Request
                             .Builder()
@@ -467,6 +531,7 @@ class OsrmClient
             }
 
         private suspend fun requestRoute(
+            backend: OsrmBackend,
             profile: String,
             waypoints: List<LatLng>,
         ): Result<OsrmRoute> =
@@ -477,7 +542,7 @@ class OsrmClient
                 val overview = AppConstants.OsrmConstants.OVERVIEW
                 val geometries = AppConstants.OsrmConstants.GEOMETRIES
                 val url =
-                    "$baseUrl/route/v1/$profile/$coordinates?overview=$overview&geometries=$geometries"
+                    "${backend.baseUrlFor(profile)}/route/v1/$profile/$coordinates?overview=$overview&geometries=$geometries"
                 val request =
                     okhttp3.Request
                         .Builder()

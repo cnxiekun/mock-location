@@ -72,9 +72,8 @@ class OsrmClientTest {
     fun `getRoute returns failure on non-Ok OSRM code`() =
         runTest {
             val body = """{"code": "NoRoute", "routes": []}"""
-            // Foot profile failure triggers a driving-profile retry; enqueue a second failure for it.
-            server.enqueue(MockResponse().setResponseCode(200).setBody(body))
-            server.enqueue(MockResponse().setResponseCode(200).setBody(body))
+            // NoRoute advances the ladder through all three profiles (foot/bike/driving).
+            repeat(3) { server.enqueue(MockResponse().setResponseCode(200).setBody(body)) }
 
             val result =
                 testClient.getRoute(
@@ -88,9 +87,8 @@ class OsrmClientTest {
     @Test
     fun `getRoute returns failure on HTTP error`() =
         runTest {
-            // HTTP errors are classified ServerError and retried (RETRY_COUNT=3) on both the foot
-            // profile and its driving-profile fallback: 4 attempts each = 8 requests total.
-            repeat(8) { server.enqueue(MockResponse().setResponseCode(400).setBody("Bad Request")) }
+            // HTTP errors are classified ServerError and advance through all three ladder slots.
+            repeat(3) { server.enqueue(MockResponse().setResponseCode(400).setBody("Bad Request")) }
 
             val result =
                 testClient.getRoute(
@@ -99,7 +97,7 @@ class OsrmClientTest {
                 )
 
             assertTrue("Expected failure on HTTP 400", result.isFailure)
-            assertEquals("Expected 4 retried foot attempts + 4 retried driving attempts", 8, server.requestCount)
+            assertEquals("Expected one attempt per ladder slot (foot/bike/driving)", 3, server.requestCount)
         }
 
     @Test
@@ -155,7 +153,7 @@ class OsrmClientTest {
         }
 
     @Test
-    fun `getRoute retries with driving profile when foot profile fails`() =
+    fun `getRoute escalates foot to bike then driving on NoRoute`() =
         runTest {
             val okBody =
                 """
@@ -168,8 +166,7 @@ class OsrmClientTest {
                   }]
                 }
                 """.trimIndent()
-            // NoRoute (not a retryable reason) so the foot profile fails in a single attempt
-            // and falls straight through to the driving-profile fallback.
+            server.enqueue(MockResponse().setResponseCode(200).setBody("""{"code": "NoRoute", "routes": []}"""))
             server.enqueue(MockResponse().setResponseCode(200).setBody("""{"code": "NoRoute", "routes": []}"""))
             server.enqueue(MockResponse().setResponseCode(200).setBody(okBody))
 
@@ -179,11 +176,10 @@ class OsrmClientTest {
                     waypoints = listOf(LatLng(48.8566, 2.3522), LatLng(48.8600, 2.3560)),
                 )
 
-            assertTrue("Expected success after driving-profile retry", result.isSuccess)
-            val firstRequest = server.takeRequest()
-            val retryRequest = server.takeRequest()
-            assertTrue("First request should use 'foot' profile", firstRequest.path!!.contains("/foot/"))
-            assertTrue("Retry request should use 'driving' profile", retryRequest.path!!.contains("/driving/"))
+            assertTrue("Expected success after profile escalation", result.isSuccess)
+            assertTrue("First request should use 'foot' profile", server.takeRequest().path!!.contains("/foot/"))
+            assertTrue("Second request should use 'bike' profile", server.takeRequest().path!!.contains("/bike/"))
+            assertTrue("Third request should use 'driving' profile", server.takeRequest().path!!.contains("/driving/"))
         }
 
     @Test
@@ -249,12 +245,12 @@ class OsrmClientTest {
                     waypoints = listOf(LatLng(48.8566, 2.3522), LatLng(48.8600, 2.3560)),
                 )
 
-            assertTrue("Expected success on third (final retry) attempt", result.isSuccess)
-            assertEquals("Expected exactly 2 retries (3 attempts total)", 3, server.requestCount)
+            assertTrue("Expected success on the third ladder slot", result.isSuccess)
+            assertEquals("Expected exactly 3 attempts (foot/bike/driving slots)", 3, server.requestCount)
         }
 
     @Test
-    fun `getRoute retries a third time and succeeds on the fourth attempt`() =
+    fun `getRoute fails over to the secondary backend when the primary keeps erroring`() =
         runTest {
             val okBody =
                 """
@@ -267,19 +263,32 @@ class OsrmClientTest {
                   }]
                 }
                 """.trimIndent()
-            server.enqueue(MockResponse().setResponseCode(500).setBody("error"))
-            server.enqueue(MockResponse().setResponseCode(500).setBody("error"))
-            server.enqueue(MockResponse().setResponseCode(500).setBody("error"))
-            server.enqueue(MockResponse().setResponseCode(200).setBody(okBody))
+            val secondary = MockWebServer()
+            secondary.start()
+            try {
+                val failoverClient =
+                    OsrmClient(
+                        listOf(
+                            OsrmBackend(singleGraph = false) { server.url("/").toString().trimEnd('/') },
+                            OsrmBackend(singleGraph = false) { secondary.url("/").toString().trimEnd('/') },
+                        ),
+                    )
+                repeat(3) { server.enqueue(MockResponse().setResponseCode(500).setBody("error")) }
+                secondary.enqueue(MockResponse().setResponseCode(200).setBody(okBody))
 
-            val result =
-                testClient.getRoute(
-                    profile = "foot",
-                    waypoints = listOf(LatLng(48.8566, 2.3522), LatLng(48.8600, 2.3560)),
-                )
+                val result =
+                    failoverClient.getRoute(
+                        profile = "foot",
+                        waypoints = listOf(LatLng(48.8566, 2.3522), LatLng(48.8600, 2.3560)),
+                    )
 
-            assertTrue("RETRY_COUNT=3 must allow a 4th attempt to succeed", result.isSuccess)
-            assertEquals("Expected exactly 3 retries (4 attempts total)", 4, server.requestCount)
+                assertTrue("Expected success from the secondary backend", result.isSuccess)
+                assertEquals("Primary should get one attempt per profile", 3, server.requestCount)
+                assertEquals("Secondary should answer on its first slot", 1, secondary.requestCount)
+                assertTrue("Secondary request should restart at 'foot'", secondary.takeRequest().path!!.contains("/foot/"))
+            } finally {
+                secondary.shutdown()
+            }
         }
 
     @Test
@@ -350,22 +359,23 @@ class OsrmClientTest {
     }
 
     @Test
-    fun `getRoute does not retry NoRouteFound failures`() =
+    fun `getRoute skips remaining profiles of a single-graph backend on NoRoute`() =
         runTest {
             val body = """{"code": "NoRoute", "routes": []}"""
             server.enqueue(MockResponse().setResponseCode(200).setBody(body))
-            server.enqueue(MockResponse().setResponseCode(200).setBody(body))
+            val singleGraphClient =
+                OsrmClient(listOf(OsrmBackend(singleGraph = true) { server.url("/").toString().trimEnd('/') }))
 
             val result =
-                testClient.getRoute(
+                singleGraphClient.getRoute(
                     profile = "foot",
                     waypoints = listOf(LatLng(48.8566, 2.3522), LatLng(48.8600, 2.3560)),
                 )
 
             assertTrue("Expected failure", result.isFailure)
             assertEquals(
-                "NoRouteFound must not be retried — exactly 1 foot + 1 driving attempt",
-                2,
+                "A single-graph backend answers identically for every profile — bike/driving slots must be skipped",
+                1,
                 server.requestCount,
             )
         }
@@ -376,8 +386,7 @@ class OsrmClientTest {
     fun `bisection is not triggered below the distance threshold`() =
         runTest {
             val body = """{"code": "NoRoute", "routes": []}"""
-            server.enqueue(MockResponse().setResponseCode(200).setBody(body))
-            server.enqueue(MockResponse().setResponseCode(200).setBody(body))
+            repeat(3) { server.enqueue(MockResponse().setResponseCode(200).setBody(body)) }
 
             // ~600m apart, well under BISECTION_MIN_DISTANCE_METERS (2500m).
             val result =
@@ -387,7 +396,7 @@ class OsrmClientTest {
                 )
 
             assertTrue("Expected failure (no bisection below threshold)", result.isFailure)
-            assertEquals("Expected only the direct foot + driving attempts", 2, server.requestCount)
+            assertEquals("Expected only the direct foot/bike/driving attempts", 3, server.requestCount)
         }
 
     @Test
@@ -409,8 +418,7 @@ class OsrmClientTest {
                   }]
                 }
                 """.trimIndent()
-            server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) // direct foot
-            server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) // direct driving
+            repeat(3) { server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) } // direct foot/bike/driving
             server.enqueue(MockResponse().setResponseCode(200).setBody(okBody(2.3522, 48.8566, 300.0))) // left half
             server.enqueue(MockResponse().setResponseCode(200).setBody(okBody(2.3522, 48.8566, 300.0))) // right half
 
@@ -422,7 +430,7 @@ class OsrmClientTest {
                 )
 
             assertTrue("Expected bisection to recover a route", result.isSuccess)
-            assertEquals("Expected 2 direct attempts + 2 bisected halves", 4, server.requestCount)
+            assertEquals("Expected 3 direct attempts + 2 bisected halves", 5, server.requestCount)
         }
 
     @Test
@@ -440,8 +448,7 @@ class OsrmClientTest {
                   }]
                 }
                 """.trimIndent()
-            server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) // direct foot
-            server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) // direct driving
+            repeat(3) { server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) } // direct foot/bike/driving
             // depth-1 split: one half succeeds, the other fails and must recurse to depth-2
             server.enqueue(MockResponse().setResponseCode(200).setBody(okBody))
             server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute))
@@ -456,17 +463,17 @@ class OsrmClientTest {
                 )
 
             assertTrue("Expected recursive bisection to recover a route", result.isSuccess)
-            assertEquals("Expected 2 direct + 2 depth-1 + 2 depth-2 attempts", 6, server.requestCount)
+            assertEquals("Expected 3 direct + 2 depth-1 + 2 depth-2 attempts", 7, server.requestCount)
         }
 
     @Test
     fun `bisection falls back to straight-line past max depth without exceeding bounded request volume`() =
         runTest {
             val noRoute = """{"code": "NoRoute", "routes": []}"""
-            // 2 direct + 2 (depth1) + 4 (depth2) + 8 (depth3) + 16 (depth4) + 32 (depth5) = 64.
-            // NoRouteFound is never retried, so this is also the exact total request count —
-            // well under the ~96 unbounded worst-case the leaf-retry cutoff is meant to avoid.
-            repeat(64) { server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) }
+            // 3 direct + 2 (depth1) + 4 (depth2) + 8 (depth3) + 16 (depth4) + 32 (depth5) = 65.
+            // Bisection leaves are one attempt per backend (single backend here), so this is also
+            // the exact total request count.
+            repeat(65) { server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) }
 
             val result =
                 testClient.getRoute(
@@ -475,16 +482,15 @@ class OsrmClientTest {
                 )
 
             assertTrue("Max-depth leaves fall back to straight-line, so the overall route still succeeds", result.isSuccess)
-            assertEquals("Recursion must stop at depth 5, bounding total request volume", 64, server.requestCount)
+            assertEquals("Recursion must stop at depth 5, bounding total request volume", 65, server.requestCount)
         }
 
     @Test
     fun `bisection time budget is enforced preemptively, not by the underlying call timeout`() =
         runTest {
             val noRoute = """{"code": "NoRoute", "routes": []}"""
-            server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) // direct foot
-            server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) // direct driving
-            // Both depth-1 halves hang past the 2s bisection budget (but well under the 30s callTimeout).
+            repeat(3) { server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute)) } // direct foot/bike/driving
+            // Both depth-1 halves hang past the 2s bisection budget (but under the 2.5s callTimeout).
             server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute).setBodyDelay(4, java.util.concurrent.TimeUnit.SECONDS))
             server.enqueue(MockResponse().setResponseCode(200).setBody(noRoute).setBodyDelay(4, java.util.concurrent.TimeUnit.SECONDS))
 
@@ -498,13 +504,13 @@ class OsrmClientTest {
                     assertTrue("Expected failure once the bisection budget is exceeded", result.isFailure)
                 }
 
-            // Pins enforcement to the 2s budget itself, not a loose bound that would also pass if
-            // cancellation silently failed and the call instead ran to the 4s mock delay (the old
-            // blocking-execute() regression) or the 30s callTimeout.
+            // Pins enforcement to the 2s budget itself (plus ~0.6s of ladder backoffs), not a loose
+            // bound that would also pass if cancellation silently failed and the call instead ran to
+            // the 4s mock delay (the old blocking-execute() regression).
             assertTrue(
-                "Expected the call to return near the 2s budget, not the 4s mock delay or 30s call " +
-                    "timeout (took ${elapsedMs}ms)",
-                elapsedMs < 3_000,
+                "Expected the call to return near the 2s bisection budget, not the 4s mock delay " +
+                    "(took ${elapsedMs}ms)",
+                elapsedMs < 3_500,
             )
         }
 
@@ -619,9 +625,8 @@ class OsrmClientTest {
     @Test
     fun `resolveRoute with followRoads true falls back to straight line on OSRM failure`() =
         runTest {
-            // NoRoute (not retryable) on both foot and driving profile attempts.
-            server.enqueue(MockResponse().setResponseCode(200).setBody("""{"code": "NoRoute", "routes": []}"""))
-            server.enqueue(MockResponse().setResponseCode(200).setBody("""{"code": "NoRoute", "routes": []}"""))
+            // NoRoute on all three ladder slots (foot/bike/driving).
+            repeat(3) { server.enqueue(MockResponse().setResponseCode(200).setBody("""{"code": "NoRoute", "routes": []}""")) }
 
             // Kept under the bisection distance threshold — this test is about the simple
             // fallback path, not bisection (covered separately below).
@@ -669,9 +674,8 @@ class OsrmClientTest {
     fun `getRoute returns failure when routes list is null`() =
         runTest {
             val body = """{"code": "Ok"}"""
-            // Foot profile failure triggers a driving-profile retry; enqueue a second failure for it.
-            server.enqueue(MockResponse().setResponseCode(200).setBody(body))
-            server.enqueue(MockResponse().setResponseCode(200).setBody(body))
+            // Any failure advances the ladder; enqueue one per profile slot.
+            repeat(3) { server.enqueue(MockResponse().setResponseCode(200).setBody(body)) }
 
             val result =
                 testClient.getRoute(

@@ -12,7 +12,7 @@ All constants → `:core:common/constants/AppConstants.kt`.
 | `RealismConstants` | Altitude sigma/drift/clamp, warmup duration, satellite interval, suspended push/pause durations, pedometer mocking enabled default |
 | `PedometerConstants` | Max walking speed, stride base, stride speed factor, stride jitter percentage |
 | `RoamingConstants` | Default radius/distance, speed profile IDs, arrival threshold, road-snapping defaults |
-| `OsrmConstants` | Base URL, overview, geometries format |
+| `OsrmConstants` | Demo + FOSSGIS base URLs, ladder backoffs, time budgets, bisection thresholds |
 | `MapConstants` | Default coordinates, zoom, tile URL, map source/layer IDs |
 | `NominatimConstants` | Search endpoint |
 | `ExportConstants` | Schema version, MIME type, GPX version/creator, max GPX import size |
