@@ -1,6 +1,6 @@
 # Technical Constraints
 
-- Min SDK API 31. Use `ProviderProperties.Builder` (API 31+). No deprecated raw-int overload.
+- Min SDK API 31. Use `ProviderProperties.Builder` (API 31+). No deprecated raw-int overload. This is a hard floor: `MockLocationService.setupTestProvider()` calls `ProviderProperties.Builder()` unconditionally with no `Build.VERSION.SDK_INT` gate or fallback to the deprecated pre-31 `ProviderProperties` constructor — lowering minSdk below 31 requires adding that dual code path (untested here; the other API-34 manifest declaration, `FOREGROUND_SERVICE_TYPE_LOCATION`, is already `SDK_INT`-gated via `ServiceCompat.startForeground` and is not itself a floor-raiser).
 - No Play Services. MapLibre, not Google Maps. No Firebase.
 - Offline-first. Core features work without internet. OSRM opt-in, degrades gracefully.
 - No `Thread.sleep()`. Use `delay()` in coroutines.
