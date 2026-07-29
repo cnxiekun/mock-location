@@ -1,6 +1,5 @@
 package com.locationjoystick.app
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -24,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -100,7 +99,7 @@ internal fun IdleScreen(
                     IdleDestinationCard(
                         LjIcons.Map,
                         "Map",
-                        "Set a fake GPS location and control your movement on the map.",
+                        "Spoof your GPS location and control movement on the map.",
                         onNavigateToMap,
                     )
                 }
@@ -118,7 +117,7 @@ internal fun IdleScreen(
                     IdleDestinationCard(
                         LjIcons.Settings,
                         "Settings",
-                        "Speed, overlays, and other preferences.",
+                        "Configure locationjoystick and spoof preferences.",
                         onNavigateToSettings,
                     )
                 }
@@ -129,7 +128,7 @@ internal fun IdleScreen(
                     Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .verticalScroll(remember { ScrollState(0) })
+                        .verticalScroll(rememberScrollState())
                         .padding(horizontal = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {

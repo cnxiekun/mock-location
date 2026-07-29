@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.UiConstants
 
@@ -23,19 +24,25 @@ fun LjMapIconButton(
     contentColor: Color,
     onClick: () -> Unit,
 ) {
-    Surface(
-        onClick = onClick,
-        shape = CircleShape,
-        color = containerColor,
-        modifier = Modifier.size(UiConstants.FAB_CONTAINER_SIZE),
+    // 48dp hit box meets the Android minimum touch target while keeping the smaller visual size.
+    Box(
+        modifier = Modifier.size(48.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Icon(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                tint = contentColor,
-                modifier = Modifier.size(UiConstants.FAB_ICON_SIZE),
-            )
+        Surface(
+            onClick = onClick,
+            shape = CircleShape,
+            color = containerColor,
+            modifier = Modifier.size(UiConstants.FAB_CONTAINER_SIZE),
+        ) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = contentDescription,
+                    tint = contentColor,
+                    modifier = Modifier.size(UiConstants.FAB_ICON_SIZE),
+                )
+            }
         }
     }
 }

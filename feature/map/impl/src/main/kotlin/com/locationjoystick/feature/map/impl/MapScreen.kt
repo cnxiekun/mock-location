@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -368,6 +370,22 @@ internal fun MapScreen(
                 },
                 modifier = Modifier.fillMaxSize(),
             )
+
+            if (uiState.walkTarget == null && !uiState.isRouteReplay && !uiState.isRoaming) {
+                Text(
+                    text = "Tap to teleport · Long-press to walk",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 12.dp)
+                            .background(
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                                MaterialTheme.shapes.small,
+                            ).padding(horizontal = 10.dp, vertical = 4.dp),
+                )
+            }
 
             if (showSearch.value) {
                 NominatimSearchBar(

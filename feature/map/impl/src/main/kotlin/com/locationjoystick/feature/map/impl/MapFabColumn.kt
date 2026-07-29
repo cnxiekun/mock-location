@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import com.locationjoystick.core.designsystem.LjAccent
 import com.locationjoystick.core.designsystem.LjBg
 import com.locationjoystick.core.designsystem.LjIcons
@@ -68,7 +67,7 @@ internal fun MapFabColumn(
                 }
                 LjMapIconButton(
                     icon = LjIcons.DirectionsWalk,
-                    contentDescription = "Walk active",
+                    contentDescription = "Walk in progress, tap for controls",
                     containerColor = LjAccent,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     onClick = { onAction(MapAction.ToggleWalkControls) },
@@ -154,7 +153,7 @@ internal fun MapFabColumn(
                                     LjMapIconButton(
                                         icon = LjIcons.Stop,
                                         contentDescription = "Stop roaming",
-                                        containerColor = Color.Black,
+                                        containerColor = LjBg,
                                         contentColor = MaterialTheme.colorScheme.error,
                                         onClick = { onAction(MapAction.StopRoaming) },
                                     )
@@ -183,7 +182,7 @@ internal fun MapFabColumn(
                                     },
                                 containerColor =
                                     when {
-                                        uiState.isRoaming -> Color.Black
+                                        uiState.isRoaming -> LjBg
                                         uiState.isRoamingSheetMinimized -> MaterialTheme.colorScheme.tertiary
                                         else -> MaterialTheme.colorScheme.primaryContainer
                                     },
