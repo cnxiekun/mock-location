@@ -105,6 +105,22 @@ class RouteRepository
                 }
             }
 
+        suspend fun setRouteSpeedProfile(
+            routeId: String,
+            speedProfileId: String?,
+        ): Result<Unit> =
+            withContext(ioDispatcher) {
+                runCatching {
+                    val entity = routeDao.getById(routeId)
+                    if (entity != null) {
+                        val updated = entity.copy(speedProfileId = speedProfileId, updatedAt = System.currentTimeMillis())
+                        routeDao.update(updated)
+                    }
+                }.onFailure { e ->
+                    Log.e(TAG, "Failed to set route speed profile: $routeId", e)
+                }
+            }
+
         suspend fun deleteAllRoutes(): Result<Unit> =
             withContext(ioDispatcher) {
                 runCatching {

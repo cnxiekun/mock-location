@@ -12,6 +12,8 @@ Covers: routes, favorites, speed profiles, widget/map feature config + shared di
 
 Each entry in `favoriteLocations` includes the optional `category` field (`FavoriteLocation.category`). Old exports without it import cleanly — a missing or `null` `category` defaults to `null`.
 
+Each entry in `routes` includes the optional `speedProfileId` field (`Route.speedProfileId`), round-tripping the same way `FavoriteLocation.category` does. Old exports without it import cleanly — a missing or `null` `speedProfileId` defaults to `null`.
+
 Schema version: `AppConstants.ExportConstants.SCHEMA_VERSION`.
 
 ## Export Flow

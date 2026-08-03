@@ -25,6 +25,7 @@ private fun route(
     waypoints: List<Waypoint> = emptyList(),
     isLooping: Boolean = false,
     createdAt: Long = 0L,
+    speedProfileId: String? = null,
 ): Route =
     Route(
         id = id,
@@ -32,6 +33,7 @@ private fun route(
         waypoints = waypoints,
         isLooping = isLooping,
         routeType = routeType,
+        speedProfileId = speedProfileId,
         createdAt = createdAt,
     )
 
@@ -144,6 +146,29 @@ class SettingsExportCodecTest {
         assertEquals(original.jitterIdleRadius, parsed.jitterIdleRadius, 0.001)
         assertEquals(original.jitterMovingRadius, parsed.jitterMovingRadius, 0.001)
         assertEquals(original.jitterIntervalSeconds, parsed.jitterIntervalSeconds)
+    }
+
+    @Test
+    fun `round-trip preserves route speedProfileId`() {
+        val data =
+            minimalExportData().copy(
+                routes = listOf(route(speedProfileId = "bike")),
+            )
+        val json = SettingsExportCodec.serializeExportData(data)
+
+        val parsed = SettingsExportCodec.parseExportData(json)
+
+        assertEquals("bike", parsed.routes[0].speedProfileId)
+    }
+
+    @Test
+    fun `parse defaults missing speedProfileId to null`() {
+        @Suppress("ktlint:standard:max-line-length") // JSON string literal cannot be split without changing its value
+        val json = """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":[]},"speedProfiles":[],"routes":[{"id":"r1","name":"test","isLooping":false,"createdAt":0,"waypoints":[]}],"favoriteLocations":[],"jitterIdleRadius":0.0,"jitterMovingRadius":1.0,"jitterIntervalSeconds":3}"""
+
+        val parsed = SettingsExportCodec.parseExportData(json)
+
+        assertEquals(null, parsed.routes[0].speedProfileId)
     }
 
     @Test(expected = IllegalArgumentException::class)

@@ -350,6 +350,71 @@ class RouteRepositoryTest {
             assertTrue(result.isSuccess)
         }
 
+    // setRouteSpeedProfile
+
+    @Test
+    fun `setRouteSpeedProfile returns success`() =
+        runTest {
+            val route = createRoute("route-1", "Test")
+            repository.insertRoute(route)
+
+            val result = repository.setRouteSpeedProfile("route-1", "run")
+            assertTrue(result.isSuccess)
+        }
+
+    @Test
+    fun `setRouteSpeedProfile changes route speedProfileId`() =
+        runTest {
+            val route = createRoute("route-1", "Test")
+            repository.insertRoute(route)
+
+            repository.setRouteSpeedProfile("route-1", "run")
+
+            repository.getRouteWithWaypoints("route-1").test {
+                val result = awaitItem()
+                assertEquals("run", result!!.speedProfileId)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `setRouteSpeedProfile updates updatedAt timestamp`() =
+        runTest {
+            val route = createRoute("route-1", "Test", createdAt = 1000L, updatedAt = 1000L)
+            repository.insertRoute(route)
+
+            repository.setRouteSpeedProfile("route-1", "run")
+
+            repository.getRouteWithWaypoints("route-1").test {
+                val result = awaitItem()
+                assertTrue(result!!.updatedAt > 1000L)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `setRouteSpeedProfile non-existent id succeeds silently`() =
+        runTest {
+            val result = repository.setRouteSpeedProfile("does-not-exist", "run")
+            assertTrue(result.isSuccess)
+        }
+
+    @Test
+    fun `setRouteSpeedProfile null clears a previously-set profile`() =
+        runTest {
+            val route = createRoute("route-1", "Test")
+            repository.insertRoute(route)
+            repository.setRouteSpeedProfile("route-1", "run")
+
+            repository.setRouteSpeedProfile("route-1", null)
+
+            repository.getRouteWithWaypoints("route-1").test {
+                val result = awaitItem()
+                assertEquals(null, result!!.speedProfileId)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     // GUIDED route type
 
     @Test

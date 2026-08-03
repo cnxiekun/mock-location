@@ -224,6 +224,59 @@ class SettingsRepositoryTest {
             }
         }
 
+    // getRouteSpeedMs
+
+    @Test
+    fun `getRouteSpeedMs returns active profile speed when speedProfileId is null`() =
+        runTest {
+            fakeDataSource.speedProfilesFlow.value =
+                SpeedProfilePreferences(
+                    walkSpeedMs = 1.4,
+                    runSpeedMs = 3.0,
+                    bikeSpeedMs = 5.0,
+                    activeProfileId = "run",
+                )
+
+            repository.getRouteSpeedMs(null).test {
+                assertEquals(3.0, awaitItem(), 0.001)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `getRouteSpeedMs returns route's own profile speed regardless of active profile`() =
+        runTest {
+            fakeDataSource.speedProfilesFlow.value =
+                SpeedProfilePreferences(
+                    walkSpeedMs = 1.4,
+                    runSpeedMs = 3.0,
+                    bikeSpeedMs = 5.0,
+                    activeProfileId = "run",
+                )
+
+            repository.getRouteSpeedMs("bike").test {
+                assertEquals(5.0, awaitItem(), 0.001)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `getRouteSpeedMs falls back to active profile speed for unrecognized speedProfileId`() =
+        runTest {
+            fakeDataSource.speedProfilesFlow.value =
+                SpeedProfilePreferences(
+                    walkSpeedMs = 1.4,
+                    runSpeedMs = 3.0,
+                    bikeSpeedMs = 5.0,
+                    activeProfileId = "run",
+                )
+
+            repository.getRouteSpeedMs("does-not-exist").test {
+                assertEquals(3.0, awaitItem(), 0.001)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     // getWidgetFeatures
 
     @Test

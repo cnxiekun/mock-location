@@ -23,6 +23,10 @@ Routes can also be imported from GPX files via the Routes screen overflow menu �
 - Snap at `AppConstants.LocationConstants.WALK_ARRIVAL_THRESHOLD_METERS`.
 - Loop: smooth interpolation last→first waypoint.
 
+### Per-Route Speed Profile
+
+A route may pin a speed profile via the Route Detail (edit) screen — a segmented control below the name field, showing "None" plus all 5 presets. Default: `null` ("None"), meaning replay uses whatever speed profile is currently active globally (today's behavior). When a route pins a profile, replay uses that profile's speed for the entire session — it stays locked even if the globally active profile changes mid-replay (e.g. via the widget's Speed Cycle button). Resolved via `SettingsRepository.getRouteSpeedMs(route.speedProfileId)`.
+
 ## Recording
 
 - Collect location every `AppConstants.LocationConstants.UPDATE_INTERVAL_MS` ms.

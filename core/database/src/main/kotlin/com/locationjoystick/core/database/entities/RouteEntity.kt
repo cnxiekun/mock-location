@@ -18,6 +18,7 @@ data class RouteEntity(
     val name: String,
     val isLooping: Boolean,
     val routeType: String = "STRAIGHT",
+    val speedProfileId: String? = null,
     val createdAt: Long,
     val updatedAt: Long,
 )
@@ -33,6 +34,7 @@ fun RouteEntity.toDomain(waypoints: List<WaypointEntity>): Route =
         waypoints = waypoints.sortedBy { it.orderIndex }.map { it.toDomain() },
         isLooping = isLooping,
         routeType = RouteType.valueOf(routeType),
+        speedProfileId = speedProfileId,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
@@ -43,6 +45,7 @@ fun Route.toEntity(): RouteEntity =
         name = name,
         isLooping = isLooping,
         routeType = routeType.name,
+        speedProfileId = speedProfileId,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )

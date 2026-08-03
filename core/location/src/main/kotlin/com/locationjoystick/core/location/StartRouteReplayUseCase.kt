@@ -27,15 +27,11 @@ class StartRouteReplayUseCase
             isReturnToLocation: Boolean = false,
             teleportToStart: Boolean = false,
         ) {
-            val speedMs = settingsRepository.getActiveSpeedProfile().first().speedMetersPerSecond
+            val route = routeRepository.getRouteWithWaypoints(routeId).first()
+            val speedMs = settingsRepository.getRouteSpeedMs(route?.speedProfileId).first()
             val returnPosition = if (isReturnToLocation) locationRepository.currentPosition.value else null
             if (teleportToStart) {
-                val waypoints =
-                    routeRepository
-                        .getRoutes()
-                        .first()
-                        .find { it.id == routeId }
-                        ?.waypoints
+                val waypoints = route?.waypoints
                 if (!waypoints.isNullOrEmpty()) {
                     val startWaypoint = if (isReverse) waypoints.last() else waypoints.first()
                     teleportUseCase.execute(startWaypoint.position)

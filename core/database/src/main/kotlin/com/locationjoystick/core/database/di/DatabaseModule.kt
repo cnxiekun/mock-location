@@ -27,7 +27,7 @@ object DatabaseModule {
                 context,
                 LjDatabase::class.java,
                 AppConstants.DatabaseConstants.DATABASE_NAME,
-            ).addMigrations(LjDatabase.MIGRATION_1_2, LjDatabase.MIGRATION_2_3)
+            ).addMigrations(LjDatabase.MIGRATION_1_2, LjDatabase.MIGRATION_2_3, LjDatabase.MIGRATION_3_4)
             .build()
 
     @Provides

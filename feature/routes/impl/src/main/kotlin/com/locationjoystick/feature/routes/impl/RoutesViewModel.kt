@@ -123,7 +123,7 @@ class RoutesViewModel
             teleportToStart: Boolean = false,
         ) {
             viewModelScope.launch {
-                val speedMs = settingsRepository.getActiveSpeedProfile().first().speedMetersPerSecond
+                val speedMs = settingsRepository.getRouteSpeedMs(route.speedProfileId).first()
                 val returnPosition = if (isReturnToLocation) locationRepository.currentPosition.value else null
 
                 if (teleportToStart && route.waypoints.isNotEmpty()) {

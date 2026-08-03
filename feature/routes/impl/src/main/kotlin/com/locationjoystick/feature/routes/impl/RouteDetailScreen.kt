@@ -2,14 +2,18 @@ package com.locationjoystick.feature.routes.impl
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,6 +21,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,10 +43,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.locationjoystick.core.data.RouteRepository
+import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.Route
+import com.locationjoystick.core.model.SpeedProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,6 +64,7 @@ class RouteDetailViewModel
     @Inject
     constructor(
         private val routeRepository: RouteRepository,
+        private val settingsRepository: SettingsRepository,
         savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
         companion object {
@@ -68,6 +78,13 @@ class RouteDetailViewModel
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = null,
+            )
+
+        val speedProfiles: StateFlow<List<SpeedProfile>> =
+            settingsRepository.getSpeedProfiles().stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList(),
             )
 
         private val _nameError = MutableStateFlow(false)
@@ -104,6 +121,16 @@ class RouteDetailViewModel
                 }
             }
         }
+
+        fun setSpeedProfile(speedProfileId: String?) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    routeRepository.setRouteSpeedProfile(routeId, speedProfileId)
+                } catch (e: Exception) {
+                    Log.e(TAG, "set speed profile failed", e)
+                }
+            }
+        }
     }
 
 @Preview(showBackground = true)
@@ -126,6 +153,7 @@ fun RouteDetailScreen(
 ) {
     val route by viewModel.route.collectAsStateWithLifecycle()
     val nameError by viewModel.nameError.collectAsStateWithLifecycle()
+    val speedProfiles by viewModel.speedProfiles.collectAsStateWithLifecycle()
     val spoofToggle = rememberSpoofToggleState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -206,6 +234,32 @@ fun RouteDetailScreen(
                                     style = MaterialTheme.typography.labelSmall,
                                     modifier = Modifier.padding(top = 4.dp),
                                 )
+                            }
+                        }
+                    }
+
+                    // Speed profile selection
+                    item {
+                        Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
+                            Text(
+                                "Speed profile",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            SingleChoiceSegmentedButtonRow(
+                                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                            ) {
+                                val options = listOf<SpeedProfile?>(null) + speedProfiles
+                                options.forEachIndexed { index, profile ->
+                                    SegmentedButton(
+                                        selected = route!!.speedProfileId == profile?.id,
+                                        onClick = { viewModel.setSpeedProfile(profile?.id) },
+                                        shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                                    ) {
+                                        Text(profile?.name ?: "None")
+                                    }
+                                }
                             }
                         }
                     }

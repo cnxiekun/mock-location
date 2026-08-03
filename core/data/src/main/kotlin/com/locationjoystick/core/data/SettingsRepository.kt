@@ -65,6 +65,18 @@ class SettingsRepository
                 prefs.toActiveSpeedProfile()
             }
 
+        /**
+         * Resolves the effective replay speed for a route: its own [speedProfileId]
+         * if set (falling back to the active profile if that id no longer matches
+         * a known preset), else whatever profile is currently active globally.
+         */
+        fun getRouteSpeedMs(speedProfileId: String?): Flow<Double> =
+            combine(getSpeedProfiles(), getActiveSpeedProfile()) { profiles, active ->
+                speedProfileId
+                    ?.let { id -> profiles.find { it.id == id }?.speedMetersPerSecond }
+                    ?: active.speedMetersPerSecond
+            }
+
         fun getFeatureOrder(): Flow<List<AppFeature>> = dataSource.getFeatureOrder()
 
         suspend fun setFeatureOrder(order: List<AppFeature>) = dataSource.setFeatureOrder(order)

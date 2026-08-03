@@ -12,6 +12,7 @@ import com.locationjoystick.core.model.Waypoint
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -119,6 +120,18 @@ class RoutesViewModelUiStateTest {
                 coVerify { routeRepository.updateRoute(match { it.name == "New Name" }) }
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+
+    @Test
+    fun startReplay_uses_route_own_speed_profile_over_active_profile() =
+        runTest {
+            every { settingsRepository.getRouteSpeedMs("bike") } returns flowOf(5.0)
+
+            val routeWithProfile = route("r1", "Bike Route", createdAt = 1000L).copy(speedProfileId = "bike")
+            viewModel.startReplay(routeWithProfile)
+
+            verify { settingsRepository.getRouteSpeedMs("bike") }
+            verify(exactly = 0) { settingsRepository.getActiveSpeedProfile() }
         }
 
     @Test

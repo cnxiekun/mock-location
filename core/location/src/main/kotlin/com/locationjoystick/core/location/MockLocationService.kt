@@ -332,9 +332,23 @@ class MockLocationService : Service() {
         serviceScope.launch {
             settingsRepository.getActiveSpeedProfile().collect { profile ->
                 when (locationRepository.currentMode.value) {
-                    MockMode.ROUTE_REPLAY -> replayOrchestrator.updateSpeed(profile.speedMetersPerSecond)
-                    MockMode.ROAMING -> roamingRepository.updateSpeed(profile.speedMetersPerSecond)
-                    else -> Unit
+                    MockMode.ROUTE_REPLAY -> {
+                        val activeRouteId = locationRepository.activeRouteId.value
+                        val isSpeedLocked =
+                            activeRouteId != null &&
+                                routeRepository.getRouteWithWaypoints(activeRouteId).first()?.speedProfileId != null
+                        if (!isSpeedLocked) {
+                            replayOrchestrator.updateSpeed(profile.speedMetersPerSecond)
+                        }
+                    }
+
+                    MockMode.ROAMING -> {
+                        roamingRepository.updateSpeed(profile.speedMetersPerSecond)
+                    }
+
+                    else -> {
+                        Unit
+                    }
                 }
             }
         }
