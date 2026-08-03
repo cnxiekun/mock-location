@@ -299,6 +299,7 @@ class FloatingWidgetService :
             val isTapToWalkActive by isTapToWalkActiveFlow.collectAsStateWithLifecycle()
             val groupState by groupRepository.groupState.collectAsStateWithLifecycle(initialValue = GroupState())
             val isGroupSyncExpanded by groupSyncExpandedFlow.collectAsStateWithLifecycle()
+            val hideTeleportFeatures by settingsRepository.getHideTeleportFeatures().collectAsStateWithLifecycle(initialValue = false)
 
             LjTheme {
                 WidgetPanel(
@@ -315,7 +316,8 @@ class FloatingWidgetService :
                     isTapToWalkEnabled = isTapToWalkEnabled,
                     isTapToWalkActive = isTapToWalkActive,
                     onTapToWalkClicked = { onTapToWalkClicked() },
-                    isGroupSyncButtonVisible = groupState.role == GroupRole.FOLLOWER && groupState.followerModeEnabled,
+                    isGroupSyncButtonVisible =
+                        groupState.role == GroupRole.FOLLOWER && groupState.followerModeEnabled && !hideTeleportFeatures,
                     isGroupSyncExpanded = isGroupSyncExpanded,
                     onGroupSyncClicked = { groupSyncExpandedFlow.value = !groupSyncExpandedFlow.value },
                     onTeleportToLeaderClicked = { teleportToLeaderNow() },

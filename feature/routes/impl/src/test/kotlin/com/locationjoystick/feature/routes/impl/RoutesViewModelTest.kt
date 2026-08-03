@@ -44,6 +44,7 @@ class RoutesViewModelUiStateTest {
         Dispatchers.setMain(testDispatcher)
         every { routeRepository.getRoutes() } returns routesFlow
         every { settingsRepository.getRoutesSortNewestFirst() } returns sortFlow
+        every { settingsRepository.getHideTeleportFeatures() } returns MutableStateFlow(false)
         viewModel = RoutesViewModel(routeRepository, locationRepository, settingsRepository, context)
     }
 

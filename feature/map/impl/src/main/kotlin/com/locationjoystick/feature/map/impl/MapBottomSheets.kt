@@ -104,6 +104,7 @@ internal fun RoutesPickerSheet(
                 onAction(MapAction.StartRouteReplay(routeId, isLooping, isReverse, isReturnToLocation, teleportToStart))
                 selectedRouteId = null
             },
+            hideTeleport = uiState.hideTeleportFeatures,
         )
     }
 }
@@ -143,6 +144,7 @@ internal fun FavoritesPickerSheet(
                 onGoToLocation = { onAction(MapAction.WalkStraightTo(target.position)) },
                 onGoToLocationViaRoads = { onAction(MapAction.WalkViaRoadsTo(target.position)) },
                 onDismiss = { onAction(MapAction.CloseFavoritesPicker) },
+                hideTeleportFeatures = uiState.hideTeleportFeatures,
             )
         }
     }
@@ -168,6 +170,7 @@ internal fun PendingTapSheet(
     onAction: (MapAction) -> Unit,
     isEphemeralReplay: Boolean = false,
     onShare: (() -> Unit)? = null,
+    hideTeleportFeatures: Boolean = false,
 ) {
     ModalBottomSheet(
         onDismissRequest = { onAction(MapAction.ClearPendingTap) },
@@ -177,13 +180,15 @@ internal fun PendingTapSheet(
             if (isRouteReplay && !isEphemeralReplay) {
                 Text("Route in progress", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(16.dp))
-                Button(
-                    onClick = { onAction(MapAction.StopRouteAndTeleport(position)) },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Stop route and teleport")
+                if (!hideTeleportFeatures) {
+                    Button(
+                        onClick = { onAction(MapAction.StopRouteAndTeleport(position)) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Stop route and teleport")
+                    }
+                    Spacer(Modifier.height(8.dp))
                 }
-                Spacer(Modifier.height(8.dp))
                 OutlinedButton(
                     onClick = { onAction(MapAction.StopRouteAndWalkTo(position)) },
                     modifier = Modifier.fillMaxWidth(),
@@ -204,13 +209,15 @@ internal fun PendingTapSheet(
                     (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel() ?: "No wait needed",
                 )
                 Spacer(Modifier.height(16.dp))
-                Button(
-                    onClick = { onAction(MapAction.ConfirmTeleport(position)) },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Teleport here")
+                if (!hideTeleportFeatures) {
+                    Button(
+                        onClick = { onAction(MapAction.ConfirmTeleport(position)) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Teleport here")
+                    }
+                    Spacer(Modifier.height(8.dp))
                 }
-                Spacer(Modifier.height(8.dp))
                 OutlinedButton(
                     onClick = {
                         onAction(MapAction.LongPressTapToWalk(position))
@@ -267,6 +274,7 @@ internal fun FavoriteTargetDetail(
     onGoToLocation: () -> Unit,
     onGoToLocationViaRoads: () -> Unit,
     onDismiss: () -> Unit,
+    hideTeleportFeatures: Boolean = false,
 ) {
     Column(
         modifier =
@@ -282,14 +290,16 @@ internal fun FavoriteTargetDetail(
             modifier = Modifier.padding(top = 4.dp),
         )
 
-        Button(
-            onClick = onSetLocation,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-        ) {
-            Text("Set location")
+        if (!hideTeleportFeatures) {
+            Button(
+                onClick = onSetLocation,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+            ) {
+                Text("Set location")
+            }
         }
         OutlinedButton(
             onClick = onGoToLocation,
@@ -358,6 +368,7 @@ internal fun SaveCurrentLocationDialog(
 private fun StartRouteDialog(
     onDismiss: () -> Unit,
     onStart: (isLooping: Boolean, isReverse: Boolean, isReturnToLocation: Boolean, teleportToStart: Boolean) -> Unit,
+    hideTeleport: Boolean = false,
 ) {
     var loop by remember { mutableStateOf(false) }
     var reverse by remember { mutableStateOf(false) }
@@ -376,12 +387,14 @@ private fun StartRouteDialog(
                     enabled = !loop,
                     onCheckedChange = { returnToLocation = it },
                 )
-                Spacer(Modifier.height(12.dp))
-                OutlinedButton(
-                    onClick = { onStart(loop, reverse, returnToLocation && !loop, true) },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Teleport and start")
+                if (!hideTeleport) {
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedButton(
+                        onClick = { onStart(loop, reverse, returnToLocation && !loop, true) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Teleport and start")
+                    }
                 }
             }
         },

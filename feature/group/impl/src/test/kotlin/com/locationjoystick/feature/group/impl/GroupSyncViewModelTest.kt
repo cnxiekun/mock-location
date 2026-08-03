@@ -5,6 +5,7 @@ import android.net.Uri
 import app.cash.turbine.test
 import com.locationjoystick.core.common.util.NsdCodeManager
 import com.locationjoystick.core.data.GroupRepository
+import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.location.FollowerSyncClient
 import com.locationjoystick.core.location.LeaderSyncServer
 import com.locationjoystick.core.model.GroupInvite
@@ -40,6 +41,7 @@ class GroupSyncViewModelTest {
     private lateinit var groupNsdManager: NsdCodeManager
     private lateinit var leaderSyncServer: LeaderSyncServer
     private lateinit var followerSyncClient: FollowerSyncClient
+    private lateinit var settingsRepository: SettingsRepository
 
     private lateinit var groupStateFlow: MutableStateFlow<GroupState>
     private lateinit var pendingInviteFlow: MutableSharedFlow<GroupInvite>
@@ -59,6 +61,8 @@ class GroupSyncViewModelTest {
         groupNsdManager = mockk()
         leaderSyncServer = mockk(relaxed = true)
         followerSyncClient = mockk(relaxed = true)
+        settingsRepository = mockk(relaxed = true)
+        every { settingsRepository.getHideTeleportFeatures() } returns MutableStateFlow(false)
 
         groupStateFlow = MutableStateFlow(GroupState())
         pendingInviteFlow = MutableSharedFlow(replay = 1)
@@ -78,6 +82,7 @@ class GroupSyncViewModelTest {
                 groupNsdManager = groupNsdManager,
                 leaderSyncServer = leaderSyncServer,
                 followerSyncClient = followerSyncClient,
+                settingsRepository = settingsRepository,
             )
     }
 

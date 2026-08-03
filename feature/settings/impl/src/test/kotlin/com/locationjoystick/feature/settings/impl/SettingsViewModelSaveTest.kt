@@ -176,6 +176,7 @@ class SettingsViewModelSaveTest {
                             warmupEnabled = true,
                             satelliteExtrasEnabled = false,
                             suspendedMockingEnabled = true,
+                            hideTeleportFeatures = true,
                             roamingDefaults = customRoaming,
                         ),
                     speedProfiles =
@@ -211,6 +212,7 @@ class SettingsViewModelSaveTest {
             assertTrue(snapshot.realismWarmupEnabled)
             assertFalse(snapshot.realismSatelliteExtrasEnabled)
             assertTrue(snapshot.realismSuspendedMockingEnabled)
+            assertTrue(snapshot.hideTeleportFeatures)
             assertEquals(2.5, snapshot.jitterIdleRadius, 0.001)
             assertEquals(4.0, snapshot.jitterMovingRadius, 0.001)
             assertEquals(15, snapshot.jitterIntervalSeconds)
@@ -570,6 +572,10 @@ internal class SaveTestPreferencesDataSource : PreferencesDataSource {
     override fun getHotLocationsEnabled(): Flow<Boolean> = flowOf(false)
 
     override suspend fun setHotLocationsEnabled(enabled: Boolean) = Unit
+
+    override fun getHideTeleportFeatures(): Flow<Boolean> = flowOf(false)
+
+    override suspend fun setHideTeleportFeatures(enabled: Boolean) = Unit
 
     override fun getSelectedHotLocationIds(): Flow<Set<String>> = flowOf(emptySet())
 

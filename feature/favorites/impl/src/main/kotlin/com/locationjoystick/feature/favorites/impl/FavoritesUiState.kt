@@ -7,4 +7,5 @@ data class FavoritesUiState(
     val isLoading: Boolean = false,
     val pendingDeleteId: String? = null,
     val sortNewestFirst: Boolean = true,
+    val hideTeleportFeatures: Boolean = false,
 )

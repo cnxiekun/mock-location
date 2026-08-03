@@ -13,6 +13,7 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.util.NsdCodeManager
 import com.locationjoystick.core.common.util.RandomCode
 import com.locationjoystick.core.data.GroupRepository
+import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.location.FollowerSyncClient
 import com.locationjoystick.core.location.LeaderSyncServer
 import com.locationjoystick.core.location.MockLocationService
@@ -45,6 +46,7 @@ class GroupSyncViewModel
         private val groupNsdManager: NsdCodeManager,
         private val leaderSyncServer: LeaderSyncServer,
         private val followerSyncClient: FollowerSyncClient,
+        private val settingsRepository: SettingsRepository,
     ) : ViewModel() {
         private val _groupState = MutableStateFlow(GroupState())
         val groupState: StateFlow<GroupState> = _groupState.asStateFlow()
@@ -57,6 +59,11 @@ class GroupSyncViewModel
 
         private val _isDiscovering = MutableStateFlow(false)
         val isDiscovering: StateFlow<Boolean> = _isDiscovering.asStateFlow()
+
+        val hideTeleportFeatures: StateFlow<Boolean> =
+            settingsRepository
+                .getHideTeleportFeatures()
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
         val followerCount: StateFlow<Int> =
             groupRepository.groupState

@@ -185,6 +185,15 @@ class SettingsViewModelDraftTest {
         }
 
     @Test
+    fun `setHideTeleportFeatures marks dirty`() =
+        runTest(testDispatcher) {
+            backgroundScope.launch(testDispatcher) { viewModel.uiState.collect {} }
+            viewModel.setHideTeleportFeatures(true)
+            assertTrue(viewModel.uiState.value.hideTeleportFeatures)
+            assertTrue(viewModel.uiState.value.isDirty)
+        }
+
+    @Test
     fun `jitter speed variation setters mark dirty`() =
         runTest(testDispatcher) {
             backgroundScope.launch(testDispatcher) { viewModel.uiState.collect {} }

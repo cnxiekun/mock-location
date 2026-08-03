@@ -348,6 +348,10 @@ fun SettingsRoute(
                     viewModel.setFloatingMapQuickWalk(action.enabled)
                 }
 
+                is SettingsAction.SetHideTeleportFeatures -> {
+                    viewModel.setHideTeleportFeatures(action.enabled)
+                }
+
                 is SettingsAction.SetTapToWalkOverlayEnabled -> {
                     viewModel.setTapToWalkOverlayEnabled(action.enabled)
                 }

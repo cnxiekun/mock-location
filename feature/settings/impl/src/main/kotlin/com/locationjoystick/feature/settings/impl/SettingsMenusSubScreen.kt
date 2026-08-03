@@ -127,6 +127,8 @@ internal fun SettingsMenusSubScreen(
                         SpeedCycleSection(uiState, onAction)
                         Spacer(Modifier.height(24.dp))
                         TapToWalkSection(uiState, onAction)
+                        Spacer(Modifier.height(24.dp))
+                        PrivacySection(uiState, onAction)
                     }
                 }
             }
@@ -264,6 +266,23 @@ private fun TapToWalkSection(
             },
         )
     }
+}
+
+@Composable
+private fun PrivacySection(
+    uiState: SettingsUiState,
+    onAction: (SettingsAction) -> Unit,
+) {
+    Text("Privacy", style = MaterialTheme.typography.headlineSmall)
+    Spacer(Modifier.height(4.dp))
+    LjCheckboxRow(
+        checked = uiState.hideTeleportFeatures,
+        onCheckedChange = { onAction(SettingsAction.SetHideTeleportFeatures(it)) },
+        title = "Hide teleport features",
+        description =
+            "Removes every teleport option across the app — map, favorites, " +
+                "routes, group sync, and the widget. Only walking and route replay remain available.",
+    )
 }
 
 @Composable

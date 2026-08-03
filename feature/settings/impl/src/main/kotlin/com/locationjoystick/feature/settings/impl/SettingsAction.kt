@@ -121,6 +121,10 @@ internal sealed class SettingsAction {
         val enabled: Boolean,
     ) : SettingsAction()
 
+    data class SetHideTeleportFeatures(
+        val enabled: Boolean,
+    ) : SettingsAction()
+
     data class SetTapToWalkOverlayEnabled(
         val enabled: Boolean,
     ) : SettingsAction()

@@ -37,7 +37,8 @@ class FavoritesViewModel
                 favoriteRepository.getFavorites(),
                 pendingDeleteIdFlow,
                 settingsRepository.getFavoritesSortNewestFirst(),
-            ) { favorites, pendingDeleteId, sortNewestFirst ->
+                settingsRepository.getHideTeleportFeatures(),
+            ) { favorites, pendingDeleteId, sortNewestFirst, hideTeleportFeatures ->
                 val sorted =
                     if (sortNewestFirst) {
                         favorites.sortedByDescending { it.createdAt }
@@ -49,6 +50,7 @@ class FavoritesViewModel
                     isLoading = false,
                     pendingDeleteId = pendingDeleteId,
                     sortNewestFirst = sortNewestFirst,
+                    hideTeleportFeatures = hideTeleportFeatures,
                 )
             }.stateIn(
                 scope = viewModelScope,
@@ -95,6 +97,7 @@ class FavoritesViewModel
         }
 
         fun teleportTo(favorite: FavoriteLocation) {
+            if (uiState.value.hideTeleportFeatures) return
             viewModelScope.launch {
                 teleportUseCase.execute(favorite.position)
             }

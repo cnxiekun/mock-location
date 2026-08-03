@@ -41,6 +41,7 @@ data class MapUiState(
     val cooldownState: CooldownState = CooldownState.Ready,
     val favoriteCooldownStates: Map<String, CooldownState> = emptyMap(),
     val isPendingTapSheetOpen: Boolean = false,
+    val hideTeleportFeatures: Boolean = false,
 )
 
 // Convenience accessors

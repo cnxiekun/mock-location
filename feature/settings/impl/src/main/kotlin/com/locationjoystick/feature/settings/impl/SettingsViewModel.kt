@@ -125,6 +125,7 @@ class SettingsViewModel
             val floatingMapQuickWalk: Boolean? = null,
             val tapToWalkOverlayEnabled: Boolean? = null,
             val tapToWalkScaleMpx: Double? = null,
+            val hideTeleportFeatures: Boolean? = null,
         )
 
         private val mutableDraft = MutableStateFlow(DraftState())
@@ -195,6 +196,7 @@ class SettingsViewModel
                     floatingMapQuickWalk = draftState.floatingMapQuickWalk ?: snapshot.floatingMapQuickWalk,
                     tapToWalkOverlayEnabled = draftState.tapToWalkOverlayEnabled ?: snapshot.tapToWalkOverlayEnabled,
                     tapToWalkScaleMpx = draftState.tapToWalkScaleMpx ?: snapshot.tapToWalkScaleMpx,
+                    hideTeleportFeatures = draftState.hideTeleportFeatures ?: snapshot.hideTeleportFeatures,
                     compassTrackingEnabled = compass.enabled,
                     isCompassServiceGranted = isServiceGranted,
                     compassRegionCxPct = compass.cx,
@@ -339,6 +341,10 @@ class SettingsViewModel
             mutableDraft.update { it.copy(floatingMapQuickWalk = enabled) }
         }
 
+        fun setHideTeleportFeatures(enabled: Boolean) {
+            mutableDraft.update { it.copy(hideTeleportFeatures = enabled) }
+        }
+
         fun setTapToWalkOverlayEnabled(enabled: Boolean) {
             mutableDraft.update { it.copy(tapToWalkOverlayEnabled = enabled) }
         }
@@ -427,6 +433,7 @@ class SettingsViewModel
                             floatingMapQuickWalk = state.floatingMapQuickWalk,
                             tapToWalkOverlayEnabled = state.tapToWalkOverlayEnabled,
                             tapToWalkScaleMpx = state.tapToWalkScaleMpx,
+                            hideTeleportFeatures = state.hideTeleportFeatures,
                             roamingDefaults =
                                 d.roamingDefaults
                                     ?: settingsRepository.getRoamingDefaults().first(),
@@ -512,6 +519,7 @@ class SettingsViewModel
                     warmupEnabled = state.realismWarmupEnabled,
                     satelliteExtrasEnabled = state.realismSatelliteExtrasEnabled,
                     suspendedMockingEnabled = state.realismSuspendedMockingEnabled,
+                    hideTeleportFeatures = state.hideTeleportFeatures,
                 )
             return ExportData(
                 schemaVersion = AppConstants.ExportConstants.SCHEMA_VERSION,
@@ -710,6 +718,7 @@ class SettingsViewModel
                     realismWarmupEnabled = data.settings.warmupEnabled,
                     realismSatelliteExtrasEnabled = data.settings.satelliteExtrasEnabled,
                     realismSuspendedMockingEnabled = data.settings.suspendedMockingEnabled,
+                    hideTeleportFeatures = data.settings.hideTeleportFeatures,
                     jitterSpeedIdleVariationPct = data.jitterSpeedIdleVariationPct,
                     jitterSpeedMovingVariationPct = data.jitterSpeedMovingVariationPct,
                     hotLocationsEnabled = data.hotLocationsEnabled,

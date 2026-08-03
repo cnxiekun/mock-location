@@ -52,14 +52,20 @@ class RoutesViewModel
             combine(
                 routeRepository.getRoutes(),
                 settingsRepository.getRoutesSortNewestFirst(),
-            ) { routes, sortNewestFirst ->
+                settingsRepository.getHideTeleportFeatures(),
+            ) { routes, sortNewestFirst, hideTeleportFeatures ->
                 val sorted =
                     if (sortNewestFirst) {
                         routes.sortedByDescending { it.createdAt }
                     } else {
                         routes.sortedBy { it.createdAt }
                     }
-                RoutesUiState(routes = sorted, isLoading = false, sortNewestFirst = sortNewestFirst)
+                RoutesUiState(
+                    routes = sorted,
+                    isLoading = false,
+                    sortNewestFirst = sortNewestFirst,
+                    hideTeleportFeatures = hideTeleportFeatures,
+                )
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),

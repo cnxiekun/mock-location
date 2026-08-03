@@ -171,6 +171,29 @@ class SettingsExportCodecTest {
         assertEquals(null, parsed.routes[0].speedProfileId)
     }
 
+    @Test
+    fun `round-trip preserves hideTeleportFeatures`() {
+        val data =
+            minimalExportData().copy(
+                settings = minimalExportData().settings.copy(hideTeleportFeatures = true),
+            )
+        val json = SettingsExportCodec.serializeExportData(data)
+
+        val parsed = SettingsExportCodec.parseExportData(json)
+
+        assertEquals(true, parsed.settings.hideTeleportFeatures)
+    }
+
+    @Test
+    fun `parse defaults missing hideTeleportFeatures to false`() {
+        @Suppress("ktlint:standard:max-line-length") // JSON string literal cannot be split without changing its value
+        val json = """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":[]},"speedProfiles":[],"routes":[],"favoriteLocations":[],"jitterIdleRadius":0.0,"jitterMovingRadius":1.0,"jitterIntervalSeconds":3}"""
+
+        val parsed = SettingsExportCodec.parseExportData(json)
+
+        assertEquals(false, parsed.settings.hideTeleportFeatures)
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun `parse throws on unsupported schemaVersion`() {
         val json = """{"schemaVersion":99,"exportedAt":0,"settings":{},"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""

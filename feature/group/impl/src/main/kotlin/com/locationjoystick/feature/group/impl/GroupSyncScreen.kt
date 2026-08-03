@@ -69,6 +69,7 @@ fun GroupSyncRoute(
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val isDiscovering by viewModel.isDiscovering.collectAsStateWithLifecycle()
     val followerCount by viewModel.followerCount.collectAsStateWithLifecycle()
+    val hideTeleportFeatures by viewModel.hideTeleportFeatures.collectAsStateWithLifecycle()
     val spoofToggle = rememberSpoofToggleState()
 
     var showQrScanner by remember { mutableStateOf(false) }
@@ -112,6 +113,7 @@ fun GroupSyncRoute(
             onTeleportToLeaderNow = viewModel::teleportToLeaderNow,
             onLeaveGroup = viewModel::leaveGroup,
             onRegenerateQr = viewModel::regenerateQr,
+            hideTeleportFeatures = hideTeleportFeatures,
         )
     }
 }
@@ -135,6 +137,7 @@ internal fun GroupSyncScreen(
     onTeleportToLeaderNow: () -> Unit,
     onLeaveGroup: () -> Unit,
     onRegenerateQr: () -> Unit,
+    hideTeleportFeatures: Boolean = false,
 ) {
     LjScaffold(
         title = "Group Sync",
@@ -183,6 +186,7 @@ internal fun GroupSyncScreen(
                         onSetFollowerModeEnabled = onSetFollowerModeEnabled,
                         onTeleportToLeaderNow = onTeleportToLeaderNow,
                         onLeaveGroup = onLeaveGroup,
+                        hideTeleportFeatures = hideTeleportFeatures,
                     )
                 }
             }
@@ -431,6 +435,7 @@ private fun FollowerContent(
     onSetFollowerModeEnabled: (Boolean) -> Unit,
     onTeleportToLeaderNow: () -> Unit,
     onLeaveGroup: () -> Unit,
+    hideTeleportFeatures: Boolean = false,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -469,7 +474,7 @@ private fun FollowerContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        if (groupState.followerModeEnabled) {
+        if (groupState.followerModeEnabled && !hideTeleportFeatures) {
             OutlinedButton(
                 onClick = onTeleportToLeaderNow,
                 modifier = Modifier.fillMaxWidth(),

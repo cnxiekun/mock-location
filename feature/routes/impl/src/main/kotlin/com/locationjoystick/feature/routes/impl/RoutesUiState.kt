@@ -6,4 +6,5 @@ data class RoutesUiState(
     val routes: List<Route> = emptyList(),
     val isLoading: Boolean = false,
     val sortNewestFirst: Boolean = true,
+    val hideTeleportFeatures: Boolean = false,
 )

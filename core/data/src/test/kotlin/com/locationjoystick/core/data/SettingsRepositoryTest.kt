@@ -861,6 +861,27 @@ class SettingsRepositoryTest {
             }
         }
 
+    // hide teleport features
+
+    @Test
+    fun `getHideTeleportFeatures returns false by default`() =
+        runTest {
+            repository.getHideTeleportFeatures().test {
+                assertFalse(awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `setHideTeleportFeatures persists true`() =
+        runTest {
+            repository.setHideTeleportFeatures(true)
+            repository.getHideTeleportFeatures().test {
+                assertTrue(awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     // recent searches
 
     @Test
@@ -1184,6 +1205,14 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
         hotLocationsEnabledFlow.value = enabled
     }
 
+    private val hideTeleportFeaturesFlow = MutableStateFlow(false)
+
+    override fun getHideTeleportFeatures(): Flow<Boolean> = hideTeleportFeaturesFlow
+
+    override suspend fun setHideTeleportFeatures(enabled: Boolean) {
+        hideTeleportFeaturesFlow.value = enabled
+    }
+
     override fun getSelectedHotLocationIds(): Flow<Set<String>> = flowOf(emptySet())
 
     override suspend fun setSelectedHotLocationIds(ids: Set<String>) = Unit
@@ -1298,6 +1327,7 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
         featureOrderFlow.value = AppFeature.DEFAULT_ORDER
         rememberLastLocationFlow.value = false
         hotLocationsEnabledFlow.value = false
+        hideTeleportFeaturesFlow.value = false
         onboardingCompleteFlow.value = onboardingComplete
     }
 }

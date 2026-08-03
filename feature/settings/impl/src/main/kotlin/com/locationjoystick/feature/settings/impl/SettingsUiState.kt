@@ -40,5 +40,6 @@ data class SettingsUiState(
     val compassRegionCyPct: Float = AppConstants.CompassTrackingConstants.DEFAULT_REGION_CY_PCT,
     val compassRegionRadiusPct: Float = AppConstants.CompassTrackingConstants.DEFAULT_REGION_RADIUS_PCT,
     val themeMode: ThemeMode = ThemeMode.DARK,
+    val hideTeleportFeatures: Boolean = false,
     val isDirty: Boolean = false,
 )

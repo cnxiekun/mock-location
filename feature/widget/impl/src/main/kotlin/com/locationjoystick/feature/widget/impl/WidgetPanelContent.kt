@@ -362,6 +362,7 @@ internal fun FavoritesFloatingView(
     cooldownStates: Map<String, CooldownState> = emptyMap(),
     currentPosition: LatLng? = null,
     onAddFromHere: ((name: String) -> Unit)? = null,
+    hideTeleport: Boolean = false,
 ) {
     var showAddForm by remember { mutableStateOf(false) }
     var newFavName by remember { mutableStateOf("") }
@@ -375,15 +376,17 @@ internal fun FavoritesFloatingView(
     ) {
         val selected = selectedFavorite
         if (selected != null) {
-            Button(
-                onClick = {
-                    onTeleport(selected)
-                    selectedFavorite = null
-                    onDismiss()
-                },
-                modifier = Modifier.fillMaxWidth(),
-            ) { Text("Teleport") }
-            Spacer(Modifier.height(8.dp))
+            if (!hideTeleport) {
+                Button(
+                    onClick = {
+                        onTeleport(selected)
+                        selectedFavorite = null
+                        onDismiss()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text("Teleport") }
+                Spacer(Modifier.height(8.dp))
+            }
             OutlinedButton(
                 onClick = {
                     onWalk(selected)
@@ -525,6 +528,7 @@ internal fun RoutesFloatingView(
     routes: List<com.locationjoystick.core.model.Route>,
     onDismiss: () -> Unit,
     onStartRoute: (routeId: String, isLooping: Boolean, isReverse: Boolean, isReturnToLocation: Boolean, teleportToStart: Boolean) -> Unit,
+    hideTeleport: Boolean = false,
 ) {
     var selectedRouteId by remember { mutableStateOf<String?>(null) }
 
@@ -558,16 +562,18 @@ internal fun RoutesFloatingView(
             ) {
                 Text("Walk and start", color = LjText)
             }
-            Spacer(Modifier.height(8.dp))
-            OutlinedButton(
-                onClick = {
-                    onStartRoute(routeId, loop, reverse, returnToLocation && !loop, true)
-                    selectedRouteId = null
-                    onDismiss()
-                },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text("Teleport and start", color = LjText)
+            if (!hideTeleport) {
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = {
+                        onStartRoute(routeId, loop, reverse, returnToLocation && !loop, true)
+                        selectedRouteId = null
+                        onDismiss()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Teleport and start", color = LjText)
+                }
             }
         } else {
             Box(modifier = Modifier.weight(1f)) {

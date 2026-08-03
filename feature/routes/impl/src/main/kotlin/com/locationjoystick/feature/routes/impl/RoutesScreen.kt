@@ -224,6 +224,7 @@ internal fun RoutesScreen(
                                 onPauseReplay = onPauseReplay,
                                 onResumeReplay = onResumeReplay,
                                 onStopReplay = onStopReplay,
+                                hideTeleportFeatures = uiState.hideTeleportFeatures,
                             )
                         }
                     }
@@ -256,6 +257,7 @@ private fun RouteCard(
     onResumeReplay: () -> Unit,
     onStopReplay: () -> Unit,
     modifier: Modifier = Modifier,
+    hideTeleportFeatures: Boolean = false,
 ) {
     val isActiveRoute = playbackState.activeRouteId == route.id
     val isPlaying = isActiveRoute && playbackState.isPlaying
@@ -373,6 +375,7 @@ private fun RouteCard(
                 onStartReplay(route, isLooping, isReverse, isReturnToLocation, teleportToStart)
                 showStartDialog = false
             },
+            hideTeleport = hideTeleportFeatures,
         )
     }
 }
@@ -381,6 +384,7 @@ private fun RouteCard(
 private fun StartRouteDialog(
     onDismiss: () -> Unit,
     onStart: (isLooping: Boolean, isReverse: Boolean, isReturnToLocation: Boolean, teleportToStart: Boolean) -> Unit,
+    hideTeleport: Boolean = false,
 ) {
     var loop by remember { mutableStateOf(false) }
     var reverse by remember { mutableStateOf(false) }
@@ -404,12 +408,14 @@ private fun StartRouteDialog(
                     enabled = !loop,
                     onCheckedChange = { returnToLocation = it },
                 )
-                Spacer(Modifier.height(12.dp))
-                OutlinedButton(
-                    onClick = { onStart(loop, reverse, returnToLocation && !loop, true) },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Teleport and start")
+                if (!hideTeleport) {
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedButton(
+                        onClick = { onStart(loop, reverse, returnToLocation && !loop, true) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Teleport and start")
+                    }
                 }
             }
         },

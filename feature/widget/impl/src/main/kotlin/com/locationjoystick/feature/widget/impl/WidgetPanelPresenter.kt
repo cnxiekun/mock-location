@@ -156,6 +156,7 @@ internal class WidgetPanelPresenter(
     fun showFavoritesFloatingView() {
         showPanel(params = mapPanelLayoutParams(), logTag = "favorites") {
             val shared by mapController.sharedState.collectAsStateWithLifecycle()
+            val hideTeleportFeatures by settingsRepository.getHideTeleportFeatures().collectAsStateWithLifecycle(initialValue = false)
             FavoritesFloatingView(
                 favorites = shared.favorites,
                 cooldownStates = shared.favoriteCooldownStates,
@@ -174,6 +175,7 @@ internal class WidgetPanelPresenter(
                     callbacks.moveAppToBack()
                 },
                 onAddFromHere = { name -> callbacks.saveCurrentLocation(name) },
+                hideTeleport = hideTeleportFeatures,
             )
         }
     }
@@ -182,6 +184,7 @@ internal class WidgetPanelPresenter(
         showPanel(logTag = "routes") {
             val routes by remember { mapController.sharedState.map { it.routes } }
                 .collectAsStateWithLifecycle(initialValue = emptyList())
+            val hideTeleportFeatures by settingsRepository.getHideTeleportFeatures().collectAsStateWithLifecycle(initialValue = false)
             RoutesFloatingView(
                 routes = routes,
                 onDismiss = { hidePanelView() },
@@ -189,6 +192,7 @@ internal class WidgetPanelPresenter(
                     callbacks.startRouteReplayWithMode(routeId, isLooping, isReverse, isReturnToLocation, teleportToStart)
                     callbacks.moveAppToBack()
                 },
+                hideTeleport = hideTeleportFeatures,
             )
         }
     }
@@ -198,6 +202,7 @@ internal class WidgetPanelPresenter(
             val shared by mapController.sharedState.collectAsStateWithLifecycle()
             val initialPosition = remember { mapController.sharedState.value.currentPosition }
             val quickWalk by settingsRepository.getFloatingMapQuickWalk().collectAsStateWithLifecycle(initialValue = false)
+            val hideTeleportFeatures by settingsRepository.getHideTeleportFeatures().collectAsStateWithLifecycle(initialValue = false)
             MapFloatingView(
                 currentPosition = shared.currentPosition,
                 initialPosition = initialPosition,
@@ -242,6 +247,7 @@ internal class WidgetPanelPresenter(
                 cooldownForPosition = { pos -> mapController.cooldownForPosition(pos) },
                 onSaveCurrentLocation = { name -> callbacks.saveCurrentLocation(name) },
                 quickWalk = quickWalk,
+                hideTeleportFeatures = hideTeleportFeatures,
             )
         }
     }

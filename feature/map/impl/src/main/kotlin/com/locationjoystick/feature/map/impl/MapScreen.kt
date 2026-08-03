@@ -373,7 +373,7 @@ internal fun MapScreen(
 
             if (uiState.walkTarget == null && !uiState.isRouteReplay && !uiState.isRoaming) {
                 Text(
-                    text = "Tap to teleport · Long-press to walk",
+                    text = if (uiState.hideTeleportFeatures) "Long-press to walk" else "Tap to teleport · Long-press to walk",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier =
@@ -452,6 +452,7 @@ internal fun MapScreen(
                     }
                 context.startActivity(Intent.createChooser(shareIntent, null))
             },
+            hideTeleportFeatures = uiState.hideTeleportFeatures,
         )
     }
 

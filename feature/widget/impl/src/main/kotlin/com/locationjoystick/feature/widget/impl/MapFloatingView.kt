@@ -121,6 +121,7 @@ internal fun MapFloatingView(
     cooldownForPosition: ((LatLng) -> Flow<CooldownState>)? = null,
     onSaveCurrentLocation: ((String) -> Unit)? = null,
     quickWalk: Boolean = false,
+    hideTeleportFeatures: Boolean = false,
 ) {
     val isRoaming = mockMode == MockMode.ROAMING
     val isRouteReplay = mockMode == MockMode.ROUTE_REPLAY
@@ -490,6 +491,7 @@ internal fun MapFloatingView(
                 onFinishRouteAndWalkTo = onFinishRouteAndWalkTo,
                 onAddEphemeralWaypoint = onAddEphemeralWaypoint,
                 onDismiss = { pendingTap = null },
+                hideTeleportFeatures = hideTeleportFeatures,
             )
         }
 
@@ -510,6 +512,7 @@ internal fun MapFloatingView(
                     onDismiss()
                 },
                 onAddFromHere = onSaveCurrentLocation,
+                hideTeleport = hideTeleportFeatures,
             )
         }
     }
@@ -606,6 +609,7 @@ private fun BoxScope.TapActionPanel(
     onFinishRouteAndWalkTo: (LatLng) -> Unit,
     onAddEphemeralWaypoint: (LatLng) -> Unit,
     onDismiss: () -> Unit,
+    hideTeleportFeatures: Boolean = false,
 ) {
     Column(
         modifier =
@@ -619,14 +623,16 @@ private fun BoxScope.TapActionPanel(
         if (isRouteReplay && !isEphemeralReplay) {
             Text("Route in progress", style = MaterialTheme.typography.titleMedium, color = LjText)
             Spacer(Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    onStopRouteAndTeleport(tap)
-                    onDismiss()
-                },
-                modifier = Modifier.fillMaxWidth(),
-            ) { Text("Stop route and teleport") }
-            Spacer(Modifier.height(8.dp))
+            if (!hideTeleportFeatures) {
+                Button(
+                    onClick = {
+                        onStopRouteAndTeleport(tap)
+                        onDismiss()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text("Stop route and teleport") }
+                Spacer(Modifier.height(8.dp))
+            }
             OutlinedButton(
                 onClick = {
                     onStopRouteAndWalkTo(tap)
@@ -652,14 +658,16 @@ private fun BoxScope.TapActionPanel(
                 (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel() ?: "No wait needed",
             )
             Spacer(Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    onTeleport(tap)
-                    onDismiss()
-                },
-                modifier = Modifier.fillMaxWidth(),
-            ) { Text("Teleport here") }
-            Spacer(Modifier.height(8.dp))
+            if (!hideTeleportFeatures) {
+                Button(
+                    onClick = {
+                        onTeleport(tap)
+                        onDismiss()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text("Teleport here") }
+                Spacer(Modifier.height(8.dp))
+            }
             OutlinedButton(
                 onClick = {
                     onWalkTo(tap)
