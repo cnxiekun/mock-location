@@ -746,7 +746,12 @@ class MockLocationService : Service() {
 
     /** Manual override: snap straight to the last-known leader position instead of walking there. */
     internal fun teleportToLeaderNow() {
-        val target = followerCatchUp.currentTarget() ?: return
+        val target =
+            followerCatchUp.currentTarget() ?: run {
+                Log.w(TAG, "Teleport to leader requested but leader position not yet known")
+                groupRepository.emitTeleportUnavailable()
+                return
+            }
         writeCurrentPosition(target.latitude, target.longitude)
         followerCatchUp.markArrived()
         locationRepository.setPositionInternal(target)

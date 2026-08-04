@@ -140,6 +140,11 @@ class GroupSyncViewModel
                     _errorMessage.value = "Disconnected from group — leader is no longer reachable"
                 }
             }
+            viewModelScope.launch {
+                groupRepository.teleportUnavailableEvent.collect {
+                    _errorMessage.value = "Leader position not yet known — try again in a moment"
+                }
+            }
         }
 
         fun createGroup() {

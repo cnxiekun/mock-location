@@ -45,6 +45,7 @@ class GroupSyncViewModelTest {
 
     private lateinit var groupStateFlow: MutableStateFlow<GroupState>
     private lateinit var pendingInviteFlow: MutableSharedFlow<GroupInvite>
+    private lateinit var teleportUnavailableFlow: MutableSharedFlow<Unit>
     private lateinit var leaderFollowerCount: MutableStateFlow<Int>
     private lateinit var followerFollowerCount: MutableStateFlow<Int>
 
@@ -66,12 +67,14 @@ class GroupSyncViewModelTest {
 
         groupStateFlow = MutableStateFlow(GroupState())
         pendingInviteFlow = MutableSharedFlow(replay = 1)
+        teleportUnavailableFlow = MutableSharedFlow(replay = 1)
         leaderFollowerCount = MutableStateFlow(0)
         followerFollowerCount = MutableStateFlow(0)
 
         every { groupRepository.groupState } returns groupStateFlow
         every { groupRepository.pendingGroupInvite } returns pendingInviteFlow
         every { groupRepository.groupLostEvent } returns MutableSharedFlow()
+        every { groupRepository.teleportUnavailableEvent } returns teleportUnavailableFlow
         every { leaderSyncServer.followerCount } returns leaderFollowerCount
         every { followerSyncClient.followerCount } returns followerFollowerCount
 
@@ -314,6 +317,14 @@ class GroupSyncViewModelTest {
 
             verify(exactly = 0) { context.startService(any()) }
             coVerify { groupRepository.leaveGroup() }
+        }
+
+    @Test
+    fun `teleportUnavailableEvent from repository sets error message`() =
+        runTest {
+            teleportUnavailableFlow.tryEmit(Unit)
+
+            assertEquals("Leader position not yet known — try again in a moment", viewModel.errorMessage.value)
         }
 
     @Test

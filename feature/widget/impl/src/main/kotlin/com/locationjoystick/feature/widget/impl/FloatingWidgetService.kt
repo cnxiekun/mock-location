@@ -222,6 +222,13 @@ class FloatingWidgetService :
             }
         }
         lifecycleScope.launch {
+            groupRepository.teleportUnavailableEvent.collect {
+                Toast
+                    .makeText(this@FloatingWidgetService, "Leader position not yet known — try again in a moment", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+        lifecycleScope.launch {
             settingsRepository.getTapToWalkOverlayEnabled().collect { enabled ->
                 if (!enabled) dismissTapToWalkOverlay()
             }

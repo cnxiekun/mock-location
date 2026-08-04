@@ -115,4 +115,11 @@ class GroupRepository
         fun emitGroupLost() {
             _groupLostEvent.tryEmit(Unit)
         }
+
+        private val _teleportUnavailableEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+        val teleportUnavailableEvent = _teleportUnavailableEvent.asSharedFlow()
+
+        fun emitTeleportUnavailable() {
+            _teleportUnavailableEvent.tryEmit(Unit)
+        }
     }
