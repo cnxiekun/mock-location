@@ -130,6 +130,7 @@ earlier than that.
 ## Edge Cases
 
 - Leader pauses its route/roaming/walk → broadcasting to followers continues (frozen position, refreshed each tick) instead of going stale. `MockLocationService.observeLocationState` keeps the update loop alive on `PAUSED` when `leaderSharingEnabled` is true.
+- **Leader manually stops/starts spoofing** (global stop/start toggle, not pause) → every `SyncPositionUpdate` carries an `active` flag (`true` for `RUNNING`/`PAUSED`, `false` for `IDLE`/`ERROR`), set in `MockLocationService.pushLocationUpdate()` and served by `LeaderSyncServer`/parsed by `FollowerSyncClient`. A follower reacts via the pure `computeFollowerActiveAction()` (`:core:location/LocationLoopPolicy.kt`): `active=false` while the follower is spoofing calls `pauseFollowerForInactiveLeader()` — removes the mock provider and sets state `IDLE` without `stopSelf()`, so the service, notification, and follower polling all stay alive; `active=true` again re-triggers the same bootstrap path used on first connect (snap straight to the leader's position, no anti-cheat risk since nothing was being reported).
 - Joining while leading → leader exits first, then joins as follower.
 - Network unavailable → follower's boot restoration fails, but retries are queued. Once network is available, restoration succeeds. UI shows last known role until sync resumes.
 - QR regeneration: leader can regenerate QR (new port/session) without changing the group code.
