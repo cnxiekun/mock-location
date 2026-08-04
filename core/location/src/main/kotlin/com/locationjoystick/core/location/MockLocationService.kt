@@ -731,6 +731,7 @@ class MockLocationService : Service() {
                 },
             ) { lat, lon, _, bearing, active ->
                 followerCatchUp.setTarget(LatLng(lat, lon), bearing)
+                groupRepository.setLeaderPosition(LatLng(lat, lon))
                 when (computeFollowerActiveAction(active, spoofingStarted.get(), _state.value)) {
                     FollowerActiveAction.BOOTSTRAP -> {
                         // Spoofing wasn't active yet — nothing was being reported to other apps, so
@@ -769,6 +770,7 @@ class MockLocationService : Service() {
         stopFollowerRestoration()
         followerSyncClient.stopPolling()
         followerCatchUp.clear()
+        groupRepository.setLeaderPosition(null)
         locationRepository.setMockMode(MockMode.TELEPORT)
         Log.i(TAG, "Exited FOLLOWER mode")
     }
@@ -784,6 +786,9 @@ class MockLocationService : Service() {
         writeCurrentPosition(target.latitude, target.longitude)
         followerCatchUp.markArrived()
         locationRepository.setPositionInternal(target)
+        // Shares the same cooldown clock as every other teleport (Favorites, map long-press) —
+        // see CooldownEngine/settingsRepository.getLastTeleportTime().
+        serviceScope.launch { settingsRepository.setLastTeleportTime(System.currentTimeMillis()) }
         Log.i(TAG, "Follower teleported to leader at (${target.latitude}, ${target.longitude})")
     }
 

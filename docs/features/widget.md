@@ -53,6 +53,11 @@ button:
   **Teleport to leader now** — which sends `ACTION_FOLLOWER_TELEPORT` to
   `MockLocationService`, the same action the Group Sync screen's own
   "Teleport to leader now" button sends (see @docs/features/group-sync.md).
+  If a cooldown advisory applies (same distance-tiered `CooldownEngine` used
+  elsewhere), `FloatingWidgetService` shows it as a one-shot Toast after
+  tapping — the teleport still goes through, the Toast is advisory only. The
+  icon-only row has no room for the persistent badge the Group Sync screen
+  shows.
 - **Auto-collapse**: the button (and its inline teleport action) disappears
   entirely once the device stops being an enabled follower — nothing is left
   on screen for the expand state to affect.

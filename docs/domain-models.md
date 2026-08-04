@@ -25,7 +25,7 @@ All in `:core:model`. Pure Kotlin — no Android, no Room. Room entities in `:co
 | `ThemeMode` | enum: `DARK`, `LIGHT` |
 | `GroupRole` | enum: `NONE`, `LEADER`, `FOLLOWER` |
 | `GroupState` | `role: GroupRole`, `groupId: String?`, `leaderHost: String?`, `leaderPort: Int?`, `followerModeEnabled: Boolean`, `sharingEnabled: Boolean` |
-| `SyncPositionUpdate` | `timestamp: Long`, `latitude: Double`, `longitude: Double`, `speedMs: Float`, `bearing: Float`, `seq: Long` |
+| `SyncPositionUpdate` | `timestamp: Long`, `latitude: Double`, `longitude: Double`, `speedMs: Float`, `bearing: Float`, `seq: Long`, `active: Boolean` |
 | `GroupInvite` | `host: String`, `port: Int`, `groupId: String` |
 
 ## Mapping
