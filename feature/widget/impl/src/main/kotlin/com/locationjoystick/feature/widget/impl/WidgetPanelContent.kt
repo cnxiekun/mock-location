@@ -176,18 +176,19 @@ internal fun WidgetPanel(
                     modifier = Modifier.fillMaxSize().clip(CircleShape),
                 )
             }
-            AnimatedVisibility(
-                visible = hasPendingCompletion,
-                enter = scaleIn(tween(150)) + fadeIn(tween(150)),
-                exit = scaleOut(tween(150)) + fadeOut(tween(150)),
-                modifier = Modifier.align(Alignment.TopEnd),
-            ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(10.dp)
-                            .background(Color.Red, CircleShape),
-                )
+            Box(modifier = Modifier.align(Alignment.TopEnd)) {
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = hasPendingCompletion,
+                    enter = scaleIn(tween(150)) + fadeIn(tween(150)),
+                    exit = scaleOut(tween(150)) + fadeOut(tween(150)),
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(10.dp)
+                                .background(Color.Red, CircleShape),
+                    )
+                }
             }
         }
 

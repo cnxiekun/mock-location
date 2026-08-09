@@ -31,8 +31,7 @@ import javax.inject.Singleton
 /**
  * Interface for accessing app preferences stored in DataStore.
  *
- * This abstraction allows for easy testing and potential future migration
- * from DataStore to another storage mechanism.
+ * Abstracted for fake-based unit testing (see SettingsRepositoryTest etc).
  *
  * Keys are defined in [AppConstants.DataStoreConstants].
  */
