@@ -242,7 +242,9 @@ class MockLocationService : Service() {
                         }
                         if (Settings.canDrawOverlays(this@MockLocationService)) {
                             startService(Intent().setClassName(packageName, JOYSTICK_SERVICE_CLASS))
-                            startService(Intent().setClassName(packageName, WIDGET_SERVICE_CLASS))
+                            if (!settingsRepository.getHideWidgetOverlay().first()) {
+                                startService(Intent().setClassName(packageName, WIDGET_SERVICE_CLASS))
+                            }
                             Log.i(TAG, "Overlay services started")
                         } else {
                             Log.i(TAG, "SYSTEM_ALERT_WINDOW not granted — skipping overlay start")
