@@ -25,7 +25,7 @@ Schema version: `AppConstants.ExportConstants.SCHEMA_VERSION`.
 ## Import Flow
 
 1. File picker (`OpenDocument`, MIME `AppConstants.ExportConstants.MIME_TYPE`).
-2. Parse + validate `schemaVersion == AppConstants.ExportConstants.SCHEMA_VERSION`.
+2. Parse + validate `schemaVersion` is between 1 and `AppConstants.ExportConstants.SCHEMA_VERSION`, inclusive.
 3. Confirm "replace all data?".
 4. Clear Room + DataStore.
 5. Insert new data.
