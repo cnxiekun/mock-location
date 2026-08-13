@@ -49,7 +49,7 @@ jobs:
 
   build:
     needs: [release-please, filter]
-    if: needs.filter.outputs.src == 'true'
+    if: ${{ !cancelled() && needs.filter.outputs.src == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
