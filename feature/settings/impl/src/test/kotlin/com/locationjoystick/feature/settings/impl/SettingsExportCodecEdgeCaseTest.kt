@@ -253,6 +253,28 @@ class SettingsExportCodecEdgeCaseTest {
     }
 
     @Test
+    fun `missing enabledWidgetFeatures defaults to AppFeature DEFAULT_WIDGET_ENABLED`() {
+        val json =
+            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH"},""" +
+                """"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""
+
+        val parsed = SettingsExportCodec.parseExportData(json)
+
+        assertEquals(AppFeature.DEFAULT_WIDGET_ENABLED, parsed.settings.enabledWidgetFeatures)
+    }
+
+    @Test
+    fun `empty enabledWidgetFeatures array defaults to AppFeature DEFAULT_WIDGET_ENABLED`() {
+        val json =
+            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":[]},""" +
+                """"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""
+
+        val parsed = SettingsExportCodec.parseExportData(json)
+
+        assertEquals(AppFeature.DEFAULT_WIDGET_ENABLED, parsed.settings.enabledWidgetFeatures)
+    }
+
+    @Test
     fun `unknown widget feature is skipped, known feature is preserved`() {
         val json =
             """{"schemaVersion":1,"exportedAt":0,""" +
