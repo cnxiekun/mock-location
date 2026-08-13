@@ -103,9 +103,23 @@ class LocationFixBuilderTest {
         val lon = 20.0
         (1..50).forEach { seed ->
             val north =
-                gaussianLatLonOffsetLateral(lat, lon, radius, bearingDeg = 0f, longitudinalFraction = 1.0, random = Random(seed))
+                gaussianLatLonOffsetLateral(
+                    lat,
+                    lon,
+                    radius,
+                    bearingDeg = 0f,
+                    longitudinalFraction = 1.0,
+                    random = Random(seed),
+                )
             val east =
-                gaussianLatLonOffsetLateral(lat, lon, radius, bearingDeg = 90f, longitudinalFraction = 1.0, random = Random(seed))
+                gaussianLatLonOffsetLateral(
+                    lat,
+                    lon,
+                    radius,
+                    bearingDeg = 90f,
+                    longitudinalFraction = 1.0,
+                    random = Random(seed),
+                )
             val dNorth = displacementMeters(lat, lon, north.first, north.second)
             val dEast = displacementMeters(lat, lon, east.first, east.second)
             assertEquals(
@@ -133,7 +147,12 @@ class LocationFixBuilderTest {
                     longitudinalFraction = 0.0,
                     random = Random(seed),
                 )
-            assertEquals("Latitude must be unchanged for pure lateral jitter heading north (seed $seed)", lat, oLat, 1e-9)
+            assertEquals(
+                "Latitude must be unchanged for pure lateral jitter heading north (seed $seed)",
+                lat,
+                oLat,
+                1e-9,
+            )
         }
     }
 

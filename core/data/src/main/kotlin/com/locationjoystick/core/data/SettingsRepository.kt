@@ -2,7 +2,6 @@ package com.locationjoystick.core.data
 
 import com.locationjoystick.core.datastore.PreferencesDataSource
 import com.locationjoystick.core.datastore.SettingsSnapshot
-import com.locationjoystick.core.datastore.SpeedProfilePreferences
 import com.locationjoystick.core.datastore.toActiveSpeedProfile
 import com.locationjoystick.core.datastore.toAppFeature
 import com.locationjoystick.core.model.AppFeature
@@ -212,9 +211,15 @@ class SettingsRepository
 
         suspend fun setRealismWarmupEnabled(enabled: Boolean) = dataSource.setRealismWarmupEnabled(enabled)
 
-        suspend fun setRealismSatelliteExtrasEnabled(enabled: Boolean) = dataSource.setRealismSatelliteExtrasEnabled(enabled)
+        suspend fun setRealismSatelliteExtrasEnabled(enabled: Boolean) =
+            dataSource.setRealismSatelliteExtrasEnabled(
+                enabled,
+            )
 
-        suspend fun setRealismSuspendedMockingEnabled(enabled: Boolean) = dataSource.setRealismSuspendedMockingEnabled(enabled)
+        suspend fun setRealismSuspendedMockingEnabled(enabled: Boolean) =
+            dataSource.setRealismSuspendedMockingEnabled(
+                enabled,
+            )
 
         fun getRoutesSortNewestFirst(): Flow<Boolean> = dataSource.getRoutesSortNewestFirst()
 
@@ -222,7 +227,10 @@ class SettingsRepository
 
         fun getFavoritesSortNewestFirst(): Flow<Boolean> = dataSource.getFavoritesSortNewestFirst()
 
-        suspend fun setFavoritesSortNewestFirst(newestFirst: Boolean) = dataSource.setFavoritesSortNewestFirst(newestFirst)
+        suspend fun setFavoritesSortNewestFirst(newestFirst: Boolean) =
+            dataSource.setFavoritesSortNewestFirst(
+                newestFirst,
+            )
 
         fun getRecentSearches(): Flow<List<RecentSearch>> = dataSource.getRecentSearches()
 

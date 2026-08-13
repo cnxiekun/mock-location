@@ -20,7 +20,6 @@ import com.locationjoystick.core.designsystem.component.EmptyState
 import com.locationjoystick.core.designsystem.component.LjButton
 import com.locationjoystick.core.designsystem.component.LjCard
 import com.locationjoystick.core.designsystem.component.LjOutlinedButton
-import com.locationjoystick.core.designsystem.component.LoadingIndicator
 
 @PreviewLightDark
 @Composable

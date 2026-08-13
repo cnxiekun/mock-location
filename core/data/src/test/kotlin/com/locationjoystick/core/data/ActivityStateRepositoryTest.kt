@@ -1,8 +1,6 @@
 package com.locationjoystick.core.data
 
-import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
-import com.locationjoystick.core.routing.RoamingEngine
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

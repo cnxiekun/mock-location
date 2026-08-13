@@ -128,7 +128,13 @@ class EphemeralReplayController
                         if (followRoads && currentWaypoints.isNotEmpty()) {
                             val from = currentWaypoints.last()
                             osrmClient
-                                .resolveRoute(OsrmClient.PROFILE_FOOT, from, newPoint, followRoads = true, onFallback = ::reportFallback)
+                                .resolveRoute(
+                                    OsrmClient.PROFILE_FOOT,
+                                    from,
+                                    newPoint,
+                                    followRoads = true,
+                                    onFallback = ::reportFallback,
+                                )
                                 .drop(1) // first point is `from`, already in the route
                         } else {
                             listOf(newPoint)

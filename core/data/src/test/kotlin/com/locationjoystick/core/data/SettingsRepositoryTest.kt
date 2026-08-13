@@ -11,7 +11,6 @@ import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.RecentSearch
 import com.locationjoystick.core.model.RoamingDefaults
-import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.SpeedUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -1123,11 +1122,14 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
         mapFollowsLocationFlow.value = enabled
     }
 
-    private val realismBearingHoldIdleFlow = MutableStateFlow(AppConstants.RealismConstants.BEARING_HOLD_ON_IDLE_DEFAULT)
+    private val realismBearingHoldIdleFlow =
+        MutableStateFlow(AppConstants.RealismConstants.BEARING_HOLD_ON_IDLE_DEFAULT)
     private val realismAltitudeEnabledFlow = MutableStateFlow(AppConstants.RealismConstants.ALTITUDE_ENABLED_DEFAULT)
     private val realismWarmupEnabledFlow = MutableStateFlow(AppConstants.RealismConstants.WARMUP_ENABLED_DEFAULT)
-    private val realismSatelliteExtrasEnabledFlow = MutableStateFlow(AppConstants.RealismConstants.SATELLITE_EXTRAS_ENABLED_DEFAULT)
-    private val realismSuspendedMockingEnabledFlow = MutableStateFlow(AppConstants.RealismConstants.SUSPENDED_MOCKING_ENABLED_DEFAULT)
+    private val realismSatelliteExtrasEnabledFlow =
+        MutableStateFlow(AppConstants.RealismConstants.SATELLITE_EXTRAS_ENABLED_DEFAULT)
+    private val realismSuspendedMockingEnabledFlow =
+        MutableStateFlow(AppConstants.RealismConstants.SUSPENDED_MOCKING_ENABLED_DEFAULT)
 
     override fun getRealismBearingHoldIdle(): Flow<Boolean> = realismBearingHoldIdleFlow
 
@@ -1174,8 +1176,10 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
         favoritesSortNewestFirstFlow.value = newestFirst
     }
 
-    private val jitterSpeedIdleVariationPctFlow = MutableStateFlow(AppPreferencesDataSource.DEFAULT_JITTER_SPEED_IDLE_VARIATION_PCT)
-    private val jitterSpeedMovingVariationPctFlow = MutableStateFlow(AppPreferencesDataSource.DEFAULT_JITTER_SPEED_MOVING_VARIATION_PCT)
+    private val jitterSpeedIdleVariationPctFlow =
+        MutableStateFlow(AppPreferencesDataSource.DEFAULT_JITTER_SPEED_IDLE_VARIATION_PCT)
+    private val jitterSpeedMovingVariationPctFlow =
+        MutableStateFlow(AppPreferencesDataSource.DEFAULT_JITTER_SPEED_MOVING_VARIATION_PCT)
 
     override fun getJitterSpeedIdleVariationPct(): Flow<Int> = jitterSpeedIdleVariationPctFlow
 
@@ -1243,15 +1247,24 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
 
     override suspend fun setCompassTrackingEnabled(enabled: Boolean) = Unit
 
-    override fun getCompassRegionCxPct(): Flow<Float> = flowOf(AppConstants.CompassTrackingConstants.DEFAULT_REGION_CX_PCT)
+    override fun getCompassRegionCxPct(): Flow<Float> =
+        flowOf(
+            AppConstants.CompassTrackingConstants.DEFAULT_REGION_CX_PCT,
+        )
 
     override suspend fun setCompassRegionCxPct(cx: Float) = Unit
 
-    override fun getCompassRegionCyPct(): Flow<Float> = flowOf(AppConstants.CompassTrackingConstants.DEFAULT_REGION_CY_PCT)
+    override fun getCompassRegionCyPct(): Flow<Float> =
+        flowOf(
+            AppConstants.CompassTrackingConstants.DEFAULT_REGION_CY_PCT,
+        )
 
     override suspend fun setCompassRegionCyPct(cy: Float) = Unit
 
-    override fun getCompassRegionRadiusPct(): Flow<Float> = flowOf(AppConstants.CompassTrackingConstants.DEFAULT_REGION_RADIUS_PCT)
+    override fun getCompassRegionRadiusPct(): Flow<Float> =
+        flowOf(
+            AppConstants.CompassTrackingConstants.DEFAULT_REGION_RADIUS_PCT,
+        )
 
     override suspend fun setCompassRegionRadiusPct(radius: Float) = Unit
 

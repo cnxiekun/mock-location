@@ -340,7 +340,10 @@ fun SpeedProfilePreferences.toActiveSpeedProfile(): SpeedProfile {
     )
 }
 
-inline fun <reified T : Enum<T>> String.toEnumFeature(): T? = enumValues<T>().firstOrNull { it.name.lowercase() == this }
+inline fun <reified T : Enum<T>> String.toEnumFeature(): T? =
+    enumValues<T>().firstOrNull {
+        it.name.lowercase() == this
+    }
 
 /**
  * Old `WidgetFeature` names that were renamed when [AppFeature] merged it with the old
@@ -550,13 +553,21 @@ class AppPreferencesDataSource
             dataStore.edit { prefs -> prefs[Keys.ONBOARDING_COMPLETE] = complete }
         }
 
-        override fun getSpeedUnit(): Flow<String> = pref(Keys.SPEED_UNIT, AppConstants.ProfileConstants.DEFAULT_SPEED_UNIT)
+        override fun getSpeedUnit(): Flow<String> =
+            pref(
+                Keys.SPEED_UNIT,
+                AppConstants.ProfileConstants.DEFAULT_SPEED_UNIT,
+            )
 
         override suspend fun setSpeedUnit(unit: String) {
             dataStore.edit { prefs -> prefs[Keys.SPEED_UNIT] = unit }
         }
 
-        override fun getThemeMode(): Flow<String> = pref(Keys.THEME_MODE, AppConstants.DataStoreConstants.DEFAULT_THEME_MODE)
+        override fun getThemeMode(): Flow<String> =
+            pref(
+                Keys.THEME_MODE,
+                AppConstants.DataStoreConstants.DEFAULT_THEME_MODE,
+            )
 
         override suspend fun setThemeMode(mode: String) {
             dataStore.edit { prefs -> prefs[Keys.THEME_MODE] = mode }
@@ -591,19 +602,37 @@ class AppPreferencesDataSource
             }
         }
 
-        override fun getJitterIdleRadius(): Flow<Double> = pref(Keys.JITTER_IDLE_RADIUS_METERS, DEFAULT_JITTER_IDLE_RADIUS_METERS)
+        override fun getJitterIdleRadius(): Flow<Double> =
+            pref(
+                Keys.JITTER_IDLE_RADIUS_METERS,
+                DEFAULT_JITTER_IDLE_RADIUS_METERS,
+            )
 
-        override fun getJitterMovingRadius(): Flow<Double> = pref(Keys.JITTER_MOVING_RADIUS_METERS, DEFAULT_JITTER_MOVING_RADIUS_METERS)
+        override fun getJitterMovingRadius(): Flow<Double> =
+            pref(
+                Keys.JITTER_MOVING_RADIUS_METERS,
+                DEFAULT_JITTER_MOVING_RADIUS_METERS,
+            )
 
         override suspend fun setJitterIdleRadius(meters: Double) {
-            dataStore.edit { prefs -> prefs[Keys.JITTER_IDLE_RADIUS_METERS] = meters.coerceIn(0.0, MAX_JITTER_RADIUS_METERS) }
+            dataStore.edit {
+                    prefs ->
+                prefs[Keys.JITTER_IDLE_RADIUS_METERS] = meters.coerceIn(0.0, MAX_JITTER_RADIUS_METERS)
+            }
         }
 
         override suspend fun setJitterMovingRadius(meters: Double) {
-            dataStore.edit { prefs -> prefs[Keys.JITTER_MOVING_RADIUS_METERS] = meters.coerceIn(0.0, MAX_JITTER_RADIUS_METERS) }
+            dataStore.edit {
+                    prefs ->
+                prefs[Keys.JITTER_MOVING_RADIUS_METERS] = meters.coerceIn(0.0, MAX_JITTER_RADIUS_METERS)
+            }
         }
 
-        override fun getJitterIntervalSeconds(): Flow<Int> = pref(Keys.JITTER_INTERVAL_SECONDS, DEFAULT_JITTER_INTERVAL_SECONDS)
+        override fun getJitterIntervalSeconds(): Flow<Int> =
+            pref(
+                Keys.JITTER_INTERVAL_SECONDS,
+                DEFAULT_JITTER_INTERVAL_SECONDS,
+            )
 
         override suspend fun setJitterIntervalSeconds(seconds: Int) {
             dataStore.edit { prefs ->
@@ -639,9 +668,17 @@ class AppPreferencesDataSource
 
         override fun getRealismWarmupEnabled(): Flow<Boolean> = pref(Keys.REALISM_WARMUP_ENABLED, false)
 
-        override fun getRealismSatelliteExtrasEnabled(): Flow<Boolean> = pref(Keys.REALISM_SATELLITE_EXTRAS_ENABLED, true)
+        override fun getRealismSatelliteExtrasEnabled(): Flow<Boolean> =
+            pref(
+                Keys.REALISM_SATELLITE_EXTRAS_ENABLED,
+                true,
+            )
 
-        override fun getRealismSuspendedMockingEnabled(): Flow<Boolean> = pref(Keys.REALISM_SUSPENDED_MOCKING_ENABLED, false)
+        override fun getRealismSuspendedMockingEnabled(): Flow<Boolean> =
+            pref(
+                Keys.REALISM_SUSPENDED_MOCKING_ENABLED,
+                false,
+            )
 
         override suspend fun setRealismBearingHoldIdle(enabled: Boolean) {
             dataStore.edit { prefs -> prefs[Keys.REALISM_BEARING_HOLD_IDLE] = enabled }

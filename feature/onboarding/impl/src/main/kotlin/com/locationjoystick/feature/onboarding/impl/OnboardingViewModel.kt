@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.locationjoystick.core.common.util.isMockLocationEnabled
 import com.locationjoystick.core.common.util.isOverlayPermissionGranted
 import com.locationjoystick.core.data.SettingsRepository
-import com.locationjoystick.feature.onboarding.impl.BuildConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -77,7 +77,7 @@ class MapController
         private val routingErrorReporter: RoutingErrorReporter,
         @param:ApplicationScope private val appScope: CoroutineScope,
     ) {
-        @Suppress("ktlint:standard:backing-property-naming")
+        @Suppress("ktlint:standard:property-naming")
         private val _state = MutableStateFlow(MapSharedState())
         val sharedState: StateFlow<MapSharedState> = _state.asStateFlow()
 
@@ -332,7 +332,13 @@ class MapController
             }
             walkCoordinator.startWalk(position, appScope) { newPos, speedMs, bearing ->
                 context.startService(
-                    MockLocationIntentBuilder.updatePosition(context, newPos.latitude, newPos.longitude, speedMs, bearing),
+                    MockLocationIntentBuilder.updatePosition(
+                        context,
+                        newPos.latitude,
+                        newPos.longitude,
+                        speedMs,
+                        bearing,
+                    ),
                 )
             }
         }
@@ -406,7 +412,11 @@ class MapController
                 ) ?: return@launch
                 _state.update {
                     it.copy(
-                        walkMode = WalkMode.EphemeralReplay(ephemeralReplayController.pendingWaypoints.value, followRoads),
+                        walkMode =
+                            WalkMode.EphemeralReplay(
+                                ephemeralReplayController.pendingWaypoints.value,
+                                followRoads,
+                            ),
                     )
                 }
             }

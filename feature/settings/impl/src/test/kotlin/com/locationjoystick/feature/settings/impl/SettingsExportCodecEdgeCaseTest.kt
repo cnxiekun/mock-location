@@ -2,7 +2,6 @@ package com.locationjoystick.feature.settings.impl
 
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.model.AppFeature
-import com.locationjoystick.core.model.ExportData
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.Route
@@ -172,7 +171,8 @@ class SettingsExportCodecEdgeCaseTest {
     @Test
     fun `missing jitterMovingRadius defaults to AppConstants value`() {
         val json =
-            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":[]},"speedProfiles":[],"routes":[],"favoriteLocations":[],"jitterIdleRadius":0.5,"jitterIntervalSeconds":3}"""
+            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":[]},""" +
+                """"speedProfiles":[],"routes":[],"favoriteLocations":[],"jitterIdleRadius":0.5,"jitterIntervalSeconds":3}"""
 
         val parsed = SettingsExportCodec.parseExportData(json)
 
@@ -187,7 +187,8 @@ class SettingsExportCodecEdgeCaseTest {
     @Test
     fun `missing jitterIdleRadius defaults to AppConstants value`() {
         val json =
-            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":[]},"speedProfiles":[],"routes":[],"favoriteLocations":[],"jitterMovingRadius":1.0,"jitterIntervalSeconds":3}"""
+            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":[]},""" +
+                """"speedProfiles":[],"routes":[],"favoriteLocations":[],"jitterMovingRadius":1.0,"jitterIntervalSeconds":3}"""
 
         val parsed = SettingsExportCodec.parseExportData(json)
 
@@ -202,7 +203,8 @@ class SettingsExportCodecEdgeCaseTest {
     @Test
     fun `missing jitterIntervalSeconds defaults to AppConstants value`() {
         val json =
-            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":[]},"speedProfiles":[],"routes":[],"favoriteLocations":[],"jitterIdleRadius":0.5,"jitterMovingRadius":1.0}"""
+            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":[]},""" +
+                """"speedProfiles":[],"routes":[],"favoriteLocations":[],"jitterIdleRadius":0.5,"jitterMovingRadius":1.0}"""
 
         val parsed = SettingsExportCodec.parseExportData(json)
 
@@ -230,7 +232,8 @@ class SettingsExportCodecEdgeCaseTest {
     @Test(expected = IllegalArgumentException::class)
     fun `schemaVersion above SCHEMA_VERSION constant is rejected`() {
         val json =
-            """{"schemaVersion":${AppConstants.ExportConstants.SCHEMA_VERSION + 1},"exportedAt":0,"settings":{},"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""
+            """{"schemaVersion":${AppConstants.ExportConstants.SCHEMA_VERSION + 1},"exportedAt":0,""" +
+                """"settings":{},"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""
         SettingsExportCodec.parseExportData(json)
     }
 
@@ -241,7 +244,8 @@ class SettingsExportCodecEdgeCaseTest {
     @Test
     fun `invalid speedUnit falls back to KMH`() {
         val json =
-            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"INVALID_UNIT","enabledWidgetFeatures":[]},"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""
+            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"INVALID_UNIT","enabledWidgetFeatures":[]},""" +
+                """"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""
 
         val parsed = SettingsExportCodec.parseExportData(json)
 
@@ -251,7 +255,9 @@ class SettingsExportCodecEdgeCaseTest {
     @Test
     fun `unknown widget feature is skipped, known feature is preserved`() {
         val json =
-            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":["UNKNOWN_FEATURE","JOYSTICK_TOGGLE"]},"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""
+            """{"schemaVersion":1,"exportedAt":0,""" +
+                """"settings":{"speedUnit":"KMH","enabledWidgetFeatures":["UNKNOWN_FEATURE","JOYSTICK_TOGGLE"]},""" +
+                """"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""
 
         val parsed = SettingsExportCodec.parseExportData(json)
 

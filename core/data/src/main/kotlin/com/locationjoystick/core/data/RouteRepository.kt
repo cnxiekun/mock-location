@@ -44,7 +44,10 @@ class RouteRepository
                 list.map { it.route.toDomain(it.waypoints) }
             }
 
-        fun getRouteWithWaypoints(id: String): Flow<Route?> = routeDao.getWithWaypoints(id).map { it?.route?.toDomain(it.waypoints) }
+        fun getRouteWithWaypoints(id: String): Flow<Route?> =
+            routeDao.getWithWaypoints(id).map {
+                it?.route?.toDomain(it.waypoints)
+            }
 
         suspend fun insertRoute(route: Route): Result<Unit> =
             withContext(ioDispatcher) {
@@ -113,7 +116,11 @@ class RouteRepository
                 runCatching {
                     val entity = routeDao.getById(routeId)
                     if (entity != null) {
-                        val updated = entity.copy(speedProfileId = speedProfileId, updatedAt = System.currentTimeMillis())
+                        val updated =
+                            entity.copy(
+                                speedProfileId = speedProfileId,
+                                updatedAt = System.currentTimeMillis(),
+                            )
                         routeDao.update(updated)
                     }
                 }.onFailure { e ->
@@ -131,7 +138,12 @@ class RouteRepository
                 }
             }
 
-        suspend fun upsertHotRoutes(selectedIds: Set<String> = HOT_ROUTES.map { idForRoute(it.name, it.city) }.toSet()): Result<Unit> =
+        suspend fun upsertHotRoutes(
+            selectedIds: Set<String> =
+                HOT_ROUTES.map {
+                    idForRoute(it.name, it.city)
+                }.toSet(),
+        ): Result<Unit> =
             withContext(ioDispatcher) {
                 runCatching {
                     val now = System.currentTimeMillis()
@@ -168,7 +180,13 @@ class RouteRepository
                                     createdAt = existing?.createdAt ?: now,
                                     updatedAt = now,
                                 )
-                            if (existing != null) toUpdate.add(entity to waypoints) else toInsert.add(entity to waypoints)
+                            if (existing != null) {
+                                toUpdate.add(
+                                    entity to waypoints,
+                                )
+                            } else {
+                                toInsert.add(entity to waypoints)
+                            }
                         } else if (existing != null) {
                             toDelete.add(existing)
                         }
@@ -213,7 +231,13 @@ class RouteRepository
             val HOT_ROUTES =
                 listOf(
                     HotRoute("Faelledparken", "Denmark", "Copenhagen", "hot_routes/cph_park.gpx"),
-                    HotRoute("Faelledparken (Via Roads)", "Denmark", "Copenhagen", "hot_routes/cph_park.gpx", RouteType.GUIDED),
+                    HotRoute(
+                        "Faelledparken (Via Roads)",
+                        "Denmark",
+                        "Copenhagen",
+                        "hot_routes/cph_park.gpx",
+                        RouteType.GUIDED,
+                    ),
                 )
         }
     }

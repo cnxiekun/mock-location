@@ -99,7 +99,9 @@ fun FavoritesList(
                         )
                         if (cooldownLabel != null) {
                             Spacer(Modifier.height(6.dp))
-                            CooldownAdvisoryBadge(cooldownLabel.invoke(favorite)?.let { "Suggested wait: $it" } ?: "No wait needed")
+                            CooldownAdvisoryBadge(
+                                cooldownLabel.invoke(favorite)?.let { "Suggested wait: $it" } ?: "No wait needed",
+                            )
                         }
                     }
                 }

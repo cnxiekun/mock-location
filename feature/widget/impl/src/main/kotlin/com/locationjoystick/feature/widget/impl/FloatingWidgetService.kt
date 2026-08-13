@@ -24,12 +24,9 @@ import com.locationjoystick.core.data.CooldownState
 import com.locationjoystick.core.data.GroupRepository
 import com.locationjoystick.core.data.LocationRepository
 import com.locationjoystick.core.data.SettingsRepository
-import com.locationjoystick.core.designsystem.LjBg
-import com.locationjoystick.core.designsystem.LjText
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.location.CompassHeadingSource
 import com.locationjoystick.core.location.MapController
-import com.locationjoystick.core.location.MockLocationIntentBuilder
 import com.locationjoystick.core.location.MockLocationService
 import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.FavoriteLocation

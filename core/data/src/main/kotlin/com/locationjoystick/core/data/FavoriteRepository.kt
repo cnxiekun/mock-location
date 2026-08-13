@@ -35,7 +35,11 @@ class FavoriteRepository
     constructor(
         private val favoriteDao: FavoriteDao,
     ) {
-        fun getFavorites(): Flow<List<FavoriteLocation>> = favoriteDao.getAll().map { list -> list.map { it.toDomain() } }
+        fun getFavorites(): Flow<List<FavoriteLocation>> =
+            favoriteDao.getAll().map {
+                    list ->
+                list.map { it.toDomain() }
+            }
 
         suspend fun addFavorite(
             id: String,

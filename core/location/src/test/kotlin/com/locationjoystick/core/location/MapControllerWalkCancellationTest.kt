@@ -86,7 +86,13 @@ class MapControllerWalkCancellationTest {
             val walkCoordinator = WalkCoordinator(locationRepository, walkToEngine)
             val routingErrorReporter = RoutingErrorReporter()
             val ephemeralController =
-                EphemeralReplayController(locationRepository, settingsRepository, walkCoordinator, osrmClient, routingErrorReporter)
+                EphemeralReplayController(
+                    locationRepository,
+                    settingsRepository,
+                    walkCoordinator,
+                    osrmClient,
+                    routingErrorReporter,
+                )
 
             val context = mockk<Context>(relaxed = true)
             val isRoaming = MutableStateFlow(false)
@@ -99,7 +105,8 @@ class MapControllerWalkCancellationTest {
             val routeRepository = mockk<RouteRepository>(relaxed = true) { every { getRoutes() } returns emptyFlow() }
             val favoriteRepository =
                 mockk<FavoriteRepository>(relaxed = true) { every { getFavorites() } returns flowOf(emptyList()) }
-            val teleportUseCase = mockk<TeleportUseCase>(relaxed = true) { every { cooldownsFor(any()) } returns emptyFlow() }
+            val teleportUseCase =
+                mockk<TeleportUseCase>(relaxed = true) { every { cooldownsFor(any()) } returns emptyFlow() }
             val startRouteReplayUseCase = mockk<StartRouteReplayUseCase>(relaxed = true)
 
             val mapController =

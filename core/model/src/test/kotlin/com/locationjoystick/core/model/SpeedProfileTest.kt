@@ -58,19 +58,28 @@ class SpeedProfileTest {
     @Test
     fun `defaultProfiles walk is slower than run`() {
         val profiles = SpeedProfile.defaultProfiles().associateBy { it.id }
-        assertTrue("walk should be slower than run", profiles["walk"]!!.speedMetersPerSecond < profiles["run"]!!.speedMetersPerSecond)
+        assertTrue(
+            "walk should be slower than run",
+            profiles["walk"]!!.speedMetersPerSecond < profiles["run"]!!.speedMetersPerSecond,
+        )
     }
 
     @Test
     fun `defaultProfiles run is slower than bike`() {
         val profiles = SpeedProfile.defaultProfiles().associateBy { it.id }
-        assertTrue("run should be slower than bike", profiles["run"]!!.speedMetersPerSecond < profiles["bike"]!!.speedMetersPerSecond)
+        assertTrue(
+            "run should be slower than bike",
+            profiles["run"]!!.speedMetersPerSecond < profiles["bike"]!!.speedMetersPerSecond,
+        )
     }
 
     @Test
     fun `defaultProfiles bike is slower than drive`() {
         val profiles = SpeedProfile.defaultProfiles().associateBy { it.id }
-        assertTrue("bike should be slower than drive", profiles["bike"]!!.speedMetersPerSecond < profiles["drive"]!!.speedMetersPerSecond)
+        assertTrue(
+            "bike should be slower than drive",
+            profiles["bike"]!!.speedMetersPerSecond < profiles["drive"]!!.speedMetersPerSecond,
+        )
     }
 
     @Test

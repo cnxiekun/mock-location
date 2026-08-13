@@ -42,7 +42,14 @@ class LeaderSyncServerTest {
     fun `push then position returns 200 with correct JSON fields`() {
         val port = server.start("gid")
         server.push(
-            SyncPositionUpdate(timestamp = 1000L, latitude = 1.5, longitude = 2.5, speedMs = 1f, bearing = 90f, seq = 0),
+            SyncPositionUpdate(
+                timestamp = 1000L,
+                latitude = 1.5,
+                longitude = 2.5,
+                speedMs = 1f,
+                bearing = 90f,
+                seq = 0,
+            ),
         )
         val conn = URL("http://localhost:$port/position?token=gid").openConnection() as HttpURLConnection
         assertEquals(200, conn.responseCode)
@@ -93,7 +100,8 @@ class LeaderSyncServerTest {
     @Test
     fun `seq increments on each push`() {
         val port = server.start("gid")
-        val update = SyncPositionUpdate(timestamp = 0L, latitude = 0.0, longitude = 0.0, speedMs = 0f, bearing = 0f, seq = 0)
+        val update =
+            SyncPositionUpdate(timestamp = 0L, latitude = 0.0, longitude = 0.0, speedMs = 0f, bearing = 0f, seq = 0)
         server.push(update)
         server.push(update)
 

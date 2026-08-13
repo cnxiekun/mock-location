@@ -111,7 +111,8 @@ class FavoriteRepositoryTest {
         runTest {
             repository.addFavorite("fav-1", "Old Name", LatLng(0.0, 0.0), createdAt = 1_000L)
 
-            val updated = FavoriteLocation(id = "fav-1", name = "New Name", position = LatLng(0.0, 0.0), createdAt = 1_000L)
+            val updated =
+                FavoriteLocation(id = "fav-1", name = "New Name", position = LatLng(0.0, 0.0), createdAt = 1_000L)
             repository.updateFavorite(updated)
 
             repository.getFavorites().test {

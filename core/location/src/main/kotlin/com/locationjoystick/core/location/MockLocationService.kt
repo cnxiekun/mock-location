@@ -26,7 +26,6 @@ import com.locationjoystick.core.data.RoamingRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.data.WalkToEngine
-import com.locationjoystick.core.location.BuildConfig
 import com.locationjoystick.core.model.GroupRole
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockLocationState
@@ -42,7 +41,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -255,7 +253,10 @@ class MockLocationService : Service() {
                         updateJobMutex.withLock {
                             when (computeIdleOrErrorLoopAction(state, leaderSharingEnabled, updateJob != null)) {
                                 IdleOrErrorLoopAction.KEEP_ALIVE -> {
-                                    Log.i(TAG, "State changed to $state - leader sharing active, keeping test provider alive")
+                                    Log.i(
+                                        TAG,
+                                        "State changed to $state - leader sharing active, keeping test provider alive",
+                                    )
                                 }
 
                                 IdleOrErrorLoopAction.TEAR_DOWN -> {
@@ -284,7 +285,10 @@ class MockLocationService : Service() {
                                 }
 
                                 PausedLoopAction.KEEP_ALIVE -> {
-                                    Log.i(TAG, "State changed to PAUSED - leader sharing active, keeping update loop alive")
+                                    Log.i(
+                                        TAG,
+                                        "State changed to PAUSED - leader sharing active, keeping update loop alive",
+                                    )
                                 }
 
                                 PausedLoopAction.TEAR_DOWN -> {
@@ -460,7 +464,10 @@ class MockLocationService : Service() {
                     val remember = settingsRepository.getRememberLastLocation().first()
                     val lastLoc = if (remember) settingsRepository.getLastLocation().first() else null
                     if (lastLoc != null) {
-                        Log.i(TAG, "OS restart: resuming spoofing at remembered location ${lastLoc.latitude}, ${lastLoc.longitude}")
+                        Log.i(
+                            TAG,
+                            "OS restart: resuming spoofing at remembered location ${lastLoc.latitude}, ${lastLoc.longitude}",
+                        )
                         startSpoofing(lastLoc.latitude, lastLoc.longitude)
                     } else {
                         Log.i(TAG, "OS restart: no remembered location — staying idle")
@@ -489,7 +496,11 @@ class MockLocationService : Service() {
 
             ACTION_ROUTE_REPLAY_START -> {
                 val isEphemeral = intent.getBooleanExtra(EXTRA_IS_EPHEMERAL, false)
-                val speedMs = intent.getDoubleExtra(EXTRA_SPEED_MS, AppConstants.LocationConstants.DEFAULT_REPLAY_SPEED_MS)
+                val speedMs =
+                    intent.getDoubleExtra(
+                        EXTRA_SPEED_MS,
+                        AppConstants.LocationConstants.DEFAULT_REPLAY_SPEED_MS,
+                    )
                 if (isEphemeral) {
                     val encoded = intent.getStringExtra(AppConstants.ServiceConstants.EXTRA_EPHEMERAL_WAYPOINTS)
                     val waypoints =
@@ -521,7 +532,11 @@ class MockLocationService : Service() {
             }
 
             ACTION_ROUTE_REPLAY_RESUME -> {
-                val speedMs = intent.getDoubleExtra(EXTRA_SPEED_MS, AppConstants.LocationConstants.DEFAULT_REPLAY_SPEED_MS)
+                val speedMs =
+                    intent.getDoubleExtra(
+                        EXTRA_SPEED_MS,
+                        AppConstants.LocationConstants.DEFAULT_REPLAY_SPEED_MS,
+                    )
                 handleReplayResume(speedMs)
             }
 

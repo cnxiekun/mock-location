@@ -33,7 +33,15 @@ sealed class CooldownState {
                     else -> "%ds".format(Locale.US, seconds)
                 }
             val distKm = distanceMeters / 1000.0
-            val distLabel = if (distKm >= 1.0) "%.1f km".format(Locale.US, distKm) else "%.0f m".format(Locale.US, distanceMeters)
+            val distLabel =
+                if (distKm >= 1.0) {
+                    "%.1f km".format(
+                        Locale.US,
+                        distKm,
+                    )
+                } else {
+                    "%.0f m".format(Locale.US, distanceMeters)
+                }
             return "$timeLabel · $distLabel teleport"
         }
     }

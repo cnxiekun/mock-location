@@ -4,7 +4,6 @@ import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.RoamingConfig
 import com.locationjoystick.core.model.distanceTo
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue

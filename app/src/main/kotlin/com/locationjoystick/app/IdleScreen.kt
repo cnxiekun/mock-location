@@ -104,7 +104,14 @@ internal fun IdleScreen(
                     )
                 }
                 item { IdleDestinationCard(LjIcons.Route, "Routes", "Replay saved routes.", onNavigateToRoutes) }
-                item { IdleDestinationCard(LjIcons.Favorite, "Favorites", "Teleport or walk to saved locations.", onNavigateToFavorites) }
+                item {
+                    IdleDestinationCard(
+                        LjIcons.Favorite,
+                        "Favorites",
+                        "Teleport or walk to saved locations.",
+                        onNavigateToFavorites,
+                    )
+                }
                 item {
                     IdleDestinationCard(
                         LjIcons.Share,

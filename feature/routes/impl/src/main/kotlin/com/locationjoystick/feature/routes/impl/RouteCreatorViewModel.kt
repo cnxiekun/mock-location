@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 

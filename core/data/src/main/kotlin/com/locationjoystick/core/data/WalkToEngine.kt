@@ -129,7 +129,8 @@ class WalkToEngine
         ): WalkTick {
             val distanceM = haversineDistance(current, target)
             val bearing = calculateBearing(current.latitude, current.longitude, target.latitude, target.longitude)
-            val advanceDistance = minOf(speedMs * (AppConstants.LocationConstants.UPDATE_INTERVAL_MS / 1000.0), distanceM)
+            val advanceDistance =
+                minOf(speedMs * (AppConstants.LocationConstants.UPDATE_INTERVAL_MS / 1000.0), distanceM)
             val actualSpeedMs = (advanceDistance / (AppConstants.LocationConstants.UPDATE_INTERVAL_MS / 1000.0)).toFloat()
             val (newLat, newLon) = advancePosition(current.latitude, current.longitude, bearing, advanceDistance)
             return WalkTick(LatLng(newLat, newLon), actualSpeedMs, bearing.toFloat())

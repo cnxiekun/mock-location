@@ -143,7 +143,8 @@ internal fun buildMockLocationNotification(
         )
 
     val mapPendingIntent = activityPendingIntent(context, 2, AppConstants.ServiceConstants.EXTRA_NAVIGATE_TO_MAP)
-    val favoritesPendingIntent = activityPendingIntent(context, 3, AppConstants.ServiceConstants.EXTRA_NAVIGATE_TO_FAVORITES)
+    val favoritesPendingIntent =
+        activityPendingIntent(context, 3, AppConstants.ServiceConstants.EXTRA_NAVIGATE_TO_FAVORITES)
 
     val builder =
         NotificationCompat

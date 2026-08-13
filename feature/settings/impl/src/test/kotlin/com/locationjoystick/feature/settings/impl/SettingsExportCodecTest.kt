@@ -1,6 +1,5 @@
 package com.locationjoystick.feature.settings.impl
 
-import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.ExportData
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng

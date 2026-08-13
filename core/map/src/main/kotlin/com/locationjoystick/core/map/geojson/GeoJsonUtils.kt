@@ -7,7 +7,8 @@ fun emptyGeoJson(): String = """{"type":"FeatureCollection","features":[]}"""
 
 fun buildPositionGeoJson(position: LatLng?): String =
     if (position != null) {
-        """{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[${position.longitude},${position.latitude}]},"properties":{}}]}"""
+        """{"type":"FeatureCollection","features":[{"type":"Feature","geometry":""" +
+            """{"type":"Point","coordinates":[${position.longitude},${position.latitude}]},"properties":{}}]}"""
     } else {
         emptyGeoJson()
     }

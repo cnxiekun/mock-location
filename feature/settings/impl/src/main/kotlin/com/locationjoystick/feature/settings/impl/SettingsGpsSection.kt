@@ -1,7 +1,6 @@
 package com.locationjoystick.feature.settings.impl
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -167,7 +166,8 @@ internal fun GpsRealismSection(
     Text("GPS Realism", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Controls how the fake GPS signal behaves. These options add metadata and variation that real GPS chips produce — some apps and games inspect these signals to detect fake locations.",
+        "Controls how the fake GPS signal behaves. These options add metadata and variation that real GPS " +
+            "chips produce — some apps and games inspect these signals to detect fake locations.",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )

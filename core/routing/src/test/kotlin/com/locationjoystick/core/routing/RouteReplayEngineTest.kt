@@ -85,7 +85,8 @@ class RouteReplayEngineTest {
     fun `onPositionUpdate exception does not stop replay loop`() {
         val callCount = AtomicInteger(0)
         engine.start(
-            waypoints = listOf(LatLng(0.0, 0.0), LatLng(10.0, 10.0)), // ~1500 km apart — won't complete
+            // ~1500 km apart — won't complete
+            waypoints = listOf(LatLng(0.0, 0.0), LatLng(10.0, 10.0)),
             speedMs = 1.4,
             onPositionUpdate = { _ ->
                 callCount.incrementAndGet()
@@ -102,7 +103,8 @@ class RouteReplayEngineTest {
     fun `onComplete exception does not propagate to test thread`() {
         var completed = false
         engine.start(
-            waypoints = listOf(LatLng(0.0, 0.0), LatLng(0.0000001, 0.0)), // < 1 cm — snaps in first tick
+            // < 1 cm — snaps in first tick
+            waypoints = listOf(LatLng(0.0, 0.0), LatLng(0.0000001, 0.0)),
             speedMs = 999.0,
             onPositionUpdate = {},
             onComplete = {
@@ -205,7 +207,8 @@ class RouteReplayEngineTest {
         val latch = CountDownLatch(1)
         val completeCount = AtomicInteger(0)
         engine.start(
-            waypoints = listOf(LatLng(0.0, 0.0), LatLng(0.0000001, 0.0)), // < 1 cm — snaps in first tick
+            // < 1 cm — snaps in first tick
+            waypoints = listOf(LatLng(0.0, 0.0), LatLng(0.0000001, 0.0)),
             speedMs = 999.0,
             isLooping = false,
             onPositionUpdate = {},

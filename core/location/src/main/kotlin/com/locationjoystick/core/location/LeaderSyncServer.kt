@@ -75,7 +75,9 @@ class LeaderSyncServer
             when {
                 path.startsWith("/health") -> {
                     val body = "{\"status\":\"ok\"}"
-                    writer.print("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: ${body.length}\r\n\r\n$body")
+                    writer.print(
+                        "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: ${body.length}\r\n\r\n$body",
+                    )
                 }
 
                 path.startsWith("/position") -> {

@@ -107,7 +107,8 @@ class CooldownEngineTest {
             CooldownEngine.computeState(
                 lastTeleportMs = System.currentTimeMillis(),
                 lastPosition = LatLng(0.0, 0.0),
-                target = LatLng(0.0, 0.00001), // ~1 m
+                // ~1 m
+                target = LatLng(0.0, 0.00001),
             )
         assertEquals(CooldownState.Ready, result)
     }
@@ -118,7 +119,8 @@ class CooldownEngineTest {
             CooldownEngine.computeState(
                 lastTeleportMs = System.currentTimeMillis(),
                 lastPosition = LatLng(0.0, 0.0),
-                target = LatLng(10.0, 10.0), // ~1550 km
+                // ~1550 km
+                target = LatLng(10.0, 10.0),
             )
         assertTrue(result is CooldownState.Cooling)
     }

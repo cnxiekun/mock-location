@@ -33,7 +33,8 @@ class GroupRepository
             val GROUP_ID = stringPreferencesKey(AppConstants.DataStoreConstants.KEY_GROUP_ID)
             val GROUP_LEADER_HOST = stringPreferencesKey(AppConstants.DataStoreConstants.KEY_GROUP_LEADER_HOST)
             val GROUP_LEADER_PORT = intPreferencesKey(AppConstants.DataStoreConstants.KEY_GROUP_LEADER_PORT)
-            val GROUP_FOLLOWER_MODE_ENABLED = booleanPreferencesKey(AppConstants.DataStoreConstants.KEY_GROUP_FOLLOWER_MODE_ENABLED)
+            val GROUP_FOLLOWER_MODE_ENABLED =
+                booleanPreferencesKey(AppConstants.DataStoreConstants.KEY_GROUP_FOLLOWER_MODE_ENABLED)
             val GROUP_SHARING_ENABLED = booleanPreferencesKey(AppConstants.DataStoreConstants.KEY_GROUP_SHARING_ENABLED)
         }
 

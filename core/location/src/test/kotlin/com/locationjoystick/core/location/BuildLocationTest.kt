@@ -363,7 +363,8 @@ class BuildLocationTest {
                 mode = MockMode.FOLLOWER,
                 speedMs = 0f,
                 jitterIdleRadiusMeters = 3.0,
-                jitterMovingRadiusMeters = 0.0, // moving jitter disabled — ensures idle branch fires
+                // moving jitter disabled — ensures idle branch fires
+                jitterMovingRadiusMeters = 0.0,
                 shouldApplyIdleJitter = true,
                 shouldApplyMovingJitter = false,
             )

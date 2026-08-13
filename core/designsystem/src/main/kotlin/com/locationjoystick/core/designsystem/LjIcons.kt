@@ -26,8 +26,6 @@ import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Hiking
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.KeyboardArrowDown
-import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.LocationOff
 import androidx.compose.material.icons.rounded.LocationOn
@@ -40,7 +38,6 @@ import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Route
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material.icons.rounded.Search

@@ -1,6 +1,5 @@
 package com.locationjoystick.feature.settings.impl
 
-import com.locationjoystick.core.common.constants.AppConstants
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

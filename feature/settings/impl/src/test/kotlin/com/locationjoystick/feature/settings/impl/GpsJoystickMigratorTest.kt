@@ -243,8 +243,10 @@ class GpsJoystickMigratorTest {
         val bytes =
             buildRealm(
                 stringBlock("Paris"),
-                doubleBlock(48.8566), // lat
-                doubleBlock(2.3522), // lon
+                // lat
+                doubleBlock(48.8566),
+                // lon
+                doubleBlock(2.3522),
             )
         val result = GpsJoystickMigrator.parse(bytes)
         assertTrue(result.isSuccess)
@@ -261,8 +263,10 @@ class GpsJoystickMigratorTest {
         val bytes =
             buildRealm(
                 stringBlock("Home", "address", "Work"),
-                doubleBlock(48.8566, 51.5074, 40.7128), // lats
-                doubleBlock(2.3522, -0.1278, -74.0060), // lons
+                // lats
+                doubleBlock(48.8566, 51.5074, 40.7128),
+                // lons
+                doubleBlock(2.3522, -0.1278, -74.0060),
             )
         val result = GpsJoystickMigrator.parse(bytes)
         assertTrue(result.isSuccess)
@@ -277,8 +281,10 @@ class GpsJoystickMigratorTest {
         // favPair=null, routePair set
         val bytes =
             buildRealm(
-                doubleBlock(48.8566, 48.9000), // lats
-                doubleBlock(2.3522, 2.4000), // lons
+                // lats
+                doubleBlock(48.8566, 48.9000),
+                // lons
+                doubleBlock(2.3522, 2.4000),
             )
         val result = GpsJoystickMigrator.parse(bytes)
         assertTrue(result.isSuccess)
