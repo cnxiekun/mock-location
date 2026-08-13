@@ -35,6 +35,18 @@ A red dot appears at the top-right of the widget FAB when a route, walk, or roam
 - **Cleared**: when the user taps the FAB to expand the panel (`isPanelExpandedFlow` becomes `true`).
 - **Does not appear**: when the user manually stops a session.
 
+## Route Controls Across Surfaces
+
+Pause/resume/stop for an active route replay is implemented separately on
+three surfaces. Each owns its own expand/collapse state — a change to one
+does not affect the others.
+
+| Surface | Entry-point file(s) | State ownership |
+|---|---|---|
+| Main map screen FAB column | `:feature:map:impl/MapFabColumn.kt`, `MapViewModel.kt`, `MapUiState.kt` | `MapUiState.isRouteControlsExpanded`, toggled by `MapAction.ToggleRouteControls` in `MapViewModel` |
+| Widget panel row | `:feature:widget:impl/WidgetPanelContent.kt`, `FloatingWidgetService.kt` | `FloatingWidgetService.routeExpandedFlow` (`MutableStateFlow<Boolean>`) |
+| Floating map (in-widget) | `:feature:widget:impl/MapFloatingView.kt`, `WidgetPanelPresenter.kt` | `WidgetPanelPresenter.mapRouteControlsExpanded` (`MutableStateFlow<Boolean>`) — see below |
+
 ## Floating Map — Route Controls
 
 When `AppFeature.MAP_FLOATING` is enabled, the floating map's FAB column includes a route button:
