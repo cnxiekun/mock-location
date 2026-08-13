@@ -50,6 +50,24 @@ class FavoriteRepositoryTest {
         }
 
     @Test
+    fun `addFavorite persists category`() =
+        runTest {
+            repository.addFavorite(
+                id = "fav-1",
+                name = "Eiffel Tower",
+                position = LatLng(48.8584, 2.2945),
+                createdAt = 1_000L,
+                category = "France",
+            )
+
+            repository.getFavorites().test {
+                val list = awaitItem()
+                assertEquals("France", list.first().category)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `deleteFavorite removes item from flow`() =
         runTest {
             repository.addFavorite("fav-1", "Tower", LatLng(48.8584, 2.2945), createdAt = 1_000L)

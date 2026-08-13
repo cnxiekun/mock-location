@@ -698,6 +698,7 @@ class SettingsViewModel
                         name = fav.name,
                         position = fav.position,
                         createdAt = fav.createdAt,
+                        category = fav.category,
                     )
                 }
                 data.routes.forEach { routeRepository.insertRoute(it).getOrNull() }

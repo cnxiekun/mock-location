@@ -42,6 +42,7 @@ class FavoriteRepository
             name: String,
             position: LatLng,
             createdAt: Long = System.currentTimeMillis(),
+            category: String? = null,
         ): Result<Unit> =
             withContext(Dispatchers.IO) {
                 runCatching {
@@ -51,6 +52,7 @@ class FavoriteRepository
                             name = name,
                             position = position,
                             createdAt = createdAt,
+                            category = category,
                         )
                     favoriteDao.insert(favorite.toEntity())
                 }.onFailure { e ->
