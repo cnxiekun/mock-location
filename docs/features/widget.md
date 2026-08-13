@@ -69,6 +69,10 @@ button:
   entirely once the device stops being an enabled follower — nothing is left
   on screen for the expand state to affect.
 
+## Anti-Patterns to Avoid
+
+- Do not store reopen-surviving panel state in a composable `remember`. `WidgetPanelPresenter.showPanel()` builds a fresh `ComposeView` on every open, so `remember` state resets to its initial value each time the panel reopens. Hoist the state to the presenter or service instead (a `StateFlow`), per the fix in PR #40 — see `mapRouteControlsExpanded` in "Floating Map — Route Controls" above for the concrete example.
+
 ## Edge Cases
 
 - No items configured → show placeholder.
