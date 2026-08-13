@@ -640,15 +640,18 @@ class MockLocationService : Service() {
         locationRepository.setPositionInternal(LatLng(lat, lon))
     }
 
-    // Joystick/walk callers: update locationRepository before calling this method (sets speed/bearing only).
-    // Route replay uses onPositionUpdate lambda instead — does not call this method.
+    // Callers: JoystickOverlayService (direct call) and the WalkCoordinator position callback
+    // (ACTION_UPDATE_POSITION intent) — both self-report their own mode (JOYSTICK / WALK_TO).
+    // Every other mode's engine (ReplayOrchestrator, RoamingEngine, follower sync) owns position
+    // updates for its own tick and must not have them overwritten by a stale/racing call here.
     fun updatePositionWithVector(
         lat: Double,
         lon: Double,
         speedMs: Float,
         bearing: Float,
     ) {
-        if (locationRepository.currentMode.value == MockMode.FOLLOWER) return
+        val mode = locationRepository.currentMode.value
+        if (mode != MockMode.JOYSTICK && mode != MockMode.WALK_TO) return
         writeCurrentPosition(lat, lon)
         currentSpeedMs = speedMs
         currentBearing = bearing
