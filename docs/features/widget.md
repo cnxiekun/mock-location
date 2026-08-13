@@ -10,6 +10,11 @@ Key files: `:feature:widget:impl/FloatingWidgetService.kt`, `:feature:settings:i
 - Separate service, toggled independently of the joystick.
 - State transitions: collapsed (FAB) ↔ expanded (panel) via `ValueAnimator`.
 - Enabled features stored in DataStore as `stringSetPreferencesKey`; the shared display order (see below) is a separate `stringPreferencesKey`.
+- `MockLocationService` auto-starts the widget overlay (alongside the joystick overlay) whenever spoofing starts and `SYSTEM_ALERT_WINDOW` is granted — there is no separate manual start button for it.
+
+## Hiding the Overlay
+
+Settings → Menus → Privacy → "Hide floating widget" (`AppSettings.hideWidgetOverlay`, DataStore key `hide_widget_overlay`, default `false`) stops `MockLocationService` from starting `FloatingWidgetService` when spoofing starts. The joystick overlay and any accessibility-based features (e.g. compass tracking, see @docs/features/tap-to-walk.md) are unaffected — this only hides the widget button/panel itself. Round-trips through `ExportData` like `hideTeleportFeatures`.
 
 ## Configurability
 
