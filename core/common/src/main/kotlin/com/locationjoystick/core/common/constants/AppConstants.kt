@@ -197,6 +197,8 @@ object AppConstants {
         const val ACTION_ROUTE_REPLAY_RESUME = "com.locationjoystick.core.location.ACTION_ROUTE_REPLAY_RESUME"
         const val ACTION_ROUTE_REPLAY_STOP = "com.locationjoystick.core.location.ACTION_ROUTE_REPLAY_STOP"
         const val ACTION_ROUTE_REPLAY_CANCEL = "com.locationjoystick.core.location.ACTION_ROUTE_REPLAY_CANCEL"
+        const val ACTION_ROUTE_REPLAY_JUMP_NEXT = "com.locationjoystick.core.location.ACTION_ROUTE_REPLAY_JUMP_NEXT"
+        const val ACTION_ROUTE_REPLAY_JUMP_PREVIOUS = "com.locationjoystick.core.location.ACTION_ROUTE_REPLAY_JUMP_PREVIOUS"
         const val ACTION_ROUTE_APPEND_WAYPOINT = "com.locationjoystick.core.location.ACTION_ROUTE_APPEND_WAYPOINT"
         const val EXTRA_ROUTE_ID = "extra_route_id"
         const val EXTRA_IS_BACKWARD = "extra_is_backward"

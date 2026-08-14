@@ -169,6 +169,49 @@ class RouteReplayEngine
         }
 
         /**
+         * Jumps directly to waypoint [target] (clamped to the valid range), teleporting there.
+         * If the replay was actively running (not paused), resumes interpolation toward the
+         * following waypoint from the new position; if paused, only the resume state updates.
+         *
+         * Mirrors [pause]'s tolerance for a benign race with the in-flight tick: writing
+         * [resumePosition]/[resumeWaypointIndex] here while the coroutine's last tick is still
+         * settling can be overwritten, in which case the jump is silently retried by the user's
+         * next tap. Not worth a Mutex for a discrete, user-triggered, non-hot-path action.
+         *
+         * @return The waypoint jumped to, or null if no replay is active.
+         */
+        private fun jumpToWaypoint(
+            target: Int,
+            onPositionUpdate: (LatLng) -> Unit,
+            onComplete: () -> Unit,
+        ): LatLng? {
+            val waypoints = savedWaypointsRef.get()
+            if (waypoints.isEmpty()) return null
+            val clamped = target.coerceIn(0, waypoints.size - 1)
+            val wasRunning = activeJob?.isActive == true
+            activeJob?.cancel()
+            resumePosition = waypoints[clamped]
+            resumeWaypointIndex = clamped + 1
+            if (wasRunning) {
+                launchReplay(onPositionUpdate, onComplete)
+            }
+            Log.i(TAG, "Jumped to waypoint $clamped")
+            return waypoints[clamped]
+        }
+
+        /** Jumps to the waypoint currently being walked toward (index unchanged if already at the last one). */
+        fun jumpToNextWaypoint(
+            onPositionUpdate: (LatLng) -> Unit,
+            onComplete: () -> Unit,
+        ): LatLng? = jumpToWaypoint(resumeWaypointIndex, onPositionUpdate, onComplete)
+
+        /** Jumps to the waypoint before the one last departed from (index unchanged if already at the first one). */
+        fun jumpToPreviousWaypoint(
+            onPositionUpdate: (LatLng) -> Unit,
+            onComplete: () -> Unit,
+        ): LatLng? = jumpToWaypoint(resumeWaypointIndex - 2, onPositionUpdate, onComplete)
+
+        /**
          * Cancels any active replay job. Call from service onDestroy to stop movement
          * without destroying the scope — the engine is a @Singleton and must remain
          * usable after the service is recreated.

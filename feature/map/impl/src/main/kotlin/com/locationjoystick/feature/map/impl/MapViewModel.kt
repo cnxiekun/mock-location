@@ -329,6 +329,14 @@ class MapViewModel
                     _uiState.update { it.copy(isRouteControlsExpanded = !it.isRouteControlsExpanded) }
                 }
 
+                MapAction.JumpToNextWaypoint -> {
+                    mapController.jumpToNextWaypoint()
+                }
+
+                MapAction.JumpToPreviousWaypoint -> {
+                    mapController.jumpToPreviousWaypoint()
+                }
+
                 // Roaming
                 MapAction.OpenRoamingSheet -> {
                     _uiState.update {

@@ -27,6 +27,24 @@ Routes can also be imported from GPX files via the Routes screen overflow menu �
 
 A route may pin a speed profile via the Route Detail (edit) screen — a segmented control below the name field, showing "None" plus all 5 presets. Default: `null` ("None"), meaning replay uses whatever speed profile is currently active globally (today's behavior). When a route pins a profile, replay uses that profile's speed for the entire session — it stays locked even if the globally active profile changes mid-replay (e.g. via the widget's Speed Cycle button). Resolved via `SettingsRepository.getRouteSpeedMs(route.speedProfileId)`.
 
+### Next / Previous Waypoint (Teleport)
+
+While a named route replay is active (running or paused), "Previous
+waypoint" / "Next waypoint" buttons instantly teleport the spoofed position
+to the adjacent stop in the route — skipping interpolation between them.
+Available on all three route-control surfaces (see
+@docs/features/widget.md, "Route Controls Across Surfaces"), alongside
+Pause/Resume/Stop.
+
+Implemented as `RouteReplayEngine.jumpToNextWaypoint()` /
+`jumpToPreviousWaypoint()`, reusing the engine's existing
+`resumeWaypointIndex` pointer rather than tracking a separate discrete
+index. Not available for ephemeral (walk-here "Add next point") replay,
+which has no persisted waypoint list. Gated by `hideTeleportFeatures` like
+every other teleport entry point (@docs/features/hide-teleport.md).
+Jumping to the last waypoint while replay is running lets it complete
+naturally on the next tick, same as reaching it by walking.
+
 ## Recording
 
 - Collect location every `AppConstants.LocationConstants.UPDATE_INTERVAL_MS` ms.

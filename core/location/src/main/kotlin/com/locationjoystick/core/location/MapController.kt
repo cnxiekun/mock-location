@@ -459,6 +459,14 @@ class MapController
             context.startService(MockLocationIntentBuilder.stopRouteReplay(context))
         }
 
+        fun jumpToNextWaypoint() {
+            context.startService(MockLocationIntentBuilder.jumpToNextWaypoint(context))
+        }
+
+        fun jumpToPreviousWaypoint() {
+            context.startService(MockLocationIntentBuilder.jumpToPreviousWaypoint(context))
+        }
+
         fun stopRouteOnly() {
             context.startService(MockLocationIntentBuilder.cancelRouteReplay(context))
         }

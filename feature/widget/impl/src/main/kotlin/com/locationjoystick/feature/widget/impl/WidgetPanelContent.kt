@@ -113,6 +113,10 @@ internal fun WidgetPanel(
     isActivityActive: Boolean,
     isActivityPaused: Boolean,
     isActivityPausable: Boolean,
+    isRouteReplay: Boolean = false,
+    onJumpToNextWaypoint: () -> Unit = {},
+    onJumpToPreviousWaypoint: () -> Unit = {},
+    hideTeleportFeatures: Boolean = false,
     routeExpanded: Boolean,
     isPanelExpanded: Boolean,
     hasPendingCompletion: Boolean,
@@ -228,6 +232,20 @@ internal fun WidgetPanel(
                                     tint = MaterialTheme.colorScheme.error,
                                     onClick = onRouteStop,
                                 )
+                                if (isRouteReplay && !hideTeleportFeatures) {
+                                    WidgetIconButton(
+                                        icon = LjIcons.SkipPrevious,
+                                        contentDescription = "Previous waypoint",
+                                        tint = LjSuccess,
+                                        onClick = onJumpToPreviousWaypoint,
+                                    )
+                                    WidgetIconButton(
+                                        icon = LjIcons.SkipNext,
+                                        contentDescription = "Next waypoint",
+                                        tint = LjSuccess,
+                                        onClick = onJumpToNextWaypoint,
+                                    )
+                                }
                             }
                         }
                     }

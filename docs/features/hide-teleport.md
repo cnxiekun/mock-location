@@ -2,7 +2,7 @@
 
 A single toggle that removes every teleport entry point in the app, leaving only walking and route replay as ways to move.
 
-Key files: `:core:model/AppSettings.kt`, `:core:data/SettingsRepository.kt`, `:core:datastore/AppPreferencesDataSource.kt`, `:feature:settings:impl/SettingsMenusSubScreen.kt`, `:feature:map:impl/MapViewModel.kt`, `:feature:map:impl/MapBottomSheets.kt`, `:feature:map:impl/MapScreen.kt`, `:feature:favorites:impl/FavoritesViewModel.kt`, `:feature:routes:impl/RoutesViewModel.kt`, `:feature:routes:impl/RoutesScreen.kt`, `:feature:group:impl/GroupSyncViewModel.kt`, `:feature:group:impl/GroupSyncScreen.kt`, `:feature:widget:impl/FloatingWidgetService.kt`, `:feature:widget:impl/WidgetPanelPresenter.kt`, `:feature:widget:impl/WidgetPanelContent.kt`, `:feature:widget:impl/MapFloatingView.kt`
+Key files: `:core:model/AppSettings.kt`, `:core:data/SettingsRepository.kt`, `:core:datastore/AppPreferencesDataSource.kt`, `:feature:settings:impl/SettingsMenusSubScreen.kt`, `:feature:map:impl/MapViewModel.kt`, `:feature:map:impl/MapBottomSheets.kt`, `:feature:map:impl/MapScreen.kt`, `:feature:map:impl/MapFabColumn.kt`, `:feature:favorites:impl/FavoritesViewModel.kt`, `:feature:routes:impl/RoutesViewModel.kt`, `:feature:routes:impl/RoutesScreen.kt`, `:feature:group:impl/GroupSyncViewModel.kt`, `:feature:group:impl/GroupSyncScreen.kt`, `:feature:widget:impl/FloatingWidgetService.kt`, `:feature:widget:impl/WidgetPanelPresenter.kt`, `:feature:widget:impl/WidgetPanelContent.kt`, `:feature:widget:impl/MapFloatingView.kt`
 
 ## Behaviour
 
@@ -15,6 +15,9 @@ Key files: `:core:model/AppSettings.kt`, `:core:data/SettingsRepository.kt`, `:c
   - "Teleport and start" checkbox when starting a route replay (map long-press sheet, Routes screen, and widget panel — three separate composables).
   - Group Sync "Teleport to leader now" button (Group Sync screen and widget panel).
   - Widget favorites-panel "Teleport" button.
+  - Route replay "Previous waypoint" / "Next waypoint" buttons (main map
+    FAB column, widget panel, and floating map — see
+    @docs/features/routes.md, "Next / Previous Waypoint (Teleport)").
 
 ## Idle-State Exception
 

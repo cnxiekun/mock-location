@@ -8,6 +8,7 @@ import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.routing.RouteReplayEngine
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -210,5 +211,41 @@ class ReplayOrchestratorTest {
         onCompleteSlot.captured.invoke()
 
         assertEquals(MockMode.TELEPORT, locationRepository.currentMode.value)
+    }
+
+    @Test
+    fun handleJumpToNextWaypoint_whenNotInRouteReplay_doesNothing() {
+        orchestrator.handleJumpToNextWaypoint()
+
+        verify(exactly = 0) { routeReplayEngine.jumpToNextWaypoint(any(), any()) }
+    }
+
+    @Test
+    fun handleJumpToNextWaypoint_whenInRouteReplay_callsEngine() {
+        locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
+
+        orchestrator.handleJumpToNextWaypoint()
+
+        verify { routeReplayEngine.jumpToNextWaypoint(any(), any()) }
+    }
+
+    @Test
+    fun handleJumpToPreviousWaypoint_whenInRouteReplay_callsEngine() {
+        locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
+
+        orchestrator.handleJumpToPreviousWaypoint()
+
+        verify { routeReplayEngine.jumpToPreviousWaypoint(any(), any()) }
+    }
+
+    @Test
+    fun handleJumpToNextWaypoint_pushesReturnedPositionImmediately() {
+        locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
+        val target = com.locationjoystick.core.model.LatLng(1.0, 2.0)
+        every { routeReplayEngine.jumpToNextWaypoint(any(), any()) } returns target
+
+        orchestrator.handleJumpToNextWaypoint()
+
+        assertEquals(target, locationRepository.currentPosition.value)
     }
 }

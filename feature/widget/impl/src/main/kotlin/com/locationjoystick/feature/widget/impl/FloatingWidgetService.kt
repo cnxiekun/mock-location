@@ -298,6 +298,7 @@ class FloatingWidgetService :
             val activeProfileId by activeProfileIdFlow.collectAsStateWithLifecycle()
             val isActivityActive by locationRepository.isActivityActive.collectAsStateWithLifecycle(initialValue = false)
             val isActivityPausable by locationRepository.isActivityPausable.collectAsStateWithLifecycle(initialValue = false)
+            val currentMode by locationRepository.currentMode.collectAsStateWithLifecycle(initialValue = MockMode.TELEPORT)
             val isActivityPaused by activityStateRepository.isActivityPaused.collectAsStateWithLifecycle(initialValue = false)
             val routeExpanded by routeExpandedFlow.collectAsStateWithLifecycle()
             val isPanelExpanded by isPanelExpandedFlow.collectAsStateWithLifecycle()
@@ -317,6 +318,10 @@ class FloatingWidgetService :
                     isActivityActive = isActivityActive,
                     isActivityPaused = isActivityPaused,
                     isActivityPausable = isActivityPausable,
+                    isRouteReplay = currentMode == MockMode.ROUTE_REPLAY,
+                    onJumpToNextWaypoint = { mapController.jumpToNextWaypoint() },
+                    onJumpToPreviousWaypoint = { mapController.jumpToPreviousWaypoint() },
+                    hideTeleportFeatures = hideTeleportFeatures,
                     routeExpanded = routeExpanded,
                     isPanelExpanded = isPanelExpanded,
                     hasPendingCompletion = hasPendingCompletion,

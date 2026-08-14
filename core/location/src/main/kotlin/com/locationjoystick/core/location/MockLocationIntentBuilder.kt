@@ -93,6 +93,16 @@ object MockLocationIntentBuilder {
             action = MockLocationService.ACTION_ROUTE_REPLAY_STOP
         }
 
+    fun jumpToNextWaypoint(context: Context): Intent =
+        Intent(context, MockLocationService::class.java).apply {
+            action = MockLocationService.ACTION_ROUTE_REPLAY_JUMP_NEXT
+        }
+
+    fun jumpToPreviousWaypoint(context: Context): Intent =
+        Intent(context, MockLocationService::class.java).apply {
+            action = MockLocationService.ACTION_ROUTE_REPLAY_JUMP_PREVIOUS
+        }
+
     fun startEphemeralReplay(
         context: Context,
         waypoints: List<LatLng>,

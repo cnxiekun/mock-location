@@ -142,6 +142,41 @@ internal class ReplayOrchestrator(
         Log.i(TAG, "Replay resumed at ${speedMs}m/s")
     }
 
+    fun handleJumpToNextWaypoint() = handleJumpToWaypoint(forward = true)
+
+    fun handleJumpToPreviousWaypoint() = handleJumpToWaypoint(forward = false)
+
+    private fun handleJumpToWaypoint(forward: Boolean) {
+        if (locationRepository.currentMode.value != MockMode.ROUTE_REPLAY) return
+        val onReplayComplete: () -> Unit = {
+            locationRepository.setRouteWaypoints(null)
+            locationRepository.setMockMode(MockMode.TELEPORT)
+            locationRepository.emitCompletion("Route complete")
+        }
+        val target =
+            if (forward) {
+                routeReplayEngine.jumpToNextWaypoint(::tickPosition, onReplayComplete)
+            } else {
+                routeReplayEngine.jumpToPreviousWaypoint(::tickPosition, onReplayComplete)
+            }
+        target?.let(::tickPosition)
+        Log.i(TAG, "Jumped to ${if (forward) "next" else "previous"} waypoint")
+    }
+
+    /**
+     * Pushes one position tick: updates the service's reported lat/lon, the shared
+     * repository state, and the test-provider location.
+     */
+    private fun tickPosition(pos: LatLng) {
+        onPositionChange(pos.latitude, pos.longitude)
+        try {
+            locationRepository.setPositionInternal(pos)
+            pushLocationUpdate()
+        } catch (e: Exception) {
+            Log.e(TAG, "Position update failed", e)
+        }
+    }
+
     suspend fun handleStop() {
         activeReplayJob?.cancelAndJoin()
         activeReplayJob = null

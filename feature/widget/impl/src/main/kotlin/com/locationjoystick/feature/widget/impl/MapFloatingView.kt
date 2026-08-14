@@ -113,6 +113,8 @@ internal fun MapFloatingView(
     onStopRouteReplay: () -> Unit,
     onPauseRouteReplay: () -> Unit,
     onResumeRouteReplay: () -> Unit,
+    onJumpToNextWaypoint: () -> Unit = {},
+    onJumpToPreviousWaypoint: () -> Unit = {},
     isRouteControlsExpanded: Boolean,
     onRouteControlsExpandedChange: (Boolean) -> Unit,
     onOpenRoutes: () -> Unit,
@@ -405,6 +407,22 @@ internal fun MapFloatingView(
                                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 onClick = { if (isRoutePaused) onResumeRouteReplay() else onPauseRouteReplay() },
                             )
+                            if (!hideTeleportFeatures) {
+                                LjMapIconButton(
+                                    icon = LjIcons.SkipPrevious,
+                                    contentDescription = "Previous waypoint",
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    contentColor = LjSuccess,
+                                    onClick = onJumpToPreviousWaypoint,
+                                )
+                                LjMapIconButton(
+                                    icon = LjIcons.SkipNext,
+                                    contentDescription = "Next waypoint",
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    contentColor = LjSuccess,
+                                    onClick = onJumpToNextWaypoint,
+                                )
+                            }
                         }
                     }
                     LjMapIconButton(

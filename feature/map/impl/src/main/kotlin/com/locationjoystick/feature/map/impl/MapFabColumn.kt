@@ -135,6 +135,22 @@ internal fun MapFabColumn(
                                         contentColor = MaterialTheme.colorScheme.onError,
                                         onClick = { onAction(MapAction.StopRouteReplay) },
                                     )
+                                    if (!uiState.hideTeleportFeatures) {
+                                        LjMapIconButton(
+                                            icon = LjIcons.SkipPrevious,
+                                            contentDescription = "Previous waypoint",
+                                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                            contentColor = LjSuccess,
+                                            onClick = { onAction(MapAction.JumpToPreviousWaypoint) },
+                                        )
+                                        LjMapIconButton(
+                                            icon = LjIcons.SkipNext,
+                                            contentDescription = "Next waypoint",
+                                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                            contentColor = LjSuccess,
+                                            onClick = { onAction(MapAction.JumpToNextWaypoint) },
+                                        )
+                                    }
                                 }
                             }
                         }

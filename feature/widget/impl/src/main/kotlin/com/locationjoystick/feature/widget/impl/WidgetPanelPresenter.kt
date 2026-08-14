@@ -267,6 +267,8 @@ internal class WidgetPanelPresenter(
                 onStopRouteReplay = { mapController.stopRouteReplay() },
                 onPauseRouteReplay = { mapController.pauseRouteReplay() },
                 onResumeRouteReplay = { mapController.resumeRouteReplay() },
+                onJumpToNextWaypoint = { mapController.jumpToNextWaypoint() },
+                onJumpToPreviousWaypoint = { mapController.jumpToPreviousWaypoint() },
                 isRouteControlsExpanded = routeControlsExpanded,
                 onRouteControlsExpandedChange = { expanded -> mapRouteControlsExpanded.value = expanded },
                 onOpenRoutes = { showRoutesFloatingView() },

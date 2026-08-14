@@ -73,6 +73,8 @@ class MockLocationService : Service() {
         const val ACTION_ROUTE_REPLAY_RESUME = AppConstants.ServiceConstants.ACTION_ROUTE_REPLAY_RESUME
         const val ACTION_ROUTE_REPLAY_STOP = AppConstants.ServiceConstants.ACTION_ROUTE_REPLAY_STOP
         const val ACTION_ROUTE_REPLAY_CANCEL = AppConstants.ServiceConstants.ACTION_ROUTE_REPLAY_CANCEL
+        const val ACTION_ROUTE_REPLAY_JUMP_NEXT = AppConstants.ServiceConstants.ACTION_ROUTE_REPLAY_JUMP_NEXT
+        const val ACTION_ROUTE_REPLAY_JUMP_PREVIOUS = AppConstants.ServiceConstants.ACTION_ROUTE_REPLAY_JUMP_PREVIOUS
         const val ACTION_ROUTE_APPEND_WAYPOINT = AppConstants.ServiceConstants.ACTION_ROUTE_APPEND_WAYPOINT
         const val ACTION_ENTER_FOLLOWER = AppConstants.ServiceConstants.ACTION_ENTER_FOLLOWER
         const val ACTION_EXIT_FOLLOWER = AppConstants.ServiceConstants.ACTION_EXIT_FOLLOWER
@@ -548,6 +550,14 @@ class MockLocationService : Service() {
                 serviceScope.launch { handleReplayCancel() }
             }
 
+            ACTION_ROUTE_REPLAY_JUMP_NEXT -> {
+                handleReplayJumpNext()
+            }
+
+            ACTION_ROUTE_REPLAY_JUMP_PREVIOUS -> {
+                handleReplayJumpPrevious()
+            }
+
             ACTION_FOLLOWER_TELEPORT -> {
                 teleportToLeaderNow()
             }
@@ -919,6 +929,10 @@ class MockLocationService : Service() {
     private suspend fun handleReplayStop() = replayOrchestrator.handleStop()
 
     private suspend fun handleReplayCancel() = replayOrchestrator.handleCancel()
+
+    private fun handleReplayJumpNext() = replayOrchestrator.handleJumpToNextWaypoint()
+
+    private fun handleReplayJumpPrevious() = replayOrchestrator.handleJumpToPreviousWaypoint()
 
     private fun setupTestProvider() {
         if (providerAdded) return
