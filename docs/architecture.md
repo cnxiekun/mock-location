@@ -21,7 +21,7 @@ core/model       — Pure Kotlin data classes, no Android deps
 | `:app` | Entry, Hilt, `LjApp`, `LjNavHost`, drawer |
 | `:core:common` | Utils, extensions, constants (`AppConstants`) |
 | `:core:data` | Repositories, DataStore prefs |
-| `:core:database` | Room DB (v2), DAOs, entities |
+| `:core:database` | Room DB, DAOs, entities |
 | `:core:datastore` | DataStore prefs source |
 | `:core:designsystem` | Tokens, theme, typography, shared components |
 | `:core:location` | Mock GPS foreground service + movement engine |

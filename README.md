@@ -170,7 +170,7 @@ Each feature split into `:api` (public contract) + `:impl` (implementation).
 | `:app` | Entry point, Hilt setup, `LjApp` composable, `LjNavHost`, drawer |
 | `:core:common` | Utilities, extensions, constants (`AppConstants`) |
 | `:core:data` | Repositories, DataStore preferences |
-| `:core:database` | Room DB (v2), DAOs, entities |
+| `:core:database` | Room DB, DAOs, entities |
 | `:core:datastore` | DataStore preferences source |
 | `:core:designsystem` | Design tokens, theme, typography, shared components |
 | `:core:location` | Mock GPS foreground service + movement engine |
