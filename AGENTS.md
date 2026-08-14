@@ -140,6 +140,8 @@ Rules:
 | `EphemeralReplayController` | `:core:location` | Class (`@Singleton`) | Owns the walk→ephemeral-replay transition. Injected by both `MapViewModel` and `FloatingWidgetService`. `addWaypoint()` decides whether to start a new ephemeral replay (walk→replay transition) or append to an existing one. Eliminates duplicated state-machine logic across call sites. |
 | `WalkCoordinator` | `:core:data` | Class (`@Singleton`) | Thin facade over `WalkToEngine`. Cancels any in-flight walk before starting a new one, forwards position ticks to `LocationRepository`, clears `walkTarget` on arrival or cancellation. |
 | `ActivityStateRepository` | `:core:data` | Repository (`@Singleton`) | Single source of truth for unified pause state across all movement modes. Exposes `isActivityPaused: Flow<Boolean>` combining walk-to, route replay, and roaming pause. Prefer over manually combining individual flows from `LocationRepository` and `RoamingRepository`. |
+| `TeleportUseCase` | `:core:data` | Class (`@Singleton`) | Single entry point for all teleport operations — fires the update-position intent to `MockLocationService`, persists last location + last teleport time. Injected by both `MapViewModel` and `FavoritesViewModel` so every teleport path shares the same persistence and cooldown logic (`cooldownFor`/`cooldownsFor`). |
+| `StartRouteReplayUseCase` | `:core:location` | Class (`@Singleton`) | Starts a route replay: resolves the route's speed profile, optionally teleports to the start waypoint first (via `TeleportUseCase`), then sends the start-replay intent to `MockLocationService`. Dedupes route-replay-start logic previously duplicated in `MapViewModel` and `FloatingWidgetService`. |
 
 ---
 
