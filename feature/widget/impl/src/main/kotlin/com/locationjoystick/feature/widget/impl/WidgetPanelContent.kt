@@ -117,6 +117,7 @@ internal fun WidgetPanel(
     onJumpToNextWaypoint: () -> Unit = {},
     onJumpToPreviousWaypoint: () -> Unit = {},
     hideTeleportFeatures: Boolean = false,
+    showRouteJumpButtons: Boolean = false,
     routeExpanded: Boolean,
     isPanelExpanded: Boolean,
     hasPendingCompletion: Boolean,
@@ -232,7 +233,7 @@ internal fun WidgetPanel(
                                     tint = MaterialTheme.colorScheme.error,
                                     onClick = onRouteStop,
                                 )
-                                if (isRouteReplay && !hideTeleportFeatures) {
+                                if (isRouteReplay && !hideTeleportFeatures && showRouteJumpButtons) {
                                     WidgetIconButton(
                                         icon = LjIcons.SkipPrevious,
                                         contentDescription = "Previous waypoint",

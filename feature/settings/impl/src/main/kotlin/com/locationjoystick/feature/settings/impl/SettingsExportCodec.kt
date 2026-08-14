@@ -82,6 +82,7 @@ internal object SettingsExportCodec {
         settingsObj.put("realismSuspendedMockingEnabled", data.settings.suspendedMockingEnabled)
         settingsObj.put("hideTeleportFeatures", data.settings.hideTeleportFeatures)
         settingsObj.put("hideWidgetOverlay", data.settings.hideWidgetOverlay)
+        settingsObj.put("showRouteJumpButtons", data.settings.showRouteJumpButtons)
         val roamingObj = JSONObject()
         roamingObj.put("radiusMeters", data.settings.roamingDefaults.radiusMeters)
         roamingObj.put("distanceMeters", data.settings.roamingDefaults.distanceMeters)
@@ -210,6 +211,7 @@ internal object SettingsExportCodec {
             )
         val hideTeleportFeatures = settingsObj.optBoolean("hideTeleportFeatures", false)
         val hideWidgetOverlay = settingsObj.optBoolean("hideWidgetOverlay", false)
+        val showRouteJumpButtons = settingsObj.optBoolean("showRouteJumpButtons", false)
         val roamingDefaultsObj = settingsObj.optJSONObject("roamingDefaults")
         val roamingDefaults =
             if (roamingDefaultsObj != null) {
@@ -241,6 +243,7 @@ internal object SettingsExportCodec {
                 suspendedMockingEnabled = suspendedMockingEnabled,
                 hideTeleportFeatures = hideTeleportFeatures,
                 hideWidgetOverlay = hideWidgetOverlay,
+                showRouteJumpButtons = showRouteJumpButtons,
                 roamingDefaults = roamingDefaults,
             )
 

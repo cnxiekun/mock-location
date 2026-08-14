@@ -95,6 +95,14 @@ class MapViewModel
                         _uiState.update { it.copy(hideTeleportFeatures = enabled) }
                     }
             }
+            viewModelScope.launch {
+                settingsRepository
+                    .getShowRouteJumpButtons()
+                    .distinctUntilChanged()
+                    .collect { enabled ->
+                        _uiState.update { it.copy(showRouteJumpButtons = enabled) }
+                    }
+            }
         }
 
         private fun observeSharedState() {

@@ -294,6 +294,15 @@ private fun PrivacySection(
         title = "Hide floating widget",
         description = "Keeps the floating widget button from appearing while spoofing is active.",
     )
+    Spacer(Modifier.height(8.dp))
+    LjCheckboxRow(
+        checked = uiState.showRouteJumpButtons,
+        onCheckedChange = { onAction(SettingsAction.SetShowRouteJumpButtons(it)) },
+        title = "Show route jump buttons",
+        description =
+            "Adds Previous waypoint / Next waypoint buttons to route replay controls, " +
+                "for instantly teleporting between waypoints. Off by default.",
+    )
 }
 
 @Composable

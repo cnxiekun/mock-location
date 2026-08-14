@@ -126,6 +126,7 @@ internal fun MapFloatingView(
     onSaveCurrentLocation: ((String) -> Unit)? = null,
     quickWalk: Boolean = false,
     hideTeleportFeatures: Boolean = false,
+    showRouteJumpButtons: Boolean = false,
 ) {
     val isRoaming = mockMode == MockMode.ROAMING
     val isRouteReplay = mockMode == MockMode.ROUTE_REPLAY
@@ -407,7 +408,7 @@ internal fun MapFloatingView(
                                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 onClick = { if (isRoutePaused) onResumeRouteReplay() else onPauseRouteReplay() },
                             )
-                            if (!hideTeleportFeatures) {
+                            if (!hideTeleportFeatures && showRouteJumpButtons) {
                                 LjMapIconButton(
                                     icon = LjIcons.SkipPrevious,
                                     contentDescription = "Previous waypoint",

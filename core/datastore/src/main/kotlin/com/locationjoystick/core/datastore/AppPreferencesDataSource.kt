@@ -185,6 +185,12 @@ interface PreferencesDataSource {
     /** Sets whether the floating widget overlay is hidden. */
     suspend fun setHideWidgetOverlay(enabled: Boolean)
 
+    /** Gets whether the route-replay jump-to-waypoint buttons are shown. */
+    fun getShowRouteJumpButtons(): Flow<Boolean>
+
+    /** Sets whether the route-replay jump-to-waypoint buttons are shown. */
+    suspend fun setShowRouteJumpButtons(enabled: Boolean)
+
     /** Gets the list of recently searched locations, newest first. */
     fun getRecentSearches(): Flow<List<RecentSearch>>
 
@@ -316,6 +322,7 @@ data class SettingsSnapshot(
     val enabledSpeedProfileIds: Set<String> = AppConstants.ProfileConstants.DEFAULT_ENABLED_SPEED_PROFILE_IDS,
     val hideTeleportFeatures: Boolean = false,
     val hideWidgetOverlay: Boolean = false,
+    val showRouteJumpButtons: Boolean = false,
 )
 
 fun SpeedProfilePreferences.toActiveSpeedProfile(): SpeedProfile {
@@ -405,6 +412,7 @@ class AppPreferencesDataSource
             val REALISM_SUSPENDED_MOCKING_ENABLED = booleanPreferencesKey("realism_suspended_mocking_enabled")
             val HIDE_TELEPORT_FEATURES = booleanPreferencesKey("hide_teleport_features")
             val HIDE_WIDGET_OVERLAY = booleanPreferencesKey("hide_widget_overlay")
+            val SHOW_ROUTE_JUMP_BUTTONS = booleanPreferencesKey("show_route_jump_buttons")
             val RECENT_SEARCHES = stringPreferencesKey("recent_searches")
             val ROUTES_SORT_NEWEST_FIRST = booleanPreferencesKey("routes_sort_newest_first")
             val FAVORITES_SORT_NEWEST_FIRST = booleanPreferencesKey("favorites_sort_newest_first")
@@ -712,6 +720,12 @@ class AppPreferencesDataSource
             dataStore.edit { prefs -> prefs[Keys.HIDE_WIDGET_OVERLAY] = enabled }
         }
 
+        override fun getShowRouteJumpButtons(): Flow<Boolean> = pref(Keys.SHOW_ROUTE_JUMP_BUTTONS, false)
+
+        override suspend fun setShowRouteJumpButtons(enabled: Boolean) {
+            dataStore.edit { prefs -> prefs[Keys.SHOW_ROUTE_JUMP_BUTTONS] = enabled }
+        }
+
         override fun getRecentSearches(): Flow<List<RecentSearch>> =
             dataStore.data
                 .catch { e ->
@@ -864,6 +878,7 @@ class AppPreferencesDataSource
                 prefs[Keys.REALISM_SUSPENDED_MOCKING_ENABLED] = snapshot.realismSuspendedMockingEnabled
                 prefs[Keys.HIDE_TELEPORT_FEATURES] = snapshot.hideTeleportFeatures
                 prefs[Keys.HIDE_WIDGET_OVERLAY] = snapshot.hideWidgetOverlay
+                prefs[Keys.SHOW_ROUTE_JUMP_BUTTONS] = snapshot.showRouteJumpButtons
                 prefs[Keys.JITTER_SPEED_IDLE_VARIATION_PCT] =
                     snapshot.jitterSpeedIdleVariationPct.coerceIn(
                         AppConstants.JitterConstants.SPEED_VARIATION_PCT_MIN,
@@ -949,6 +964,7 @@ class AppPreferencesDataSource
                         realismSuspendedMockingEnabled = prefs[Keys.REALISM_SUSPENDED_MOCKING_ENABLED] ?: false,
                         hideTeleportFeatures = prefs[Keys.HIDE_TELEPORT_FEATURES] ?: false,
                         hideWidgetOverlay = prefs[Keys.HIDE_WIDGET_OVERLAY] ?: false,
+                        showRouteJumpButtons = prefs[Keys.SHOW_ROUTE_JUMP_BUTTONS] ?: false,
                         jitterSpeedIdleVariationPct =
                             prefs[Keys.JITTER_SPEED_IDLE_VARIATION_PCT]
                                 ?: DEFAULT_JITTER_SPEED_IDLE_VARIATION_PCT,

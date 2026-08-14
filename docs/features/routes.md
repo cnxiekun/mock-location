@@ -40,8 +40,12 @@ Implemented as `RouteReplayEngine.jumpToNextWaypoint()` /
 `jumpToPreviousWaypoint()`, reusing the engine's existing
 `resumeWaypointIndex` pointer rather than tracking a separate discrete
 index. Not available for ephemeral (walk-here "Add next point") replay,
-which has no persisted waypoint list. Gated by `hideTeleportFeatures` like
-every other teleport entry point (@docs/features/hide-teleport.md).
+which has no persisted waypoint list. Gated by `hideTeleportFeatures` like every other teleport entry point
+(@docs/features/hide-teleport.md), **and** by a separate, independent
+opt-in toggle — `AppSettings.showRouteJumpButtons` (Settings → Menus →
+Privacy → "Show route jump buttons", DataStore key
+`show_route_jump_buttons`, default `false`). Both must allow the buttons
+for them to show: `!hideTeleportFeatures && showRouteJumpButtons`.
 Jumping to the last waypoint while replay is running lets it complete
 naturally on the next tick, same as reaching it by walking.
 

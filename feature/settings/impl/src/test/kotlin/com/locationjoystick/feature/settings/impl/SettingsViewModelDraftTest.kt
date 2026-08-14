@@ -194,6 +194,15 @@ class SettingsViewModelDraftTest {
         }
 
     @Test
+    fun `setShowRouteJumpButtons marks dirty`() =
+        runTest(testDispatcher) {
+            backgroundScope.launch(testDispatcher) { viewModel.uiState.collect {} }
+            viewModel.setShowRouteJumpButtons(true)
+            assertTrue(viewModel.uiState.value.showRouteJumpButtons)
+            assertTrue(viewModel.uiState.value.isDirty)
+        }
+
+    @Test
     fun `jitter speed variation setters mark dirty`() =
         runTest(testDispatcher) {
             backgroundScope.launch(testDispatcher) { viewModel.uiState.collect {} }

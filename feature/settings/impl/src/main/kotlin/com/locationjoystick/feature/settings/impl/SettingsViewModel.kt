@@ -127,6 +127,7 @@ class SettingsViewModel
             val tapToWalkScaleMpx: Double? = null,
             val hideTeleportFeatures: Boolean? = null,
             val hideWidgetOverlay: Boolean? = null,
+            val showRouteJumpButtons: Boolean? = null,
         )
 
         private val mutableDraft = MutableStateFlow(DraftState())
@@ -199,6 +200,7 @@ class SettingsViewModel
                     tapToWalkScaleMpx = draftState.tapToWalkScaleMpx ?: snapshot.tapToWalkScaleMpx,
                     hideTeleportFeatures = draftState.hideTeleportFeatures ?: snapshot.hideTeleportFeatures,
                     hideWidgetOverlay = draftState.hideWidgetOverlay ?: snapshot.hideWidgetOverlay,
+                    showRouteJumpButtons = draftState.showRouteJumpButtons ?: snapshot.showRouteJumpButtons,
                     compassTrackingEnabled = compass.enabled,
                     isCompassServiceGranted = isServiceGranted,
                     compassRegionCxPct = compass.cx,
@@ -351,6 +353,10 @@ class SettingsViewModel
             mutableDraft.update { it.copy(hideWidgetOverlay = enabled) }
         }
 
+        fun setShowRouteJumpButtons(enabled: Boolean) {
+            mutableDraft.update { it.copy(showRouteJumpButtons = enabled) }
+        }
+
         fun setTapToWalkOverlayEnabled(enabled: Boolean) {
             mutableDraft.update { it.copy(tapToWalkOverlayEnabled = enabled) }
         }
@@ -441,6 +447,7 @@ class SettingsViewModel
                             tapToWalkScaleMpx = state.tapToWalkScaleMpx,
                             hideTeleportFeatures = state.hideTeleportFeatures,
                             hideWidgetOverlay = state.hideWidgetOverlay,
+                            showRouteJumpButtons = state.showRouteJumpButtons,
                             roamingDefaults =
                                 d.roamingDefaults
                                     ?: settingsRepository.getRoamingDefaults().first(),
@@ -528,6 +535,7 @@ class SettingsViewModel
                     suspendedMockingEnabled = state.realismSuspendedMockingEnabled,
                     hideTeleportFeatures = state.hideTeleportFeatures,
                     hideWidgetOverlay = state.hideWidgetOverlay,
+                    showRouteJumpButtons = state.showRouteJumpButtons,
                 )
             return ExportData(
                 schemaVersion = AppConstants.ExportConstants.SCHEMA_VERSION,
@@ -729,6 +737,7 @@ class SettingsViewModel
                     realismSuspendedMockingEnabled = data.settings.suspendedMockingEnabled,
                     hideTeleportFeatures = data.settings.hideTeleportFeatures,
                     hideWidgetOverlay = data.settings.hideWidgetOverlay,
+                    showRouteJumpButtons = data.settings.showRouteJumpButtons,
                     jitterSpeedIdleVariationPct = data.jitterSpeedIdleVariationPct,
                     jitterSpeedMovingVariationPct = data.jitterSpeedMovingVariationPct,
                     hotLocationsEnabled = data.hotLocationsEnabled,

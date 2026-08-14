@@ -135,7 +135,7 @@ internal fun MapFabColumn(
                                         contentColor = MaterialTheme.colorScheme.onError,
                                         onClick = { onAction(MapAction.StopRouteReplay) },
                                     )
-                                    if (!uiState.hideTeleportFeatures) {
+                                    if (!uiState.hideTeleportFeatures && uiState.showRouteJumpButtons) {
                                         LjMapIconButton(
                                             icon = LjIcons.SkipPrevious,
                                             contentDescription = "Previous waypoint",

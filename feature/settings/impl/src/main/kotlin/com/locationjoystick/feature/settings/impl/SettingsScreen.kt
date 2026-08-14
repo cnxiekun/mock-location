@@ -356,6 +356,10 @@ fun SettingsRoute(
                     viewModel.setHideWidgetOverlay(action.enabled)
                 }
 
+                is SettingsAction.SetShowRouteJumpButtons -> {
+                    viewModel.setShowRouteJumpButtons(action.enabled)
+                }
+
                 is SettingsAction.SetTapToWalkOverlayEnabled -> {
                     viewModel.setTapToWalkOverlayEnabled(action.enabled)
                 }

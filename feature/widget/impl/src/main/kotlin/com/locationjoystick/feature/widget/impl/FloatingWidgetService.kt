@@ -308,6 +308,7 @@ class FloatingWidgetService :
             val groupState by groupRepository.groupState.collectAsStateWithLifecycle(initialValue = GroupState())
             val isGroupSyncExpanded by groupSyncExpandedFlow.collectAsStateWithLifecycle()
             val hideTeleportFeatures by settingsRepository.getHideTeleportFeatures().collectAsStateWithLifecycle(initialValue = false)
+            val showRouteJumpButtons by settingsRepository.getShowRouteJumpButtons().collectAsStateWithLifecycle(initialValue = false)
 
             LjTheme {
                 WidgetPanel(
@@ -322,6 +323,7 @@ class FloatingWidgetService :
                     onJumpToNextWaypoint = { mapController.jumpToNextWaypoint() },
                     onJumpToPreviousWaypoint = { mapController.jumpToPreviousWaypoint() },
                     hideTeleportFeatures = hideTeleportFeatures,
+                    showRouteJumpButtons = showRouteJumpButtons,
                     routeExpanded = routeExpanded,
                     isPanelExpanded = isPanelExpanded,
                     hasPendingCompletion = hasPendingCompletion,

@@ -260,6 +260,10 @@ class SettingsRepository
 
         suspend fun setHideWidgetOverlay(enabled: Boolean) = dataSource.setHideWidgetOverlay(enabled)
 
+        fun getShowRouteJumpButtons(): Flow<Boolean> = dataSource.getShowRouteJumpButtons()
+
+        suspend fun setShowRouteJumpButtons(enabled: Boolean) = dataSource.setShowRouteJumpButtons(enabled)
+
         fun getFloatingMapQuickWalk(): Flow<Boolean> = dataSource.getFloatingMapQuickWalk()
 
         fun getTapToWalkOverlayEnabled(): Flow<Boolean> = dataSource.getTapToWalkOverlayEnabled()

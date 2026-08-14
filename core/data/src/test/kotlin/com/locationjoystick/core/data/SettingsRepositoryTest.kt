@@ -881,6 +881,27 @@ class SettingsRepositoryTest {
             }
         }
 
+    // route jump buttons
+
+    @Test
+    fun `getShowRouteJumpButtons returns false by default`() =
+        runTest {
+            repository.getShowRouteJumpButtons().test {
+                assertFalse(awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `setShowRouteJumpButtons persists true`() =
+        runTest {
+            repository.setShowRouteJumpButtons(true)
+            repository.getShowRouteJumpButtons().test {
+                assertTrue(awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     // recent searches
 
     @Test
@@ -1225,6 +1246,14 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
         hideWidgetOverlayFlow.value = enabled
     }
 
+    private val showRouteJumpButtonsFlow = MutableStateFlow(false)
+
+    override fun getShowRouteJumpButtons(): Flow<Boolean> = showRouteJumpButtonsFlow
+
+    override suspend fun setShowRouteJumpButtons(enabled: Boolean) {
+        showRouteJumpButtonsFlow.value = enabled
+    }
+
     override fun getSelectedHotLocationIds(): Flow<Set<String>> = flowOf(emptySet())
 
     override suspend fun setSelectedHotLocationIds(ids: Set<String>) = Unit
@@ -1350,6 +1379,7 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
         hotLocationsEnabledFlow.value = false
         hideTeleportFeaturesFlow.value = false
         hideWidgetOverlayFlow.value = false
+        showRouteJumpButtonsFlow.value = false
         onboardingCompleteFlow.value = onboardingComplete
     }
 }

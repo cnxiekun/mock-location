@@ -227,6 +227,7 @@ internal class WidgetPanelPresenter(
             val initialPosition = remember { mapController.sharedState.value.currentPosition }
             val quickWalk by settingsRepository.getFloatingMapQuickWalk().collectAsStateWithLifecycle(initialValue = false)
             val hideTeleportFeatures by settingsRepository.getHideTeleportFeatures().collectAsStateWithLifecycle(initialValue = false)
+            val showRouteJumpButtons by settingsRepository.getShowRouteJumpButtons().collectAsStateWithLifecycle(initialValue = false)
             val routeControlsExpanded by mapRouteControlsExpanded.collectAsStateWithLifecycle()
             MapFloatingView(
                 currentPosition = shared.currentPosition,
@@ -278,6 +279,7 @@ internal class WidgetPanelPresenter(
                 onSaveCurrentLocation = { name -> callbacks.saveCurrentLocation(name) },
                 quickWalk = quickWalk,
                 hideTeleportFeatures = hideTeleportFeatures,
+                showRouteJumpButtons = showRouteJumpButtons,
             )
         }
     }
