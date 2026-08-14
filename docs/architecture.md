@@ -32,10 +32,12 @@ core/model       — Pure Kotlin data classes, no Android deps
 | `:core:testing` | Shared test utils, fakes |
 | `:feature:favorites:api` / `:impl` | Favorites list, MapPicker, teleport |
 | `:feature:group:api` / `:impl` | Group Sync screen — leader/follower Wi-Fi location sync |
+| `:feature:joystick:impl` | Floating joystick overlay |
 | `:feature:map:api` / `:impl` | MapLibre screen, map interactions, roaming bottom sheet |
 | `:feature:onboarding:api` / `:impl` | Multi-step onboarding flow |
 | `:feature:routes:api` / `:impl` | Route list, creator, detail, replay |
 | `:feature:settings:api` / `:impl` | Speed profiles, widget config, export/import, QR transfer |
+| `:feature:widget:impl` | Floating widget overlay + panel |
 
 ## MVVM + Repository Pattern
 
