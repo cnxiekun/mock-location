@@ -104,7 +104,7 @@ make coverage-open   # open HTML in browser
 
 - Android Studio Hedgehog or newer (or JDK + Android SDK command-line tools)
 - Java 17
-- Android SDK with API 31+
+- Android SDK with API 28+
 
 ### Clone and build
 
@@ -205,7 +205,7 @@ Each feature split into `:api` (public contract) + `:impl` (implementation).
 | Async | Kotlin Coroutines + Flow |
 | Build | Gradle + Version Catalog (`libs.versions.toml`) |
 | CI | GitHub Actions |
-| Min SDK | API 31 (Android 12) |
+| Min SDK | API 28 (Android 9) |
 
 ---
 

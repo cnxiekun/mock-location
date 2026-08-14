@@ -3,6 +3,7 @@ package com.locationjoystick.feature.widget.impl
 import android.accessibilityservice.AccessibilityService
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import android.util.Log
 import android.view.Display
 import android.view.accessibility.AccessibilityEvent
@@ -21,6 +22,11 @@ class CompassAccessibilityService :
     CompassAccessibilityServiceBridge {
     companion object {
         private const val TAG = "CompassAccessibilitySvc"
+
+        /**
+         * `takeScreenshot(int, Executor, TakeScreenshotCallback)` requires API 30 — no fallback exists.
+         */
+        fun isSupported(sdkInt: Int = Build.VERSION.SDK_INT): Boolean = sdkInt >= Build.VERSION_CODES.R
 
         /**
          * Detects the angle of the red north arrow inside a circular region of [bitmap].
@@ -80,6 +86,10 @@ class CompassAccessibilityService :
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        if (!isSupported()) {
+            Log.d(TAG, "Service connected — skipping bind, API ${Build.VERSION.SDK_INT} < R")
+            return
+        }
         compassHeadingSource.bind(this)
         Log.d(TAG, "Service connected — bound to CompassHeadingSource")
     }
@@ -99,6 +109,10 @@ class CompassAccessibilityService :
         cy: Float,
         radius: Float,
     ): Float? {
+        // Unreachable in practice — onServiceConnected() never binds below API 30 — but
+        // takeScreenshot() itself requires API 30, so lint needs an inline SDK_INT check here
+        // too (it doesn't trace version guards through a delegated boolean function).
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
         val bitmap =
             suspendCancellableCoroutine<Bitmap?> { cont ->
                 try {

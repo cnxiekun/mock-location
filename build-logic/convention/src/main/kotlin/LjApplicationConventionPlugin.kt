@@ -31,7 +31,7 @@ class LjApplicationConventionPlugin : Plugin<Project> {
                 }
 
                 defaultConfig {
-                    minSdk = 31
+                    minSdk = 28
                     targetSdk = 36
                     val versionName = "0.15.0" // x-release-please-version
                     val (maj, min, pat) = versionName.split(".").map { it.toInt() }

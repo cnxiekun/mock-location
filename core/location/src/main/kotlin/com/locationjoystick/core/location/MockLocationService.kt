@@ -9,6 +9,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.location.provider.ProviderProperties
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
@@ -949,20 +950,24 @@ class MockLocationService : Service() {
         }
 
         try {
-            val properties =
-                ProviderProperties
-                    .Builder()
-                    .setHasAltitudeSupport(true)
-                    .setHasSpeedSupport(true)
-                    .setHasBearingSupport(true)
-                    .setPowerUsage(ProviderProperties.POWER_USAGE_HIGH)
-                    .setAccuracy(ProviderProperties.ACCURACY_FINE)
-                    .build()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val properties =
+                    ProviderProperties
+                        .Builder()
+                        .setHasAltitudeSupport(true)
+                        .setHasSpeedSupport(true)
+                        .setHasBearingSupport(true)
+                        .setPowerUsage(ProviderProperties.POWER_USAGE_HIGH)
+                        .setAccuracy(ProviderProperties.ACCURACY_FINE)
+                        .build()
 
-            locationManager.addTestProvider(
-                LocationManager.GPS_PROVIDER,
-                properties,
-            )
+                locationManager.addTestProvider(
+                    LocationManager.GPS_PROVIDER,
+                    properties,
+                )
+            } else {
+                addLegacyTestProvider()
+            }
             locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true)
             providerAdded = true
             Log.i(TAG, "Test provider registered")
@@ -973,6 +978,24 @@ class MockLocationService : Service() {
             Log.e(TAG, "Missing mock location permission", e)
             _state.value = MockLocationState.ERROR
         }
+    }
+
+    // Pre-31 devices lack ProviderProperties.Builder + the ProviderProperties addTestProvider
+    // overload — same property values as the API 31+ Builder path above.
+    @Suppress("DEPRECATION")
+    private fun addLegacyTestProvider() {
+        locationManager.addTestProvider(
+            LocationManager.GPS_PROVIDER,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            ProviderProperties.POWER_USAGE_HIGH,
+            ProviderProperties.ACCURACY_FINE,
+        )
     }
 
     private fun removeTestProvider() {

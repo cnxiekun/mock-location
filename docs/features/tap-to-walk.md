@@ -91,6 +91,8 @@ Accessibility services running in the background are detectable by some games. T
 
 `android.permission.BIND_ACCESSIBILITY_SERVICE` — granted by Android when the user enables the service in system Accessibility Settings. No runtime prompt needed.
 
+API 30 (`takeScreenshot`) — no fallback exists below it. On API 28–29, the "Compass orientation" Settings section is hidden and `CompassAccessibilityService.onServiceConnected()` skips binding, so compass tracking is unavailable; the rest of Tap to Walk (Tier 1 quick-walk, Tier 2 overlay) works unchanged.
+
 ## Warning Dialog
 
 Enabling the overlay shows an `AlertDialog` with three caveats before activating:

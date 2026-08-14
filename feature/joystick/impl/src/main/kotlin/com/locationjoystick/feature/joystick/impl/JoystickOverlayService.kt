@@ -5,7 +5,9 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.PixelFormat
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -239,9 +241,7 @@ class JoystickOverlayService : OverlayService() {
 
     override fun getWindowManagerParams(view: View): WindowManager.LayoutParams {
         val sizePx = (AppConstants.JoystickConstants.SIZE_DP * resources.displayMetrics.density).toInt()
-        val metrics = windowManager.currentWindowMetrics
-        val screenW = metrics.bounds.width()
-        val screenH = metrics.bounds.height()
+        val (screenW, screenH) = screenSize()
 
         return WindowManager
             .LayoutParams(
@@ -257,6 +257,19 @@ class JoystickOverlayService : OverlayService() {
                 y = ((screenH - sizePx) / 2).coerceAtLeast(0)
             }
     }
+
+    // WindowManager#currentWindowMetrics requires API 30 — fall back to the deprecated
+    // real-metrics query below that, same values.
+    @Suppress("DEPRECATION")
+    private fun screenSize(): Pair<Int, Int> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val bounds = windowManager.currentWindowMetrics.bounds
+            Pair(bounds.width(), bounds.height())
+        } else {
+            val metrics = DisplayMetrics()
+            windowManager.defaultDisplay.getRealMetrics(metrics)
+            Pair(metrics.widthPixels, metrics.heightPixels)
+        }
 
     private fun startMovement() {
         movementJob?.cancel()

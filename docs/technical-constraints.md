@@ -1,6 +1,6 @@
 # Technical Constraints
 
-- Min SDK API 31. Use `ProviderProperties.Builder` (API 31+). No deprecated raw-int overload. This is a hard floor: `MockLocationService.setupTestProvider()` calls `ProviderProperties.Builder()` unconditionally with no `Build.VERSION.SDK_INT` gate or fallback to the deprecated pre-31 `ProviderProperties` constructor — lowering minSdk below 31 requires adding that dual code path (untested here; the other API-34 manifest declaration, `FOREGROUND_SERVICE_TYPE_LOCATION`, is already `SDK_INT`-gated via `ServiceCompat.startForeground` and is not itself a floor-raiser).
+- Min SDK API 28. `MockLocationService.setupTestProvider()` gates on `Build.VERSION.SDK_INT >= Build.VERSION_CODES.S`: the `ProviderProperties.Builder()` path on API 31+, the deprecated raw-arg `addTestProvider` overload (`@Suppress("DEPRECATION")`) below it. Compass orientation tracking (see @docs/features/tap-to-walk.md) requires API 30 (`takeScreenshot`) with no fallback — its Settings row and `CompassAccessibilityService` binding are both gated on `Build.VERSION.SDK_INT >= Build.VERSION_CODES.R`, effectively unavailable on API 28–29.
 - No Play Services. MapLibre, not Google Maps. No Firebase.
 - Offline-first. Core features work without internet. OSRM opt-in, degrades gracefully.
 - No `Thread.sleep()`. Use `delay()` in coroutines.

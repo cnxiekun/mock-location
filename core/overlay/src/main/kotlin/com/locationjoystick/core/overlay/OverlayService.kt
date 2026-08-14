@@ -4,7 +4,9 @@ import android.app.Service
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.PixelFormat
+import android.os.Build
 import android.os.IBinder
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -114,14 +116,25 @@ abstract class OverlayService : Service() {
         y: Int,
         view: View,
     ): Pair<Int, Int> {
-        val metrics = windowManager.currentWindowMetrics
-        val w = metrics.bounds.width()
-        val h = metrics.bounds.height()
+        val (w, h) = screenSize()
         return Pair(
             x.coerceIn(0, (w - view.width).coerceAtLeast(0)),
             y.coerceIn(0, (h - view.height).coerceAtLeast(0)),
         )
     }
+
+    // WindowManager#currentWindowMetrics requires API 30 — fall back to the deprecated
+    // real-metrics query below that, same values.
+    @Suppress("DEPRECATION")
+    private fun screenSize(): Pair<Int, Int> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val bounds = windowManager.currentWindowMetrics.bounds
+            Pair(bounds.width(), bounds.height())
+        } else {
+            val metrics = DisplayMetrics()
+            windowManager.defaultDisplay.getRealMetrics(metrics)
+            Pair(metrics.widthPixels, metrics.heightPixels)
+        }
 
     protected fun updateOverlayPosition(
         x: Int,

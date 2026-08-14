@@ -1,6 +1,7 @@
 package com.locationjoystick.feature.settings.impl
 
 import android.content.Intent
+import android.os.Build
 import android.provider.Settings
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
@@ -241,8 +242,11 @@ private fun TapToWalkSection(
             valueRange = AppConstants.TapToWalkConstants.MIN_SCALE_MPX.toFloat()..AppConstants.TapToWalkConstants.MAX_SCALE_MPX.toFloat(),
             modifier = Modifier.fillMaxWidth(),
         )
-        Spacer(Modifier.height(16.dp))
-        CompassOrientationSection(uiState, onAction)
+        // takeScreenshot(int, Executor, TakeScreenshotCallback) requires API 30 — no fallback exists.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Spacer(Modifier.height(16.dp))
+            CompassOrientationSection(uiState, onAction)
+        }
     }
     if (showWarning) {
         AlertDialog(

@@ -13,7 +13,7 @@ Android-only mock GPS app. Background operation, minimal battery.
 | Package | `com.locationjoystick.app` |
 | Language | Kotlin |
 | UI | Jetpack Compose |
-| Min SDK | API 31 |
+| Min SDK | API 28 |
 | Distribution | GitHub Releases APK + Play Store (AAB) |
 | Storage | Room + DataStore |
 | Backend | None |
