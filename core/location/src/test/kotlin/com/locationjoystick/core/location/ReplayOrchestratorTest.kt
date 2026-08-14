@@ -4,9 +4,11 @@ import com.locationjoystick.core.data.LocationRepository
 import com.locationjoystick.core.data.RoamingRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.WalkToEngine
+import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.routing.RouteReplayEngine
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -248,4 +250,35 @@ class ReplayOrchestratorTest {
 
         assertEquals(target, locationRepository.currentPosition.value)
     }
+
+    // walkToPosition (the walk-to-start-of-route phase) is routed through the same
+    // tickPosition() helper as the other 3 call sites, so a failed push must not propagate
+    // and abort the replay start — matching handleResume/startReplayWithWaypoints' behavior.
+    @Test
+    fun startReplay_walkToStartOfRoute_swallowsPushLocationUpdateException() =
+        runTest {
+            locationRepository.setPositionInternal(LatLng(0.0, 0.0))
+            val callbackSlot = slot<suspend (LatLng) -> Unit>()
+            coEvery { walkToEngine.walkToOnce(any(), any(), any(), capture(callbackSlot)) } coAnswers {
+                callbackSlot.captured.invoke(LatLng(1.0, 1.0))
+            }
+            val throwingOrchestrator =
+                ReplayOrchestrator(
+                    locationRepository = locationRepository,
+                    routeRepository = routeRepository,
+                    roamingRepository = roamingRepository,
+                    routeReplayEngine = routeReplayEngine,
+                    walkToEngine = walkToEngine,
+                    scope = kotlinx.coroutines.CoroutineScope(dispatcher),
+                    onStateChange = { },
+                    onPositionChange = { _, _ -> },
+                    onSpeedChange = { },
+                    pushLocationUpdate = { throw RuntimeException("boom") },
+                    startUpdateLoop = { },
+                )
+
+            throwingOrchestrator.handleEphemeralStart(listOf(LatLng(0.0, 0.0), LatLng(2.0, 2.0)), 1.4)
+
+            assertEquals(LatLng(1.0, 1.0), locationRepository.currentPosition.value)
+        }
 }

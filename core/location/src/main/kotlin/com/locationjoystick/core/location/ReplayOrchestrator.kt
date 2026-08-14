@@ -121,15 +121,7 @@ internal class ReplayOrchestrator(
         onStateChange(MockLocationState.RUNNING)
         locationRepository.startSpoofing()
         routeReplayEngine.resume(
-            onPositionUpdate = { pos ->
-                onPositionChange(pos.latitude, pos.longitude)
-                try {
-                    locationRepository.setPositionInternal(pos)
-                    pushLocationUpdate()
-                } catch (e: Exception) {
-                    Log.e(TAG, "Position update failed during route resume", e)
-                }
-            },
+            onPositionUpdate = ::tickPosition,
             onComplete = {
                 // Matches startReplayWithWaypoints' default onComplete (used when a replay finishes
                 // without ever being paused) — a natural completion must not force IDLE/stopSpoofing.
@@ -253,15 +245,7 @@ internal class ReplayOrchestrator(
             waypoints = waypoints,
             speedMs = speedMs,
             isLooping = isLooping,
-            onPositionUpdate = { pos ->
-                onPositionChange(pos.latitude, pos.longitude)
-                try {
-                    locationRepository.setPositionInternal(pos)
-                    pushLocationUpdate()
-                } catch (e: Exception) {
-                    Log.e(TAG, "Position update failed during replay", e)
-                }
-            },
+            onPositionUpdate = ::tickPosition,
             onComplete = { scope.launch { onComplete() } },
         )
 
@@ -275,10 +259,6 @@ internal class ReplayOrchestrator(
         speedMs: Double,
     ) {
         val startPos = locationRepository.currentPosition.value ?: return
-        walkToEngine.walkToOnce(startPos, target, speedMs) { pos ->
-            onPositionChange(pos.latitude, pos.longitude)
-            locationRepository.setPositionInternal(pos)
-            pushLocationUpdate()
-        }
+        walkToEngine.walkToOnce(startPos, target, speedMs, ::tickPosition)
     }
 }
