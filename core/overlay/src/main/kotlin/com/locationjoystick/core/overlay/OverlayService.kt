@@ -126,7 +126,7 @@ abstract class OverlayService : Service() {
     // WindowManager#currentWindowMetrics requires API 30 — fall back to the deprecated
     // real-metrics query below that, same values.
     @Suppress("DEPRECATION")
-    private fun screenSize(): Pair<Int, Int> =
+    protected fun screenSize(): Pair<Int, Int> =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val bounds = windowManager.currentWindowMetrics.bounds
             Pair(bounds.width(), bounds.height())
