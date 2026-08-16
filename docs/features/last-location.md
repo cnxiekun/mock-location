@@ -13,4 +13,10 @@ On app restart, restores the last spoofed position. No manual re-entry needed.
 ## Behaviour
 
 - On service start: if `REMEMBER_LAST_LOCATION` is `true` and valid coordinates exist, seed initial position from `LAST_LATITUDE`/`LAST_LONGITUDE`.
-- On each position update: persist current coordinates to DataStore.
+- While spoofing runs, `MockLocationService.pushLocationUpdate()` — the single 1 Hz tick every mode
+  (joystick, walk-to, route replay, roaming, follower catch-up) routes through — writes the current
+  position to DataStore, throttled to `AppConstants.LocationConstants.LAST_LOCATION_PERSIST_INTERVAL_MS`
+  (5 s) so a battery death or hard reboot loses at most a few seconds of movement instead of resuming
+  at wherever the session started. The write is unconditional — `REMEMBER_LAST_LOCATION` gates restore
+  only, not persistence.
+- `stopSpoofing()` and `onDestroy()` also persist immediately on clean stop / process kill, same as before.

@@ -197,6 +197,9 @@ class MockLocationService : Service() {
     /** Cached satellites-used-in-fix count; updated alongside cachedSatelliteCount. */
     @Volatile private var cachedUsedInFixCount: Int = 0
 
+    /** Timestamp of the last live-position DataStore write; throttles persistLastLocation(). */
+    @Volatile private var lastPersistedLocationMs: Long = 0L
+
     override fun onCreate() {
         super.onCreate()
         replayOrchestrator =
@@ -1169,6 +1172,11 @@ class MockLocationService : Service() {
                 lastIdleJitterTimestampMs = nowMs
             }
             applyToProvider(fix, nowNanos)
+            if (shouldPersistLastLocation(lastPersistedLocationMs, nowMs)) {
+                lastPersistedLocationMs = nowMs
+                val pos = positionRef.get()
+                serviceScope.launch { settingsRepository.setLastLocation(pos) }
+            }
             if (leaderSharingEnabled) {
                 leaderSyncServer.push(
                     SyncPositionUpdate(

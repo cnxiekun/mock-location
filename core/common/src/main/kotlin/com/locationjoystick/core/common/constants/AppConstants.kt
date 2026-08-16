@@ -10,6 +10,7 @@ object AppConstants {
         const val DEFAULT_REPLAY_SPEED_MS = ProfileConstants.WALK_SPEED_MPS
         const val DEGREES_IN_CIRCLE = 360.0
         const val CARDINAL_SNAP_STEP_DEGREES = 45.0
+        const val LAST_LOCATION_PERSIST_INTERVAL_MS = 5000L
     }
 
     object ProfileConstants {

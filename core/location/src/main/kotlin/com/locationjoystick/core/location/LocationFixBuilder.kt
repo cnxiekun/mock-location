@@ -98,6 +98,16 @@ internal data class LocationFix(
     val humanAltitudeOffsetMeters: Double,
 )
 
+/**
+ * Pure throttle check for persisting the live position to DataStore. `pushLocationUpdate()` runs
+ * at 1 Hz; writing every tick would churn flash storage, so the write is skipped unless
+ * [AppConstants.LocationConstants.LAST_LOCATION_PERSIST_INTERVAL_MS] has elapsed since the last one.
+ */
+internal fun shouldPersistLastLocation(
+    lastPersistedMs: Long,
+    nowMs: Long,
+): Boolean = nowMs - lastPersistedMs >= AppConstants.LocationConstants.LAST_LOCATION_PERSIST_INTERVAL_MS
+
 /** Atomic push/pause phase state for suspended mocking. */
 internal data class SuspendedPhaseState(
     val isActive: Boolean,
