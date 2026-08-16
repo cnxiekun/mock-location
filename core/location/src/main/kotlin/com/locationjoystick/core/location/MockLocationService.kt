@@ -1135,12 +1135,17 @@ class MockLocationService : Service() {
 
     /**
      * Applies one [FollowerCatchUpCoordinator.advance] step. Called once per tick, before
-     * [captureSnapshot] reads [positionRef]. No-ops outside FOLLOWER mode.
+     * [captureSnapshot] reads [positionRef]. Writes the new position to both [positionRef]
+     * (consumed by the real GPS test-provider fix) and [LocationRepository] (consumed by the
+     * map UI) — the two writers this service otherwise keeps separate for every other mode
+     * are collapsed here because FOLLOWER mode has no other in-process writer of its own.
+     * No-ops outside FOLLOWER mode.
      */
-    private fun advanceFollowerCatchUp() {
+    internal fun advanceFollowerCatchUp() {
         if (locationRepository.currentMode.value != MockMode.FOLLOWER) return
         val result = followerCatchUp.advance(positionRef.get(), realism.activeProfileSpeedMs) ?: return
         writeCurrentPosition(result.latitude, result.longitude)
+        locationRepository.setPositionInternal(LatLng(result.latitude, result.longitude))
     }
 
     private fun pushLocationUpdate() {
