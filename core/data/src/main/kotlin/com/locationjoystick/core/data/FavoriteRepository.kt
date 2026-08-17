@@ -7,6 +7,7 @@ import com.locationjoystick.core.database.entities.toDomain
 import com.locationjoystick.core.database.entities.toEntity
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -34,6 +35,7 @@ class FavoriteRepository
     @Inject
     constructor(
         private val favoriteDao: FavoriteDao,
+        private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     ) {
         fun getFavorites(): Flow<List<FavoriteLocation>> =
             favoriteDao.getAll().map {
@@ -48,7 +50,7 @@ class FavoriteRepository
             createdAt: Long = System.currentTimeMillis(),
             category: String? = null,
         ): Result<Unit> =
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 runCatching {
                     val favorite =
                         FavoriteLocation(
@@ -65,7 +67,7 @@ class FavoriteRepository
             }
 
         suspend fun updateFavorite(favorite: FavoriteLocation): Result<Unit> =
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 runCatching {
                     favoriteDao.update(favorite.toEntity())
                 }.onFailure { e ->
@@ -74,7 +76,7 @@ class FavoriteRepository
             }
 
         suspend fun deleteFavorite(id: String): Result<Unit> =
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 runCatching {
                     val entity = favoriteDao.getById(id)
                     if (entity != null) {
@@ -86,7 +88,7 @@ class FavoriteRepository
             }
 
         suspend fun deleteAllFavorites(): Result<Unit> =
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 runCatching {
                     favoriteDao.deleteAll()
                 }.onFailure { e ->
@@ -136,7 +138,7 @@ class FavoriteRepository
         suspend fun upsertHotLocations(
             selectedIds: Set<String> = HOT_LOCATIONS.map { idForLocation(it.name, it.city) }.toSet(),
         ): Result<Unit> =
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 runCatching {
                     HOT_LOCATIONS.forEach { location ->
                         val id = idForLocation(location.name, location.city)
@@ -171,7 +173,7 @@ class FavoriteRepository
             }
 
         suspend fun removeHotLocations(): Result<Unit> =
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 runCatching {
                     favoriteDao.deleteHotLocations()
                 }.onFailure { e -> Log.e(TAG, "Failed to remove hot locations", e) }

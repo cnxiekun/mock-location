@@ -38,7 +38,7 @@ class FavoritesViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         fakeFavoriteDao = FakeFavoriteDao()
-        favoriteRepository = FavoriteRepository(fakeFavoriteDao)
+        favoriteRepository = FavoriteRepository(fakeFavoriteDao, testDispatcher)
         every { settingsRepository.getFavoritesSortNewestFirst() } returns flowOf(true)
         every { settingsRepository.getLastTeleportTime() } returns flowOf(0L)
         every { settingsRepository.getLastLocation() } returns flowOf(null)
