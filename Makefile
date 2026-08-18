@@ -32,13 +32,13 @@ install-on-phone:
 	./gradlew installDebug
 
 reinstall-on-phone:
-	adb uninstall com.locationjoystick.app.cn || true && ./gradlew installDebug
+	adb uninstall com.cnxiekun.mocklocation || true && ./gradlew installDebug
 
 start-on-phone:
-	adb shell am start -n com.locationjoystick.app.cn/.MainActivity
+	adb shell am start -n com.cnxiekun.mocklocation/.MainActivity
 
 tail-log-on-phone:
-	adb logcat --pid=$(adb shell pidof com.locationjoystick.app.cn)
+	adb logcat --pid=$(adb shell pidof com.cnxiekun.mocklocation)
 
 test:
 	./gradlew testRelease

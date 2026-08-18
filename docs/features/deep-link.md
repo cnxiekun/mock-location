@@ -16,7 +16,7 @@ https://locationjoystick.shrtcts.fr/?lat=LAT&lon=LON
 Custom scheme equivalent (app-to-app):
 
 ```
-locationjoystick://open?lat=LAT&lon=LON
+mocklocation://open?lat=LAT&lon=LON
 ```
 
 Both formats are parsed identically. HTTPS is preferred for general sharing. The custom scheme is useful for automation and app-to-app workflows.

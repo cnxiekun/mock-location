@@ -167,10 +167,10 @@ object AppConstants {
 
     object ExportConstants {
         const val SCHEMA_VERSION = 2
-        const val FILENAME_PREFIX = "locationjoystick-export"
+        const val FILENAME_PREFIX = "mocklocation-export"
         const val MIME_TYPE = "application/json"
         const val GPX_VERSION = "1.1"
-        const val GPX_CREATOR = "locationjoystick"
+        const val GPX_CREATOR = "MockLocation"
 
         /** Maximum GPX file size accepted for import (10 MB). Larger files are rejected to prevent OOM. */
         const val MAX_GPX_IMPORT_SIZE_BYTES = 10 * 1024 * 1024L
@@ -299,7 +299,7 @@ object AppConstants {
     }
 
     object DatabaseConstants {
-        const val DATABASE_NAME = "locationjoystick.db"
+        const val DATABASE_NAME = "mocklocation.db"
     }
 
     object AppInfo {

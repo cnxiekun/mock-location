@@ -46,7 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview as ComposePreview
  * QR code scanner screen for importing settings via camera.
  *
  * Uses CameraX + ZXing to scan a QR code emitted by [QrShareDialog]. The decoded text is a
- * `locationjoystick://export?host=...&port=...&token=...` URL pointing at the sender's
+ * `mocklocation://export?host=...&port=...&token=...` URL pointing at the sender's
  * [ExportSyncServer]; the caller (typically [SettingsViewModel]) fetches the export over the
  * local network via [ExportSyncClient].
  *

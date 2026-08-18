@@ -15,7 +15,7 @@ internal fun parseGroupInvite(intent: Intent): GroupInvite? {
 
 /**
  * Canonical deep link format: https://locationjoystick.shrtcts.fr/?lat=LAT&lon=LON
- * Custom scheme equivalent:   locationjoystick://open?lat=LAT&lon=LON
+ * Custom scheme equivalent:   mocklocation://open?lat=LAT&lon=LON
  * Android geo URI:            geo:LAT,LON
  * Google Maps web/app links:  https://maps.google.com/maps?q=LAT,LON
  *                             https://www.google.com/maps/search/?api=1&query=LAT,LON

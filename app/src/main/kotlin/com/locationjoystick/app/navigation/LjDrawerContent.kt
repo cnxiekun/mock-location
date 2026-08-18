@@ -1,15 +1,11 @@
 package com.locationjoystick.app.navigation
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
@@ -22,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
@@ -43,7 +38,6 @@ fun LjDrawerContent(
     navController: NavHostController,
     drawerState: DrawerState,
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -132,25 +126,6 @@ fun LjDrawerContent(
                     launchSingleTop = true
                     restoreState = true
                 }
-                scope.launch { drawerState.close() }
-            },
-        )
-        NavigationDrawerItem(
-            icon = { Icon(LjIcons.Explore, "网站") },
-            label = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("网站")
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(
-                        imageVector = LjIcons.OpenInNew,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                    )
-                }
-            },
-            selected = false,
-            onClick = {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://locationjoystick.shrtcts.fr/")))
                 scope.launch { drawerState.close() }
             },
         )

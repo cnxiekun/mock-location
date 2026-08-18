@@ -182,7 +182,7 @@ class GroupSyncViewModelTest {
     @Test
     fun `joinViaScannedUrl joins group for a valid url`() =
         runTest {
-            viewModel.joinViaScannedUrl("locationjoystick://group?host=1.2.3.4&port=9000&id=ZZZZZZ")
+            viewModel.joinViaScannedUrl("mocklocation://group?host=1.2.3.4&port=9000&id=ZZZZZZ")
 
             coVerify {
                 groupRepository.joinGroup(GroupInvite(host = "1.2.3.4", port = 9000, groupId = "ZZZZZZ"))
@@ -203,7 +203,7 @@ class GroupSyncViewModelTest {
         runTest {
             groupStateFlow.value = GroupState(role = GroupRole.LEADER, groupId = "old")
 
-            viewModel.joinViaScannedUrl("locationjoystick://group?host=1.2.3.4&port=9000&id=ZZZZZZ")
+            viewModel.joinViaScannedUrl("mocklocation://group?host=1.2.3.4&port=9000&id=ZZZZZZ")
 
             verify { context.startService(any()) }
             coVerify { groupRepository.joinGroup(any()) }

@@ -26,7 +26,7 @@ The leader's group ID is a 6-character uppercase alphanumeric code (e.g. `AB3X9K
    - Starts `LeaderSyncServer` (OS-assigned port).
    - Registers NSD service via `GroupNsdManager.startLeader(code, port)`.
    - Calls `GroupRepository.createGroup(host, port, code)`.
-4. QR code generated encoding `locationjoystick://group?host=HOST&port=PORT&id=CODE`.
+4. QR code generated encoding `mocklocation://group?host=HOST&port=PORT&id=CODE`.
 5. Leader screen shows both the 6-char code and the QR. Toggle **Sharing** to broadcast.
 
 ### Join a group (follower) — via QR
@@ -57,7 +57,7 @@ The leader's group ID is a 6-character uppercase alphanumeric code (e.g. `AB3X9K
 ## Deep Link / QR Format
 
 ```
-locationjoystick://group?host=HOST&port=PORT&id=CODE
+mocklocation://group?host=HOST&port=PORT&id=CODE
 ```
 
 The `id` parameter is the 6-char group code. Parsed by `GroupSyncViewModel.joinViaScannedUrl()`. The same format is used for `GroupRepository.pendingGroupInvite` (system QR scanner / deep link path via `MainActivity`).

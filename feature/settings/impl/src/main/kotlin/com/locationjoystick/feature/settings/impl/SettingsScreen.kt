@@ -85,7 +85,6 @@ fun SettingsRoute(
     bottomBar: @Composable () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val amapKey by viewModel.amapKey.collectAsStateWithLifecycle()
     val roamingDefaults by viewModel.roamingDefaults.collectAsStateWithLifecycle()
     val isRooted by viewModel.isRooted.collectAsStateWithLifecycle()
     val spoofToggle = rememberSpoofToggleState()
@@ -239,7 +238,7 @@ fun SettingsRoute(
     SettingsScreen(
         uiState = uiState,
         roamingDefaults = roamingDefaults,
-        amapKey = amapKey,
+        amapKey = uiState.amapKey,
         isRooted = isRooted,
         hotLocationTree = viewModel.hotLocationTree,
         hotRouteTree = viewModel.hotRouteTree,

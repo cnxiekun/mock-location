@@ -309,7 +309,7 @@ class GroupSyncViewModel
             port: Int,
             groupId: String,
         ) {
-            val url = "locationjoystick://group?host=$host&port=$port&id=$groupId"
+            val url = "mocklocation://group?host=$host&port=$port&id=$groupId"
             try {
                 val matrix = MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, QR_SIZE, QR_SIZE)
                 val pixels = IntArray(QR_SIZE * QR_SIZE)

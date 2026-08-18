@@ -10,7 +10,7 @@ Android-only mock GPS app. Background operation, minimal battery.
 
 | Field | Value |
 |---|---|
-| Package | `com.locationjoystick.app.cn`（与原版 `com.locationjoystick.app` 可共存） |
+| Package | `com.cnxiekun.mocklocation`（与原版 `com.locationjoystick.app` 可共存） |
 | Language | Kotlin |
 | UI | Jetpack Compose |
 | Min SDK | API 28 |
@@ -167,9 +167,9 @@ make coverage-open   # open HTML report in browser
 ## 个人定制（2026-08-18）
 
 - 全程使用简体中文回复，所有提示、报错、帮助文档都用中文。
-- 应用显示名「定位模拟」，包名 `com.locationjoystick.app.cn`（与作者原版可共存）。
+- 应用显示名「定位模拟」，包名 `com.cnxiekun.mocklocation`（与作者原版可共存）。
 - 地图瓦片使用高德（国内可达，代码内做 WGS-84 ↔ GCJ-02 坐标转换）；地图搜索用高德地理编码，key 由用户在设置中填写（不写进代码）。
-- release 构建用 `xiekun-location-release.keystore` 签名（别名/密码见 `xiekun-location-密钥备忘.txt`）。
+- release 构建用 `cnxiekun-mock-location.keystore` 签名（别名/密码见 `cnxiekun-mock-location-密钥备忘.txt`）。
 - 版本号有**两处**，发版时必须同步改，否则系统显示与实际不符：
   1. `build-logic/convention/.../LjApplicationConventionPlugin.kt` 的 `versionName`（系统「应用信息」显示 + versionCode 计算）。
   2. `AppConstants.AppInfo.VERSION_NAME`（App 界面底部显示）。

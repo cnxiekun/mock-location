@@ -16,6 +16,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -96,10 +97,22 @@ internal fun SettingsGpsSubScreen(
                         Text("高德地图 API Key", style = MaterialTheme.typography.headlineSmall)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "用于地图搜索（地理编码）。在高德开放平台申请「Web 服务」key 后填入即可使用中文搜索。",
+                            "用于地图搜索（地理编码）。填入高德「Web 服务」key 后即可使用中文搜索。",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        var showAmapHint by remember { mutableStateOf(false) }
+                        TextButton(onClick = { showAmapHint = !showAmapHint }) {
+                            Text(if (showAmapHint) "收起申请步骤" else "如何申请 key？")
+                        }
+                        if (showAmapHint) {
+                            Text(
+                                "① 打开 lbs.amap.com 注册登录\n② 控制台「应用管理」→ 创建应用\n③ 添加「Web 服务」类型的 Key\n④ 复制 Key 填入下方，点右上角「保存」",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         var keyInput by remember { mutableStateOf(amapKey) }
                         LaunchedEffect(amapKey) { keyInput = amapKey }

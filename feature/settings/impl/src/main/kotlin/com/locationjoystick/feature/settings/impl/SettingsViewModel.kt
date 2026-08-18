@@ -128,6 +128,7 @@ class SettingsViewModel
             val hideTeleportFeatures: Boolean? = null,
             val hideWidgetOverlay: Boolean? = null,
             val showRouteJumpButtons: Boolean? = null,
+            val amapKey: String? = null,
         )
 
         private val mutableDraft = MutableStateFlow(DraftState())
@@ -168,7 +169,8 @@ class SettingsViewModel
                 compassPrefsFlow,
                 compassServiceGranted,
                 settingsRepository.getThemeMode(),
-            ) { (snapshot, draftState), compass, isServiceGranted, themeMode ->
+                settingsRepository.getAmapWebKey(),
+            ) { (snapshot, draftState), compass, isServiceGranted, themeMode, amapKey ->
                 val isDirty = draftState != DraftState()
                 SettingsUiState(
                     isLoading = false,
@@ -201,6 +203,7 @@ class SettingsViewModel
                     hideTeleportFeatures = draftState.hideTeleportFeatures ?: snapshot.hideTeleportFeatures,
                     hideWidgetOverlay = draftState.hideWidgetOverlay ?: snapshot.hideWidgetOverlay,
                     showRouteJumpButtons = draftState.showRouteJumpButtons ?: snapshot.showRouteJumpButtons,
+                    amapKey = draftState.amapKey ?: amapKey,
                     compassTrackingEnabled = compass.enabled,
                     isCompassServiceGranted = isServiceGranted,
                     compassRegionCxPct = compass.cx,
@@ -215,16 +218,9 @@ class SettingsViewModel
                 initialValue = SettingsUiState(isLoading = true),
             )
 
-        /** 高德 Web 服务 API key（地理编码搜索用），由用户在设置中填写。 */
-        val amapKey: StateFlow<String> =
-            settingsRepository.getAmapWebKey().stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = "",
-            )
-
+        /** 高德 Web 服务 API key（地理编码搜索用），由用户在设置中填写。走草稿机制，点「保存」后写入。 */
         fun setAmapWebKey(key: String) {
-            viewModelScope.launch { settingsRepository.setAmapWebKey(key) }
+            mutableDraft.update { it.copy(amapKey = key) }
         }
 
         fun setSpeed(
@@ -479,6 +475,7 @@ class SettingsViewModel
                             routeRepository.removeHotRoutes()
                         }
                     }
+                    d.amapKey?.let { settingsRepository.setAmapWebKey(it) }
                     mutableDraft.value = DraftState()
                     userFeedback.emit(UserFeedback("设置已保存"))
                 } catch (e: Exception) {
@@ -619,7 +616,7 @@ class SettingsViewModel
                     val code = RandomCode.generate()
                     val port = exportSyncServer.start(code, json)
                     nsdCodeManager.startAdvertising(code, port)
-                    qrExportReady.emit(QrExportSession(qrText = "locationjoystick://export?host=$host&port=$port&token=$code", code = code))
+                    qrExportReady.emit(QrExportSession(qrText = "mocklocation://export?host=$host&port=$port&token=$code", code = code))
                 } catch (e: Exception) {
                     Log.e(TAG, "QR export preparation failed", e)
                     userFeedback.emit(UserFeedback("准备二维码导出失败——请确保 Wi-Fi 已连接", isError = true))

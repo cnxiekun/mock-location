@@ -13,10 +13,9 @@
 | 项目 | 说明 |
 |------|------|
 | 应用名称 | **定位模拟** |
-| 包名 | `com.locationjoystick.app.cn`（与原版 `com.locationjoystick.app` 可共存安装） |
+| 包名 | `com.cnxiekun.mocklocation`（与原版 `com.locationjoystick.app` 可共存安装） |
 | 地图瓦片 | 高德地图（国内可达，代码内做 WGS-84 ↔ GCJ-02 坐标转换对齐） |
 | 地图搜索 | 高德地理编码，**API Key 由用户在设置中填写**（设置 → 定位与 GPS → 高德地图 API Key），不写进代码 |
-| 默认位置 | 深圳 · 中国海外大厦（WGS-84 校准值） |
 | 版本号 | `1.0.0` |
 | 发布 | 本地构建 + 手动上传 GitHub Releases（不依赖原作者的 release-please 自动发布） |
 
@@ -46,7 +45,7 @@
 
 ## 下载
 
-正式版 APK 在 [GitHub Releases](https://github.com/shortcuts/locationjoystick/releases) 页面发布。
+正式版 APK 在 [GitHub Releases](https://github.com/cnxiekun/mock-location/releases) 页面发布。
 
 侧载安装：
 
@@ -56,7 +55,7 @@ adb install mock-location-v1.0.0.apk
 
 或把 APK 传到手机后用文件管理器打开安装（允许安装未知来源应用）。
 
-> 说明：`com.locationjoystick.app.cn` 与原版 `com.locationjoystick.app` 是独立应用，可以同时安装，互不影响。
+> 说明：`com.cnxiekun.mocklocation` 与原版 `com.locationjoystick.app` 是独立应用，可以同时安装，互不影响。
 
 ## 使用步骤
 
@@ -89,7 +88,7 @@ make build-debug
 
 ### 正式包（签名）
 
-本项目使用专属签名文件 `xiekun-location-release.keystore`（在项目根目录，已被 `.gitignore` 忽略，不要提交）。签名信息（别名 / 密码）记录在 `xiekun-location-密钥备忘.txt`。
+本项目使用专属签名文件 `cnxiekun-mock-location.keystore`（在项目根目录，已被 `.gitignore` 忽略，不要提交）。签名信息（别名 / 密码）记录在 `cnxiekun-mock-location-密钥备忘.txt`。
 
 ```bash
 ./gradlew assembleRelease

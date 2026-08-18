@@ -18,10 +18,10 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -160,8 +160,8 @@ fun NominatimSearchBar(
             placeholder = { Text("搜索位置...") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             trailingIcon = {
-                IconButton(onClick = { performSearch() }) {
-                    Icon(Icons.Default.Search, contentDescription = "搜索")
+                TextButton(onClick = { performSearch() }) {
+                    Text("搜索")
                 }
             },
             singleLine = true,

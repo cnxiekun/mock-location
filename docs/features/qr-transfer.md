@@ -13,7 +13,7 @@ The QR code does not carry the export data itself — it carries connection info
    - Generates a random 6-character code via `RandomCode.generate()`.
    - Starts `ExportSyncServer` (a `ServerSocket(0)`-bound local HTTP server, OS-assigned port), which serves that JSON at `GET /export?token=CODE`.
    - Registers the code for NSD discovery via `NsdCodeManager.startAdvertising(code, port)`.
-   - Builds `locationjoystick://export?host=HOST&port=PORT&token=CODE` (HOST resolved via `NetworkUtils.getLocalIpAddress()`) and renders it as a QR code via `QrEncoder`. `QrShareDialog` displays the code alongside the QR for manual entry.
+   - Builds `mocklocation://export?host=HOST&port=PORT&token=CODE` (HOST resolved via `NetworkUtils.getLocalIpAddress()`) and renders it as a QR code via `QrEncoder`. `QrShareDialog` displays the code alongside the QR for manual entry.
    - Both the HTTP server and NSD advertising only run while `QrShareDialog` is open — dismissing it calls `SettingsViewModel.stopQrExport()`.
 2. **Receiver** has two options, both ending in the same fetch:
    - **Scan**: taps "Import from QR code", scans the code. `QrScannerScreen` decodes the raw URL via `ZxingImageAnalyzer` and passes it to `SettingsViewModel.onQrScanned`, which parses `host`/`port`/`token` from the URL.

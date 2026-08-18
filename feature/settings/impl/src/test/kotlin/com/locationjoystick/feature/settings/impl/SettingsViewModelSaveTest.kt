@@ -282,7 +282,7 @@ class SettingsViewModelSaveTest {
     fun `onQrScanned with malformed url emits error feedback`() =
         runTest(testDispatcher) {
             viewModel.userFeedback.test {
-                viewModel.onQrScanned("locationjoystick://export?host=1.2.3.4")
+                viewModel.onQrScanned("mocklocation://export?host=1.2.3.4")
                 val feedback = awaitItem()
                 assertTrue(feedback.isError)
                 cancelAndIgnoreRemainingEvents()

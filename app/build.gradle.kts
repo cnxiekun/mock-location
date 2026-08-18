@@ -11,8 +11,8 @@ android {
         buildConfig = true
     }
     defaultConfig {
-        // 独立包名：与作者原版（com.locationjoystick.app）可同时安装
-        applicationId = "com.locationjoystick.app.cn"
+        // 独立包名：改造版应用 ID，与原作者（com.locationjoystick.app）互不干扰
+        applicationId = "com.cnxiekun.mocklocation"
         testInstrumentationRunner = "com.locationjoystick.app.HiltTestRunner"
         ndk {
             // 只保留真机架构，去掉 x86/x86_64 模拟器架构以显著减小体积
@@ -23,7 +23,7 @@ android {
     }
     signingConfigs {
         create("release") {
-            storeFile = rootProject.file("xiekun-location-release.keystore")
+            storeFile = rootProject.file("cnxiekun-mock-location.keystore")
             storePassword = "xiekun123"
             keyAlias = "xiekun"
             keyPassword = "xiekun123"

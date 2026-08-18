@@ -43,5 +43,6 @@ data class SettingsUiState(
     val hideTeleportFeatures: Boolean = false,
     val hideWidgetOverlay: Boolean = false,
     val showRouteJumpButtons: Boolean = false,
+    val amapKey: String = "",
     val isDirty: Boolean = false,
 )
