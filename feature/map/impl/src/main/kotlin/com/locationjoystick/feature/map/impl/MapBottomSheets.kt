@@ -50,10 +50,10 @@ internal fun RoutesPickerSheet(
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-            Text(text = "Routes", style = MaterialTheme.typography.headlineSmall)
+            Text(text = "路线", style = MaterialTheme.typography.headlineSmall)
             if (uiState.routes.isEmpty()) {
                 Text(
-                    text = "No routes saved",
+                    text = "暂无保存的路线",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 16.dp),
                 )
@@ -79,13 +79,13 @@ internal fun RoutesPickerSheet(
                                     style = MaterialTheme.typography.titleMedium,
                                 )
                                 Text(
-                                    text = "${route.waypoints.size} waypoints",
+                                    text = "${route.waypoints.size} 个途经点",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             Button(onClick = { selectedRouteId = route.id }) {
-                                Icon(LjIcons.PlayArrow, contentDescription = "Start route")
+                                Icon(LjIcons.PlayArrow, contentDescription = "开始路线")
                             }
                         }
                     }
@@ -121,7 +121,7 @@ internal fun FavoritesPickerSheet(
         val target = uiState.favoriteTarget
         if (target == null) {
             FavoritesList(
-                title = "Favorites",
+                title = "收藏",
                 favorites = uiState.favorites,
                 onSelect = { onAction(MapAction.SelectFavorite(it)) },
                 onSaveCurrentLocation =
@@ -175,14 +175,14 @@ internal fun PendingTapSheet(
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(16.dp)) {
             if (isRouteReplay && !isEphemeralReplay) {
-                Text("Route in progress", style = MaterialTheme.typography.titleMedium)
+                Text("路线进行中", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(16.dp))
                 if (!hideTeleportFeatures) {
                     Button(
                         onClick = { onAction(MapAction.StopRouteAndTeleport(position)) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Stop route and teleport")
+                        Text("停止路线并传送")
                     }
                     Spacer(Modifier.height(8.dp))
                 }
@@ -190,20 +190,20 @@ internal fun PendingTapSheet(
                     onClick = { onAction(MapAction.StopRouteAndWalkTo(position)) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Stop route and walk here")
+                    Text("停止路线并走到这里")
                 }
                 Spacer(Modifier.height(8.dp))
                 OutlinedButton(
                     onClick = { onAction(MapAction.FinishRouteAndWalkTo(position)) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Finish route and walk here")
+                    Text("结束路线并走到这里")
                 }
             } else {
-                Text("Move to this location?", style = MaterialTheme.typography.titleMedium)
+                Text("移动到该位置？", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(12.dp))
                 CooldownAdvisoryBadge(
-                    (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel() ?: "No wait needed",
+                    (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel() ?: "无需等待",
                 )
                 Spacer(Modifier.height(16.dp))
                 if (!hideTeleportFeatures) {
@@ -211,7 +211,7 @@ internal fun PendingTapSheet(
                         onClick = { onAction(MapAction.ConfirmTeleport(position)) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Teleport here")
+                        Text("传送到这里")
                     }
                     Spacer(Modifier.height(8.dp))
                 }
@@ -222,7 +222,7 @@ internal fun PendingTapSheet(
                     },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Walk here")
+                    Text("走到这里")
                 }
                 Spacer(Modifier.height(8.dp))
                 OutlinedButton(
@@ -232,7 +232,7 @@ internal fun PendingTapSheet(
                     },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Walk here via roads")
+                    Text("沿道路走到这里")
                 }
                 if (isWalkActive) {
                     Spacer(Modifier.height(8.dp))
@@ -240,7 +240,7 @@ internal fun PendingTapSheet(
                         onClick = { onAction(MapAction.AddEphemeralWaypoint(position)) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Add next point")
+                        Text("添加下一个点")
                     }
                 }
             }
@@ -250,7 +250,7 @@ internal fun PendingTapSheet(
                     onClick = onShare,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Share this location")
+                    Text("分享此位置")
                 }
             }
             Spacer(Modifier.height(4.dp))
@@ -258,7 +258,7 @@ internal fun PendingTapSheet(
                 onClick = { onAction(MapAction.ClearPendingTap) },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Close")
+                Text("关闭")
             }
         }
     }
@@ -295,7 +295,7 @@ internal fun FavoriteTargetDetail(
                         .fillMaxWidth()
                         .padding(top = 16.dp),
             ) {
-                Text("Set location")
+                Text("设置位置")
             }
         }
         OutlinedButton(
@@ -305,7 +305,7 @@ internal fun FavoriteTargetDetail(
                     .fillMaxWidth()
                     .padding(top = 8.dp),
         ) {
-            Text("Walk to location")
+            Text("走到该位置")
         }
         OutlinedButton(
             onClick = onGoToLocationViaRoads,
@@ -314,13 +314,13 @@ internal fun FavoriteTargetDetail(
                     .fillMaxWidth()
                     .padding(top = 8.dp),
         ) {
-            Text("Walk via roads")
+            Text("沿道路行走")
         }
         TextButton(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
         ) {
-            Text("Do nothing")
+            Text("不做任何操作")
         }
     }
 }
@@ -334,12 +334,12 @@ internal fun SaveCurrentLocationDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Save current location") },
+        title = { Text("保存当前位置") },
         text = {
             androidx.compose.material3.OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text("名称") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
             )
@@ -350,12 +350,12 @@ internal fun SaveCurrentLocationDialog(
                     if (name.isNotBlank()) onSave(name.trim())
                 },
             ) {
-                Text("Save")
+                Text("保存")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("取消")
             }
         },
     )
@@ -373,13 +373,13 @@ private fun StartRouteDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Start route") },
+        title = { Text("开始路线") },
         text = {
             Column {
-                LjCheckboxRow(title = "Loop", checked = loop, enabled = !returnToLocation, onCheckedChange = { loop = it })
-                LjCheckboxRow(title = "Reverse", checked = reverse, onCheckedChange = { reverse = it })
+                LjCheckboxRow(title = "循环", checked = loop, enabled = !returnToLocation, onCheckedChange = { loop = it })
+                LjCheckboxRow(title = "反向", checked = reverse, onCheckedChange = { reverse = it })
                 LjCheckboxRow(
-                    title = "Return to location",
+                    title = "返回原位置",
                     checked = returnToLocation,
                     enabled = !loop,
                     onCheckedChange = { returnToLocation = it },
@@ -390,19 +390,19 @@ private fun StartRouteDialog(
                         onClick = { onStart(loop, reverse, returnToLocation && !loop, true) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Teleport and start")
+                        Text("传送并开始")
                     }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = { onStart(loop, reverse, returnToLocation && !loop, false) }) {
-                Text("Walk and start")
+                Text("行走并开始")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("取消")
             }
         },
     )

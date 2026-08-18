@@ -152,7 +152,7 @@ class GroupSyncViewModelTest {
         runTest {
             viewModel.joinByCode("AB")
 
-            assertEquals("Code must be 6 characters", viewModel.errorMessage.value)
+            assertEquals("代码必须是 6 个字符", viewModel.errorMessage.value)
             coVerify(exactly = 0) { groupNsdManager.discoverByCode(any()) }
         }
 
@@ -175,7 +175,7 @@ class GroupSyncViewModelTest {
 
             viewModel.joinByCode("ABC123")
 
-            assertEquals("No group found for code ABC123", viewModel.errorMessage.value)
+            assertEquals("未找到代码 ABC123 对应的群组", viewModel.errorMessage.value)
             coVerify(exactly = 0) { groupRepository.joinGroup(any()) }
         }
 
@@ -194,7 +194,7 @@ class GroupSyncViewModelTest {
         runTest {
             viewModel.joinViaScannedUrl("https://example.com/not-a-group-link")
 
-            assertEquals("Invalid group QR code", viewModel.errorMessage.value)
+            assertEquals("无效的群组二维码", viewModel.errorMessage.value)
             coVerify(exactly = 0) { groupRepository.joinGroup(any()) }
         }
 
@@ -266,7 +266,7 @@ class GroupSyncViewModelTest {
 
             viewModel.setFollowerModeEnabled(true)
 
-            assertEquals("No group found for code g", viewModel.errorMessage.value)
+            assertEquals("未找到代码 g 对应的群组", viewModel.errorMessage.value)
             coVerify { groupRepository.setFollowerModeEnabled(false) }
             verify(exactly = 0) { context.startService(any()) }
         }
@@ -340,14 +340,14 @@ class GroupSyncViewModelTest {
         runTest {
             teleportUnavailableFlow.tryEmit(Unit)
 
-            assertEquals("Leader position not yet known — try again in a moment", viewModel.errorMessage.value)
+            assertEquals("队长位置尚不可知——请稍后重试", viewModel.errorMessage.value)
         }
 
     @Test
     fun `clearError resets error message to null`() =
         runTest {
             viewModel.joinByCode("AB")
-            assertEquals("Code must be 6 characters", viewModel.errorMessage.value)
+            assertEquals("代码必须是 6 个字符", viewModel.errorMessage.value)
 
             viewModel.clearError()
 

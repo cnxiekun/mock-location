@@ -209,6 +209,11 @@ interface PreferencesDataSource {
 
     suspend fun setFavoritesSortNewestFirst(newestFirst: Boolean)
 
+    /** 高德 Web 服务 API key（地理编码搜索用，设置里可填）。 */
+    fun getAmapWebKey(): Flow<String>
+
+    suspend fun setAmapWebKey(key: String)
+
     /** Gets the GPS jitter idle speed variation percentage (0 = off). */
     fun getJitterSpeedIdleVariationPct(): Flow<Int>
 
@@ -416,6 +421,7 @@ class AppPreferencesDataSource
             val RECENT_SEARCHES = stringPreferencesKey("recent_searches")
             val ROUTES_SORT_NEWEST_FIRST = booleanPreferencesKey("routes_sort_newest_first")
             val FAVORITES_SORT_NEWEST_FIRST = booleanPreferencesKey("favorites_sort_newest_first")
+            val AMAP_WEB_KEY = stringPreferencesKey("amap_web_key")
             val JITTER_SPEED_IDLE_VARIATION_PCT = intPreferencesKey("jitter_speed_idle_variation_pct")
             val JITTER_SPEED_MOVING_VARIATION_PCT = intPreferencesKey("jitter_speed_moving_variation_pct")
             val HOT_LOCATIONS_ENABLED = booleanPreferencesKey("hot_locations_enabled")
@@ -765,6 +771,12 @@ class AppPreferencesDataSource
 
         override suspend fun setFavoritesSortNewestFirst(newestFirst: Boolean) {
             dataStore.edit { prefs -> prefs[Keys.FAVORITES_SORT_NEWEST_FIRST] = newestFirst }
+        }
+
+        override fun getAmapWebKey(): Flow<String> = pref(Keys.AMAP_WEB_KEY, "")
+
+        override suspend fun setAmapWebKey(key: String) {
+            dataStore.edit { prefs -> prefs[Keys.AMAP_WEB_KEY] = key }
         }
 
         override fun getJitterSpeedIdleVariationPct(): Flow<Int> =

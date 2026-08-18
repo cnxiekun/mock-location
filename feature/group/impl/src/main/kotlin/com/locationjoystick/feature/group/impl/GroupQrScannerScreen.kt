@@ -138,14 +138,14 @@ fun GroupQrScannerScreen(
                         .padding(horizontal = 16.dp, vertical = 8.dp),
             ) {
                 Text(
-                    text = "Point at the leader's group QR code",
+                    text = "对准队长的群组二维码",
                     color = Color.White,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
         } else {
             Text(
-                text = "Camera permission required to scan QR code.",
+                text = "扫描二维码需要相机权限。",
                 modifier = Modifier.align(Alignment.Center).padding(24.dp),
             )
         }
@@ -154,7 +154,7 @@ fun GroupQrScannerScreen(
             onClick = onNavigateBack,
             modifier = Modifier.align(Alignment.TopStart).padding(8.dp),
         ) {
-            Icon(LjIcons.ArrowBack, contentDescription = "Back", tint = Color.White)
+            Icon(LjIcons.ArrowBack, contentDescription = "返回", tint = Color.White)
         }
     }
 }

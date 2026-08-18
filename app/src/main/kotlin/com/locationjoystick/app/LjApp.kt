@@ -8,22 +8,17 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.compose.rememberNavController
 import com.locationjoystick.app.navigation.LjDrawerContent
 import com.locationjoystick.app.navigation.LjNavHost
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.feature.favorites.api.FAVORITES_ROUTE
 import com.locationjoystick.feature.map.api.MAP_ROUTE
-import com.locationjoystick.feature.onboarding.api.ONBOARDING_ROUTE
 import com.locationjoystick.feature.routes.api.ROUTES_ROUTE
 import com.locationjoystick.feature.routes.api.ROUTE_CREATOR_ROUTE
 import com.locationjoystick.feature.settings.api.SETTINGS_ROUTE
@@ -42,12 +37,11 @@ fun LjApp(
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         deepLinkFailedFlow.collect {
-            snackbarHostState.showSnackbar("Couldn't open that link")
+            snackbarHostState.showSnackbar("无法打开该链接")
         }
     }
 
@@ -91,25 +85,6 @@ fun LjApp(
                 }
             }
         }
-    }
-
-    DisposableEffect(lifecycleOwner) {
-        val observer =
-            LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_STOP) {
-                    val current = navController.currentDestination?.route
-                    // Skip redirect for screens that may launch sub-activities (file pickers, etc.)
-                    val skipRedirect =
-                        current == IDLE_ROUTE || current == ONBOARDING_ROUTE || current == SETTINGS_ROUTE
-                    if (!skipRedirect) {
-                        navController.navigate(IDLE_ROUTE) {
-                            popUpTo(IDLE_ROUTE) { inclusive = false }
-                        }
-                    }
-                }
-            }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

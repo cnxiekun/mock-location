@@ -358,8 +358,8 @@ class MapController
                     if (waypoints.isNullOrEmpty()) {
                         val reason = routeResult.exceptionOrNull()?.let(::classifyOsrmFailure)
                         Log.w(TAG, "OSRM road-following failed ($reason); falling back to straight walk")
-                        val prefix = reason?.let(::osrmFailureMessage) ?: "Road routing unavailable"
-                        routingErrorReporter.report("$prefix — using straight walk")
+                        val prefix = reason?.let(::osrmFailureMessage) ?: "道路路由不可用"
+                        routingErrorReporter.report("$prefix — 使用直线行走")
                         walkTo(position)
                         return@launch
                     }

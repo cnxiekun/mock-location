@@ -37,6 +37,7 @@ import com.locationjoystick.core.model.SpeedUnit
 @Composable
 internal fun SettingsGpsSubScreen(
     uiState: SettingsUiState,
+    amapKey: String = "",
     onNavigateBack: () -> Unit,
     isSpoofing: Boolean,
     onToggleSpoofing: () -> Unit,
@@ -46,7 +47,7 @@ internal fun SettingsGpsSubScreen(
     snackbarHost: @Composable () -> Unit,
 ) {
     LjScaffold(
-        title = "Movement & GPS",
+        title = "移动与 GPS",
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -77,10 +78,10 @@ internal fun SettingsGpsSubScreen(
                         Spacer(modifier = Modifier.height(24.dp))
                         GpsRealismSection(uiState, onAction)
                         Spacer(modifier = Modifier.height(24.dp))
-                        Text("Location Memory", style = MaterialTheme.typography.headlineSmall)
+                        Text("位置记忆", style = MaterialTheme.typography.headlineSmall)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "Controls whether the app remembers where you left off when reopened.",
+                            "控制应用重新打开时是否记住上次的位置。",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -88,8 +89,29 @@ internal fun SettingsGpsSubScreen(
                         LjCheckboxRow(
                             checked = uiState.rememberLastLocation,
                             onCheckedChange = { onAction(SettingsAction.SetRememberLastLocation(it)) },
-                            title = "Remember last location",
-                            description = "Restores your last set position when the app restarts.",
+                            title = "记住上次位置",
+                            description = "应用重启时恢复你上次设置的位置。",
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text("高德地图 API Key", style = MaterialTheme.typography.headlineSmall)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "用于地图搜索（地理编码）。在高德开放平台申请「Web 服务」key 后填入即可使用中文搜索。",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        var keyInput by remember { mutableStateOf(amapKey) }
+                        LaunchedEffect(amapKey) { keyInput = amapKey }
+                        OutlinedTextField(
+                            value = keyInput,
+                            onValueChange = {
+                                keyInput = it
+                                onAction(SettingsAction.SetAmapWebKey(it))
+                            },
+                            label = { Text("高德 Web 服务 Key") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
                         )
                     }
                 }
@@ -103,10 +125,10 @@ private fun SpeedProfilesSection(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Speed Profiles", style = MaterialTheme.typography.headlineSmall)
+    Text("速度方案", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Movement speed used by the joystick, route replay, and roaming. Select a unit, then set each preset.",
+        "摇杆、路线回放和漫游使用的移动速度。先选择单位，再设置每个预设。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -116,7 +138,7 @@ private fun SpeedProfilesSection(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("Unit", modifier = Modifier.weight(0.3f))
+        Text("单位", modifier = Modifier.weight(0.3f))
         LjSegmentedControl(
             options = listOf(SpeedUnit.KMH to "km/h", SpeedUnit.MPH to "mph"),
             selected = uiState.speedUnit,
@@ -195,7 +217,7 @@ private fun SpeedProfileInput(
 @Composable
 private fun AntiCheatWarning() {
     Text(
-        text = "Speed exceeds 8 m/s — may trigger anti-cheat in some games",
+        text = "速度超过 8 米/秒——可能在某些游戏中触发反作弊检测",
         color = MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.labelSmall,
         modifier = Modifier.padding(start = 4.dp, top = 2.dp),

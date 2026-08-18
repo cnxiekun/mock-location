@@ -108,7 +108,7 @@ class SettingsViewModelSaveTest {
                 assertFalse(viewModel.uiState.value.isDirty)
                 val feedback = awaitItem()
                 assertFalse(feedback.isError)
-                assertTrue(feedback.message.contains("saved", ignoreCase = true))
+                assertTrue(feedback.message.contains("已保存"))
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -560,6 +560,10 @@ internal class SaveTestPreferencesDataSource : PreferencesDataSource {
     override fun getFavoritesSortNewestFirst(): Flow<Boolean> = flowOf(true)
 
     override suspend fun setFavoritesSortNewestFirst(newestFirst: Boolean) = Unit
+
+    override fun getAmapWebKey(): Flow<String> = flowOf("")
+
+    override suspend fun setAmapWebKey(key: String) = Unit
 
     override fun getJitterSpeedIdleVariationPct(): Flow<Int> = flowOf(AppPreferencesDataSource.DEFAULT_JITTER_SPEED_IDLE_VARIATION_PCT)
 

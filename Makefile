@@ -18,8 +18,9 @@ clean:
 build:
 	./gradlew assembleRelease
 
-bundle:
-	./gradlew bundleRelease
+.PHONY: build-debug
+build-debug:
+	./gradlew assembleDebug
 
 format:
 	./gradlew ktlintFormat
@@ -31,13 +32,13 @@ install-on-phone:
 	./gradlew installDebug
 
 reinstall-on-phone:
-	adb uninstall com.locationjoystick.app || true && ./gradlew installDebug
+	adb uninstall com.locationjoystick.app.cn || true && ./gradlew installDebug
 
 start-on-phone:
-	adb shell am start -n com.locationjoystick.app/.MainActivity
+	adb shell am start -n com.locationjoystick.app.cn/.MainActivity
 
 tail-log-on-phone:
-	adb logcat --pid=$(adb shell pidof com.locationjoystick.app)
+	adb logcat --pid=$(adb shell pidof com.locationjoystick.app.cn)
 
 test:
 	./gradlew testRelease
@@ -50,9 +51,6 @@ coverage-open:
 
 screenshot:
 	./scripts/screenshot-gallery.sh --auto
-
-screenshot-playstore:
-	./scripts/screenshot-gallery.sh --playstore-only
 
 wiki-serve:
 	lsof -ti:8080 | xargs kill -9 || true

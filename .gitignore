@@ -16,6 +16,9 @@ kls_database.db
 *.apk
 *.aab
 
+# 发布产物——APK 不上传仓库，发布到 GitHub Releases
+dist/
+
 # OS
 .DS_Store
 Thumbs.db
@@ -29,3 +32,6 @@ Thumbs.db
 .agents
 .shortcuts
 .claude/.radin
+
+# 密钥备忘
+xiekun-location-密钥备忘.txt

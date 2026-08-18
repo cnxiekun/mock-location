@@ -47,6 +47,7 @@ import com.locationjoystick.core.map.geojson.buildPointsGeoJson
 import com.locationjoystick.core.map.geojson.buildPositionGeoJson
 import com.locationjoystick.core.map.geojson.buildRouteTraceGeoJson
 import com.locationjoystick.core.map.geojson.emptyGeoJson
+import com.locationjoystick.core.common.util.Gcj02Converter
 import com.locationjoystick.core.map.maplibre.addEphemeralRouteLayers
 import com.locationjoystick.core.map.maplibre.addLocationLayers
 import com.locationjoystick.core.model.RecentSearch
@@ -119,6 +120,7 @@ fun MapRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val recentSearches by viewModel.recentSearches.collectAsStateWithLifecycle()
+    val amapKey by viewModel.amapKey.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
         viewModel.completionMessages.collect { msg ->
@@ -133,6 +135,7 @@ fun MapRoute(
     MapScreen(
         uiState = uiState,
         recentSearches = recentSearches,
+        amapKey = amapKey,
         onOpenDrawer = onOpenDrawer,
         onAction = viewModel::onAction,
         onSearchCommitted = viewModel::addRecentSearch,
@@ -152,6 +155,7 @@ internal fun MapScreen(
     onNavigateToRoutes: () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    amapKey: String = "",
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -204,15 +208,16 @@ internal fun MapScreen(
         val target = uiState.pendingCameraTarget ?: return@LaunchedEffect
         // Use closer zoom for favorite teleports (street-level), default zoom for other cases
         val zoom = if (uiState.favoriteTarget != null) 18.0 else AppConstants.MapConstants.DEFAULT_ZOOM
+        val display = Gcj02Converter.wgs84ToGcj02(target.latitude, target.longitude)
         mapRef.value?.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(MapLatLng(target.latitude, target.longitude), zoom),
+            CameraUpdateFactory.newLatLngZoom(MapLatLng(display.latitude, display.longitude), zoom),
             500,
         )
         onAction(MapAction.CameraTargetConsumed)
     }
 
     LjScaffold(
-        title = "Map",
+        title = "地图",
         isSpoofing = spoofToggle.isSpoofing,
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,
@@ -244,16 +249,18 @@ internal fun MapScreen(
                             map.uiSettings.isAttributionEnabled = false
                             map.uiSettings.isLogoEnabled = false
                             map.uiSettings.isScrollGesturesEnabled = true
+                            val initialDisplay =
+                                initialPosition?.let {
+                                    Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude)
+                                } ?: Gcj02Converter.wgs84ToGcj02(
+                                    AppConstants.MapConstants.DEFAULT_LAT,
+                                    AppConstants.MapConstants.DEFAULT_LON,
+                                )
                             map.cameraPosition =
                                 CameraPosition
                                     .Builder()
-                                    .target(
-                                        if (initialPosition != null) {
-                                            MapLatLng(initialPosition.latitude, initialPosition.longitude)
-                                        } else {
-                                            MapLatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
-                                        },
-                                    ).zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
+                                    .target(MapLatLng(initialDisplay.latitude, initialDisplay.longitude))
+                                    .zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
                                     .build()
 
                             map.setStyle(Style.Builder().fromUri("asset://empty.json")) { style ->
@@ -270,11 +277,13 @@ internal fun MapScreen(
                             }
 
                             map.addOnMapClickListener { latLng ->
+                                // 底图为 GCJ-02，转回 WGS-84 存储
+                                val wgs = Gcj02Converter.gcj02ToWgs84(latLng.latitude, latLng.longitude)
                                 onAction(
                                     MapAction.TapToTeleport(
                                         com.locationjoystick.core.model.LatLng(
-                                            latitude = latLng.latitude,
-                                            longitude = latLng.longitude,
+                                            latitude = wgs.latitude,
+                                            longitude = wgs.longitude,
                                         ),
                                     ),
                                 )
@@ -282,11 +291,13 @@ internal fun MapScreen(
                             }
 
                             map.addOnMapLongClickListener { latLng ->
+                                // 底图为 GCJ-02，转回 WGS-84 存储
+                                val wgs = Gcj02Converter.gcj02ToWgs84(latLng.latitude, latLng.longitude)
                                 onAction(
                                     MapAction.LongPressTapToWalk(
                                         com.locationjoystick.core.model.LatLng(
-                                            latitude = latLng.latitude,
-                                            longitude = latLng.longitude,
+                                            latitude = wgs.latitude,
+                                            longitude = wgs.longitude,
                                         ),
                                     ),
                                 )
@@ -312,21 +323,34 @@ internal fun MapScreen(
                     val ephemeralEndpointsSrc = ephemeralEndpointsSource.value ?: return@AndroidView
                     val position = uiState.currentPosition
 
-                    src.setGeoJson(buildPositionGeoJson(position))
+                    src.setGeoJson(
+                        buildPositionGeoJson(
+                            position?.let { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) },
+                        ),
+                    )
 
-                    pendingTapMarkerSource.value?.setGeoJson(buildPositionGeoJson(uiState.pendingTapPosition))
+                    pendingTapMarkerSource.value?.setGeoJson(
+                        buildPositionGeoJson(
+                            uiState.pendingTapPosition?.let { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) },
+                        ),
+                    )
 
                     val traceWaypoints =
                         uiState.routeTrace
                             ?: uiState.ephemeralWaypoints.takeIf { it.size >= 2 }
                     if (traceWaypoints != null && position != null) {
-                        val (tracedGeoJson, remainingGeoJson) = buildRouteTraceGeoJson(traceWaypoints, position)
+                        val displayPos = Gcj02Converter.wgs84ToGcj02(position.latitude, position.longitude)
+                        val displayTrace = traceWaypoints.map { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) }
+                        val (tracedGeoJson, remainingGeoJson) = buildRouteTraceGeoJson(displayTrace, displayPos)
                         tracedSrc.setGeoJson(tracedGeoJson)
                         remainingSrc.setGeoJson(remainingGeoJson)
-                        endpointsSrc.setGeoJson(buildPointsGeoJson(traceWaypoints))
+                        endpointsSrc.setGeoJson(buildPointsGeoJson(displayTrace))
                     } else if (uiState.walkStart != null && uiState.walkTarget != null && position != null) {
-                        val walkPoints = listOfNotNull(uiState.walkStart, uiState.walkTarget)
-                        val (tracedGeoJson, remainingGeoJson) = buildRouteTraceGeoJson(walkPoints, position)
+                        val displayPos = Gcj02Converter.wgs84ToGcj02(position.latitude, position.longitude)
+                        val walkPoints =
+                            listOfNotNull(uiState.walkStart, uiState.walkTarget)
+                                .map { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) }
+                        val (tracedGeoJson, remainingGeoJson) = buildRouteTraceGeoJson(walkPoints, displayPos)
                         tracedSrc.setGeoJson(tracedGeoJson)
                         remainingSrc.setGeoJson(remainingGeoJson)
                         endpointsSrc.setGeoJson(buildPointsGeoJson(walkPoints))
@@ -337,24 +361,26 @@ internal fun MapScreen(
                     }
 
                     // Ephemeral route preview polyline — show roaming preview when the sheet is open or minimized
-                    val displayWaypoints =
+                    val previewWaypoints =
                         if (uiState.showRoamingSheet || uiState.isRoamingSheetMinimized) {
                             uiState.roamingPreviewWaypoints ?: emptyList()
                         } else {
                             uiState.ephemeralWaypoints
                         }
-                    if (displayWaypoints.size >= 2) {
-                        ephemeralRouteSrc.setGeoJson(buildLineGeoJson(displayWaypoints))
-                        ephemeralEndpointsSrc.setGeoJson(buildPointsGeoJson(displayWaypoints))
+                    if (previewWaypoints.size >= 2) {
+                        val displayEphemeral = previewWaypoints.map { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) }
+                        ephemeralRouteSrc.setGeoJson(buildLineGeoJson(displayEphemeral))
+                        ephemeralEndpointsSrc.setGeoJson(buildPointsGeoJson(displayEphemeral))
                     } else {
                         ephemeralRouteSrc.setGeoJson(emptyGeoJson())
                         ephemeralEndpointsSrc.setGeoJson(emptyGeoJson())
                     }
 
                     if (isFollowingCamera.value && position != null) {
+                        val display = Gcj02Converter.wgs84ToGcj02(position.latitude, position.longitude)
                         map.animateCamera(
                             CameraUpdateFactory.newLatLng(
-                                MapLatLng(position.latitude, position.longitude),
+                                MapLatLng(display.latitude, display.longitude),
                             ),
                             500,
                         )
@@ -365,7 +391,7 @@ internal fun MapScreen(
 
             if (uiState.walkTarget == null && !uiState.isRouteReplay && !uiState.isRoaming) {
                 Text(
-                    text = if (uiState.hideTeleportFeatures) "Long-press to walk" else "Tap to teleport · Long-press to walk",
+                    text = if (uiState.hideTeleportFeatures) "长按走路" else "点击地图定位 · 长按走路",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier =
@@ -385,16 +411,21 @@ internal fun MapScreen(
                         val position =
                             com.locationjoystick.core.model
                                 .LatLng(latitude = lat, longitude = lon)
+                        val display = Gcj02Converter.wgs84ToGcj02(lat, lon)
                         mapRef.value?.animateCamera(
-                            CameraUpdateFactory.newLatLngZoom(MapLatLng(lat, lon), AppConstants.MapConstants.DEFAULT_ZOOM),
+                            CameraUpdateFactory.newLatLngZoom(
+                                MapLatLng(display.latitude, display.longitude),
+                                AppConstants.MapConstants.DEFAULT_ZOOM,
+                            ),
                             500,
                         )
-                        searchMarkerSource.value?.setGeoJson(buildMarkerGeoJson(lat, lon))
+                        searchMarkerSource.value?.setGeoJson(buildMarkerGeoJson(display.latitude, display.longitude))
                         showSearch.value = false
                         onAction(MapAction.TapToTeleport(position))
                     },
                     recentSearches = recentSearches,
                     onSearchCommitted = onSearchCommitted,
+                    amapKey = amapKey,
                     modifier =
                         Modifier
                             .align(Alignment.TopCenter)

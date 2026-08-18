@@ -100,27 +100,27 @@ internal fun GpsJitterSection(
     isMph: Boolean,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Location Randomness", style = MaterialTheme.typography.headlineSmall)
+    Text("位置随机性", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Adds small random shifts to your fake location, making it look more natural. Set 0 to disable.",
+        "为你的模拟位置添加小幅随机偏移，使其看起来更自然。设为 0 可禁用。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Spacer(modifier = Modifier.height(8.dp))
-    Text("Position jitter", style = MaterialTheme.typography.labelLarge)
+    Text("位置抖动", style = MaterialTheme.typography.labelLarge)
     Spacer(modifier = Modifier.height(4.dp))
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         JitterInput(
             value = if (isMph) uiState.jitterIdleRadiusMeters * 3.28084 else uiState.jitterIdleRadiusMeters,
             onValueChange = { onAction(SettingsAction.SetJitterIdleRadius(if (isMph) it / 3.28084 else it)) },
-            label = if (isMph) "Wobble when still (ft)" else "Wobble when still (m)",
+            label = if (isMph) "静止时抖动（英尺）" else "静止时抖动（米）",
             modifier = Modifier.weight(1f),
         )
         JitterInput(
             value = uiState.jitterIdleIntervalSeconds,
             onValueChange = { onAction(SettingsAction.SetJitterIdleIntervalSeconds(it)) },
-            label = "How often when still (sec)",
+            label = "静止时频率（秒）",
             modifier = Modifier.weight(1f),
         )
     }
@@ -129,30 +129,30 @@ internal fun GpsJitterSection(
         JitterInput(
             value = if (isMph) uiState.jitterMovingRadiusMeters * 3.28084 else uiState.jitterMovingRadiusMeters,
             onValueChange = { onAction(SettingsAction.SetJitterMovingRadius(if (isMph) it / 3.28084 else it)) },
-            label = if (isMph) "Wobble while moving (ft)" else "Wobble while moving (m)",
+            label = if (isMph) "移动时抖动（英尺）" else "移动时抖动（米）",
             modifier = Modifier.weight(1f),
         )
         JitterInput(
             value = uiState.jitterIntervalSeconds,
             onValueChange = { onAction(SettingsAction.SetJitterIntervalSeconds(it)) },
-            label = "How often while moving (sec)",
+            label = "移动时频率（秒）",
             modifier = Modifier.weight(1f),
         )
     }
     Spacer(modifier = Modifier.height(8.dp))
-    Text("Speed variation", style = MaterialTheme.typography.labelLarge)
+    Text("速度变化", style = MaterialTheme.typography.labelLarge)
     Spacer(modifier = Modifier.height(4.dp))
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         JitterInput(
             value = uiState.jitterSpeedIdleVariationPct.toDouble(),
             onValueChange = { onAction(SettingsAction.SetJitterSpeedIdleVariationPct(it.toInt())) },
-            label = "Speed wobble when still (%)",
+            label = "静止时速度波动（%）",
             modifier = Modifier.weight(1f),
         )
         JitterInput(
             value = uiState.jitterSpeedMovingVariationPct.toDouble(),
             onValueChange = { onAction(SettingsAction.SetJitterSpeedMovingVariationPct(it.toInt())) },
-            label = "Speed wobble while moving (%)",
+            label = "移动时速度波动（%）",
             modifier = Modifier.weight(1f),
         )
     }
@@ -163,11 +163,11 @@ internal fun GpsRealismSection(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("GPS Realism", style = MaterialTheme.typography.headlineSmall)
+    Text("GPS 真实度", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Controls how the fake GPS signal behaves. These options add metadata and variation that real GPS " +
-            "chips produce — some apps and games inspect these signals to detect fake locations.",
+        "控制模拟 GPS 信号的行为。这些选项会添加真实 GPS 芯片产生的元数据和变化——" +
+            "一些应用和游戏会检查这些信号来检测模拟位置。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -175,43 +175,43 @@ internal fun GpsRealismSection(
     LjCheckboxRow(
         checked = uiState.realismBearingHoldIdle,
         onCheckedChange = { onAction(SettingsAction.SetRealismBearingHoldIdle(it)) },
-        title = "Hold bearing when stationary",
+        title = "静止时保持方向",
         description =
-            "Keeps the last known direction when you stop moving instead of snapping to 0° (north). " +
-                "Real GPS chips do the same — a sudden reset to north is a common mock-location tell.",
+            "停止移动时保持最后已知的方向，而不是瞬间回到 0°（正北）。" +
+                "真实 GPS 芯片也是如此——突然重置到正北是常见的模拟定位破绽。",
     )
     LjCheckboxRow(
         checked = uiState.realismAltitudeEnabled,
         onCheckedChange = { onAction(SettingsAction.SetRealismAltitudeEnabled(it)) },
-        title = "Vary altitude",
+        title = "改变海拔",
         description =
-            "Simulates a plausible altitude with small random drift instead of always reporting 0 m. " +
-                "A flat zero altitude is an obvious signal that the location is synthetic.",
+            "模拟合理的海拔高度，带小幅随机漂移，而不是始终报告 0 米。" +
+                "持续为 0 的海拔是模拟位置的明显信号。",
     )
     LjCheckboxRow(
         checked = uiState.realismWarmupEnabled,
         onCheckedChange = { onAction(SettingsAction.SetRealismWarmupEnabled(it)) },
-        title = "GPS warm-up simulation",
+        title = "GPS 预热模拟",
         description =
-            "Starts each session with slightly inaccurate readings that improve over ~30 seconds, " +
-                "like a real GPS that takes time to lock on. " +
-                "Off by default because it temporarily reduces location precision at session start.",
+            "每次会话开始时报告略有偏差的读数，并在约 30 秒内逐渐改善，" +
+                "就像真实 GPS 需要时间锁定信号一样。" +
+                "默认关闭，因为它在会话开始时会暂时降低定位精度。",
     )
     LjCheckboxRow(
         checked = uiState.realismSatelliteExtrasEnabled,
         onCheckedChange = { onAction(SettingsAction.SetRealismSatelliteExtrasEnabled(it)) },
-        title = "Realistic satellite count",
+        title = "真实的卫星数量",
         description =
-            "Attaches satellite metadata to each update (7–14 satellites visible, 6–12 in fix) instead of zero. " +
-                "Some apps check for zero satellites as a spoofing signal.",
+            "为每次更新附加卫星元数据（可见卫星 7–14 颗，锁定 6–12 颗），而不是 0。" +
+                "一些应用会通过检查卫星数为 0 来识别模拟定位。",
     )
     LjCheckboxRow(
         checked = uiState.realismSuspendedMockingEnabled,
         onCheckedChange = { onAction(SettingsAction.SetRealismSuspendedMockingEnabled(it)) },
-        title = "Simulate signal dropouts",
+        title = "模拟信号中断",
         description =
-            "Briefly pauses the fake location signal every ~10 seconds, like a real GPS dropping signal momentarily. " +
-                "Off by default — the pauses cause visible freezes in most apps. " +
-                "Skipped automatically during route replay.",
+            "大约每 10 秒短暂暂停模拟位置信号，就像真实 GPS 暂时丢失信号一样。" +
+                "默认关闭——暂停会导致大多数应用出现明显的卡顿。" +
+                "路线回放期间会自动跳过。",
     )
 }

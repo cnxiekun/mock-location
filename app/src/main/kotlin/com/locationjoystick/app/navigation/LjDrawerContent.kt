@@ -54,13 +54,13 @@ fun LjDrawerContent(
             horizontalArrangement = Arrangement.End,
         ) {
             IconButton(onClick = { scope.launch { drawerState.close() } }) {
-                Icon(LjIcons.Close, contentDescription = "Close menu")
+                Icon(LjIcons.Close, contentDescription = "关闭菜单")
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Home, "Home") },
-            label = { Text("Home") },
+            icon = { Icon(LjIcons.Home, "主页") },
+            label = { Text("主页") },
             selected = currentRoute == IDLE_ROUTE,
             onClick = {
                 navController.navigate(IDLE_ROUTE) {
@@ -71,8 +71,8 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.LocationOn, "Map") },
-            label = { Text("Map") },
+            icon = { Icon(LjIcons.LocationOn, "地图") },
+            label = { Text("地图") },
             selected = currentRoute == MAP_ROUTE,
             onClick = {
                 navController.navigate(MAP_ROUTE) {
@@ -84,8 +84,8 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Route, "Routes") },
-            label = { Text("Routes") },
+            icon = { Icon(LjIcons.Route, "路线") },
+            label = { Text("路线") },
             selected = currentRoute != null && (currentRoute == ROUTES_ROUTE || currentRoute.startsWith("route_")),
             onClick = {
                 navController.navigate(ROUTES_ROUTE) {
@@ -97,8 +97,8 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Favorite, "Favorites") },
-            label = { Text("Favorites") },
+            icon = { Icon(LjIcons.Favorite, "收藏") },
+            label = { Text("收藏") },
             selected = currentRoute == FAVORITES_ROUTE || currentRoute == MAP_PICKER_ROUTE,
             onClick = {
                 navController.navigate(FAVORITES_ROUTE) {
@@ -110,8 +110,8 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Share, "Group Sync") },
-            label = { Text("Group Sync") },
+            icon = { Icon(LjIcons.Share, "群组同步") },
+            label = { Text("群组同步") },
             selected = currentRoute == GROUP_ROUTE,
             onClick = {
                 navController.navigate(GROUP_ROUTE) {
@@ -123,8 +123,8 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Settings, "Settings") },
-            label = { Text("Settings") },
+            icon = { Icon(LjIcons.Settings, "设置") },
+            label = { Text("设置") },
             selected = currentRoute == SETTINGS_ROUTE,
             onClick = {
                 navController.navigate(SETTINGS_ROUTE) {
@@ -136,10 +136,10 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Explore, "Website") },
+            icon = { Icon(LjIcons.Explore, "网站") },
             label = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Website")
+                    Text("网站")
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         imageVector = LjIcons.OpenInNew,

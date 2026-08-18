@@ -63,6 +63,8 @@ class FavoritesViewModel
                 .getRecentSearches()
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+        val amapKey: StateFlow<String> = settingsRepository.getAmapWebKey().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "")
+
         val currentPosition: com.locationjoystick.core.model.LatLng?
             get() = locationRepository.currentPosition.value
 

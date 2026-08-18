@@ -160,4 +160,8 @@ internal sealed class SettingsAction {
     data object DiscardChanges : SettingsAction()
 
     data object ResetAllData : SettingsAction()
+
+    data class SetAmapWebKey(
+        val key: String,
+    ) : SettingsAction()
 }

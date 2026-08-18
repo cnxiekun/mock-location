@@ -50,7 +50,7 @@ fun LjTopBar(
                     IconButton(onClick = onNavigationClick) {
                         Icon(
                             imageVector = navigationIcon,
-                            contentDescription = "Open navigation menu",
+                            contentDescription = "打开导航菜单",
                         )
                     }
                 }
@@ -87,7 +87,7 @@ fun LjTopBar(
                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp),
                     modifier =
                         Modifier.semantics {
-                            contentDescription = if (isSpoofing) "Stop location simulation" else "Start location simulation"
+                            contentDescription = if (isSpoofing) "停止位置模拟" else "开始位置模拟"
                         },
                 ) {
                     Crossfade(
@@ -104,11 +104,11 @@ fun LjTopBar(
                     Text(
                         text =
                             if (isSpoofing) {
-                                "Stop"
+                                "停止"
                             } else if (locationLabel != null) {
-                                "Start · $locationLabel"
+                                "开始 · $locationLabel"
                             } else {
-                                "Start"
+                                "开始"
                             },
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1,

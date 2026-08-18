@@ -52,7 +52,7 @@ fun QrShareDialog(
                     .padding(16.dp),
         ) {
             Text(
-                "Scan this on the other device — both must be on the same Wi-Fi network",
+                "在另一台设备上扫描此二维码——两台设备必须处于同一 Wi-Fi 网络",
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(bottom = 8.dp),
             )
@@ -60,15 +60,15 @@ fun QrShareDialog(
             if (bitmap != null) {
                 Image(
                     bitmap = bitmap.asImageBitmap(),
-                    contentDescription = "Export QR code",
+                    contentDescription = "导出二维码",
                     modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                 )
             } else {
-                Text("Failed to encode QR")
+                Text("二维码生成失败")
             }
 
             Text(
-                "Or enter code: $code",
+                "或输入代码：$code",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 12.dp),
             )
@@ -81,14 +81,14 @@ fun QrShareDialog(
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp),
             ) {
-                Text("Share")
+                Text("分享")
             }
 
             Button(
                 onClick = onDismiss,
                 modifier = Modifier.align(Alignment.End).padding(top = 8.dp),
             ) {
-                Text("Done")
+                Text("完成")
             }
         }
     }
@@ -118,7 +118,7 @@ private suspend fun shareQrBitmap(
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
             withContext(Dispatchers.Main) {
-                context.startActivity(Intent.createChooser(intent, "Share QR Code"))
+                context.startActivity(Intent.createChooser(intent, "分享二维码"))
             }
         } catch (e: Exception) {
             Log.e(TAG, "Share QR bitmap failed", e)

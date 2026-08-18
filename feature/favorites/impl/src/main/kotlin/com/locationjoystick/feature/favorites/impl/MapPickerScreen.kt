@@ -39,6 +39,7 @@ import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.NominatimSearchBar
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.map.geojson.buildMarkerGeoJson
+import com.locationjoystick.core.common.util.Gcj02Converter
 import com.locationjoystick.core.map.maplibre.addPickerLayers
 import com.locationjoystick.core.model.RecentSearch
 import com.locationjoystick.core.overlay.OverlayService
@@ -63,6 +64,7 @@ fun MapPickerRoute(
     onBack: () -> Unit,
     recentSearches: List<RecentSearch> = emptyList(),
     onSearchCommitted: ((String, Double, Double) -> Unit)? = null,
+    amapKey: String = "",
     bottomBar: @Composable () -> Unit = {},
 ) {
     MapPickerScreen(
@@ -71,6 +73,7 @@ fun MapPickerRoute(
         onBack = onBack,
         recentSearches = recentSearches,
         onSearchCommitted = onSearchCommitted,
+        amapKey = amapKey,
         bottomBar = bottomBar,
     )
 }
@@ -91,6 +94,7 @@ internal fun MapPickerScreen(
     initialPosition: com.locationjoystick.core.model.LatLng? = null,
     recentSearches: List<RecentSearch> = emptyList(),
     onSearchCommitted: ((String, Double, Double) -> Unit)? = null,
+    amapKey: String = "",
     onLocationPicked: (name: String, lat: Double, lon: Double) -> Unit,
     onBack: () -> Unit,
     bottomBar: @Composable () -> Unit = {},
@@ -129,23 +133,21 @@ internal fun MapPickerScreen(
                 suggestedName = ""
                 withContext(Dispatchers.IO) {
                     try {
-                        val url = URL("${AppConstants.NominatimConstants.REVERSE_URL}?lat=${pos.first}&lon=${pos.second}&format=json")
+                        val url = URL("${AppConstants.AmapConstants.REVERSE_URL}?location=${pos.second},${pos.first}&key=$amapKey")
                         val conn = url.openConnection() as HttpURLConnection
-                        conn.setRequestProperty("User-Agent", "locationjoystick/1.0")
                         conn.connectTimeout = AppConstants.NominatimConstants.CONNECT_TIMEOUT_MS
                         conn.readTimeout = AppConstants.NominatimConstants.READ_TIMEOUT_MS
                         try {
                             val json = JSONObject(conn.inputStream.bufferedReader().readText())
-                            val address = json.optJSONObject("address")
+                            val regeocode = json.optJSONObject("regeocode")
+                            val address = regeocode?.optJSONObject("addressComponent")
                             if (address != null) {
                                 val city =
                                     address
                                         .optString("city")
-                                        .ifEmpty { address.optString("town") }
-                                        .ifEmpty { address.optString("village") }
-                                        .ifEmpty { address.optString("state") }
-                                val country = address.optString("country")
-                                suggestedName = listOf(country, city).filter { it.isNotEmpty() }.joinToString(", ")
+                                        .ifEmpty { address.optString("province") }
+                                val district = address.optString("district")
+                                suggestedName = listOf(city, district).filter { it.isNotEmpty() }.joinToString(" ")
                             }
                         } finally {
                             conn.disconnect()
@@ -177,7 +179,7 @@ internal fun MapPickerScreen(
     }
 
     LjScaffold(
-        title = "Pick Location",
+        title = "选择地点",
         isSpoofing = spoofToggle.isSpoofing,
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,
@@ -193,7 +195,7 @@ internal fun MapPickerScreen(
             ) {
                 LjMapIconButton(
                     icon = LjIcons.Search,
-                    contentDescription = "Search location",
+                    contentDescription = "搜索地点",
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     onClick = { showSearchBar = !showSearchBar },
@@ -201,7 +203,7 @@ internal fun MapPickerScreen(
                 if (effectivePosition() != null) {
                     LjMapIconButton(
                         icon = LjIcons.Save,
-                        contentDescription = "Save location",
+                        contentDescription = "保存地点",
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         onClick = { showNameDialog = true },
@@ -224,16 +226,18 @@ internal fun MapPickerScreen(
                             mapRef.value = map
                             map.uiSettings.isAttributionEnabled = false
                             map.uiSettings.isLogoEnabled = false
+                            val initialDisplay =
+                                initialPosition?.let {
+                                    Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude)
+                                } ?: Gcj02Converter.wgs84ToGcj02(
+                                    AppConstants.MapConstants.DEFAULT_LAT,
+                                    AppConstants.MapConstants.DEFAULT_LON,
+                                )
                             map.cameraPosition =
                                 CameraPosition
                                     .Builder()
-                                    .target(
-                                        if (initialPosition != null) {
-                                            MapLatLng(initialPosition.latitude, initialPosition.longitude)
-                                        } else {
-                                            MapLatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
-                                        },
-                                    ).zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
+                                    .target(MapLatLng(initialDisplay.latitude, initialDisplay.longitude))
+                                    .zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
                                     .build()
 
                             map.setStyle(Style.Builder().fromUri(AppConstants.MapConstants.EMPTY_MAP_STYLE_URI)) { style ->
@@ -241,14 +245,17 @@ internal fun MapPickerScreen(
                                     style.addPickerLayers(
                                         currentPosGeoJson =
                                             initialPosition?.let {
-                                                buildMarkerGeoJson(it.latitude, it.longitude)
+                                                val display = Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude)
+                                                buildMarkerGeoJson(display.latitude, display.longitude)
                                             },
                                     )
                                 markerSource.value = layers.markerSource
                             }
 
                             map.addOnMapClickListener { latLng ->
-                                selectedPosition.value = latLng.latitude to latLng.longitude
+                                // 底图为 GCJ-02，转回 WGS-84 存储
+                                val wgs = Gcj02Converter.gcj02ToWgs84(latLng.latitude, latLng.longitude)
+                                selectedPosition.value = wgs.latitude to wgs.longitude
                                 val src = markerSource.value ?: return@addOnMapClickListener true
                                 src.setGeoJson(buildMarkerGeoJson(latLng.latitude, latLng.longitude))
                                 true
@@ -266,16 +273,21 @@ internal fun MapPickerScreen(
                     onLocationSelected = { lat, lon, _ ->
                         selectedPosition.value = lat to lon
                         showSearchBar = false
+                        val display = Gcj02Converter.wgs84ToGcj02(lat, lon)
                         val map = mapRef.value ?: return@NominatimSearchBar
                         map.animateCamera(
-                            CameraUpdateFactory.newLatLngZoom(MapLatLng(lat, lon), AppConstants.MapConstants.DEFAULT_ZOOM),
+                            CameraUpdateFactory.newLatLngZoom(
+                                MapLatLng(display.latitude, display.longitude),
+                                AppConstants.MapConstants.DEFAULT_ZOOM,
+                            ),
                             500,
                         )
                         val src = markerSource.value ?: return@NominatimSearchBar
-                        src.setGeoJson(buildMarkerGeoJson(lat, lon))
+                        src.setGeoJson(buildMarkerGeoJson(display.latitude, display.longitude))
                     },
                     recentSearches = recentSearches,
                     onSearchCommitted = onSearchCommitted,
+                    amapKey = amapKey,
                     modifier =
                         Modifier
                             .align(Alignment.TopCenter)
@@ -314,12 +326,12 @@ private fun SaveLocationDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Save Location") },
+        title = { Text("保存地点") },
         text = {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text("名称") },
                 modifier = Modifier,
                 singleLine = true,
             )
@@ -332,12 +344,12 @@ private fun SaveLocationDialog(
                     }
                 },
             ) {
-                Text("Save")
+                Text("保存")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("取消")
             }
         },
     )

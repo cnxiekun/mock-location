@@ -126,10 +126,13 @@ object AppConstants {
     }
 
     object MapConstants {
-        const val DEFAULT_LAT = 48.8566
-        const val DEFAULT_LON = 2.3522
+        /** 默认位置：中国海外大厦（深圳市南山区粤海街道创业路1688号），WGS-84 校准值。 */
+        const val DEFAULT_LAT = 22.516370
+        const val DEFAULT_LON = 113.936577
         const val DEFAULT_ZOOM = 15.0
-        const val OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+
+        /** 国内可达的栅格瓦片源（高德，GCJ-02 火星坐标系，代码内做 WGS-84→GCJ-02 转换对齐）。 */
+        const val OSM_TILE_URL = "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}"
         const val TILESET_VERSION = "2.2.0"
         const val OSM_MAX_ZOOM = 19f
         const val EMPTY_MAP_STYLE_URI = "asset://empty.json"
@@ -155,6 +158,13 @@ object AppConstants {
         const val RECENT_SEARCHES_MAX_COUNT = 5
     }
 
+    object AmapConstants {
+        /** 高德 Web 服务 API key——由用户在设置中填写，不写死进代码。 */
+        const val WEB_KEY = ""
+        const val GEOCODE_URL = "https://restapi.amap.com/v3/geocode/geo"
+        const val REVERSE_URL = "https://restapi.amap.com/v3/geocode/regeo"
+    }
+
     object ExportConstants {
         const val SCHEMA_VERSION = 2
         const val FILENAME_PREFIX = "locationjoystick-export"
@@ -171,19 +181,19 @@ object AppConstants {
         const val ID_PERMISSION_ERROR = 1002
         const val CHANNEL_ID_ACTIVE = "location_spoof_channel"
         const val CHANNEL_ID_PERMISSION_ERROR = "location_perm_error_channel"
-        const val CHANNEL_NAME_ACTIVE = "Location Spoofing"
-        const val CHANNEL_DESC_ACTIVE = "Active while mock location is running"
-        const val CHANNEL_NAME_PERMISSION_ERROR = "Permission Errors"
-        const val CHANNEL_DESC_PERMISSION_ERROR = "Shown when required permissions are missing"
-        const val TITLE_PERMISSION_ERROR = "Permissions missing"
-        const val TEXT_PERMISSION_ERROR = "Open the app and complete setup to start spoofing."
-        const val TITLE_ACTIVE = "Mock location active"
-        const val TEXT_ACTIVE = "locationjoystick is spoofing your GPS position"
-        const val ACTION_STOP = "Stop"
-        const val ACTION_OPEN_MAP = "Map"
-        const val ACTION_OPEN_FAVORITES = "Favorites"
-        const val ACTION_PAUSE = "Pause"
-        const val ACTION_RESUME = "Resume"
+        const val CHANNEL_NAME_ACTIVE = "位置模拟"
+        const val CHANNEL_DESC_ACTIVE = "位置模拟运行期间保持活跃"
+        const val CHANNEL_NAME_PERMISSION_ERROR = "权限错误"
+        const val CHANNEL_DESC_PERMISSION_ERROR = "缺少所需权限时显示"
+        const val TITLE_PERMISSION_ERROR = "缺少权限"
+        const val TEXT_PERMISSION_ERROR = "打开应用并完成设置以开始模拟。"
+        const val TITLE_ACTIVE = "位置模拟已开启"
+        const val TEXT_ACTIVE = "定位模拟正在模拟你的 GPS 位置"
+        const val ACTION_STOP = "停止"
+        const val ACTION_OPEN_MAP = "地图"
+        const val ACTION_OPEN_FAVORITES = "收藏"
+        const val ACTION_PAUSE = "暂停"
+        const val ACTION_RESUME = "继续"
     }
 
     object ServiceConstants {
@@ -293,7 +303,7 @@ object AppConstants {
     }
 
     object AppInfo {
-        const val VERSION_NAME = "0.16.0" // x-release-please-version
+        const val VERSION_NAME = "1.0.0"
         const val GITHUB_ISSUES_URL = "https://github.com/shortcuts/locationjoystick/issues/new?template=bug_report.yml"
         const val DOCS_URL = "https://shortcuts.github.io/locationjoystick/"
         const val TROUBLESHOOTING_URL = "https://shortcuts.github.io/locationjoystick/troubleshooting.html"

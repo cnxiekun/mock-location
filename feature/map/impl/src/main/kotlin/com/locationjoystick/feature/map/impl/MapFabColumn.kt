@@ -29,7 +29,7 @@ internal fun MapFabColumn(
         if (!isFollowingCamera) {
             LjMapIconButton(
                 icon = LjIcons.MyLocation,
-                contentDescription = "Re-center on location",
+                contentDescription = "重新定位到当前位置",
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 onClick = { onAction(MapAction.RecenterCamera) },
@@ -45,7 +45,7 @@ internal fun MapFabColumn(
                     Row(horizontalArrangement = Arrangement.spacedBy(UiConstants.FAB_CONTAINER_SIZE / 4)) {
                         LjMapIconButton(
                             icon = if (uiState.isWalkPaused) LjIcons.PlayArrow else LjIcons.Pause,
-                            contentDescription = if (uiState.isWalkPaused) "Resume walk" else "Pause walk",
+                            contentDescription = if (uiState.isWalkPaused) "继续行走" else "暂停行走",
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             onClick = {
@@ -58,7 +58,7 @@ internal fun MapFabColumn(
                         )
                         LjMapIconButton(
                             icon = LjIcons.Stop,
-                            contentDescription = "Stop walk",
+                            contentDescription = "停止行走",
                             containerColor = MaterialTheme.colorScheme.error,
                             contentColor = MaterialTheme.colorScheme.onError,
                             onClick = { onAction(MapAction.StopWalk) },
@@ -67,7 +67,7 @@ internal fun MapFabColumn(
                 }
                 LjMapIconButton(
                     icon = LjIcons.DirectionsWalk,
-                    contentDescription = "Walk in progress, tap for controls",
+                    contentDescription = "行走进行中，点击查看控制",
                     containerColor = LjAccent,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     onClick = { onAction(MapAction.ToggleWalkControls) },
@@ -82,7 +82,7 @@ internal fun MapFabColumn(
                     if (enabled) {
                         LjMapIconButton(
                             icon = LjIcons.Favorite,
-                            contentDescription = "Open favorites",
+                            contentDescription = "打开收藏",
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,
                             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                             onClick = { onAction(MapAction.OpenFavoritesPicker) },
@@ -100,7 +100,7 @@ internal fun MapFabColumn(
                             LjMapIconButton(
                                 icon = LjIcons.Route,
                                 contentDescription =
-                                    if (uiState.isRouteReplay) "Route active" else "Open routes",
+                                    if (uiState.isRouteReplay) "路线进行中" else "打开路线",
                                 containerColor =
                                     if (uiState.isRouteReplay) LjSuccess else MaterialTheme.colorScheme.primaryContainer,
                                 contentColor =
@@ -117,7 +117,7 @@ internal fun MapFabColumn(
                                 Row(horizontalArrangement = Arrangement.spacedBy(UiConstants.FAB_CONTAINER_SIZE / 4)) {
                                     LjMapIconButton(
                                         icon = if (uiState.isRoutePaused) LjIcons.PlayArrow else LjIcons.Pause,
-                                        contentDescription = if (uiState.isRoutePaused) "Resume route" else "Pause route",
+                                        contentDescription = if (uiState.isRoutePaused) "继续路线" else "暂停路线",
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                         onClick = {
@@ -130,7 +130,7 @@ internal fun MapFabColumn(
                                     )
                                     LjMapIconButton(
                                         icon = LjIcons.Stop,
-                                        contentDescription = "Stop route",
+                                        contentDescription = "停止路线",
                                         containerColor = MaterialTheme.colorScheme.error,
                                         contentColor = MaterialTheme.colorScheme.onError,
                                         onClick = { onAction(MapAction.StopRouteReplay) },
@@ -138,14 +138,14 @@ internal fun MapFabColumn(
                                     if (!uiState.hideTeleportFeatures && uiState.showRouteJumpButtons) {
                                         LjMapIconButton(
                                             icon = LjIcons.SkipPrevious,
-                                            contentDescription = "Previous waypoint",
+                                            contentDescription = "上一个途经点",
                                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                             contentColor = LjSuccess,
                                             onClick = { onAction(MapAction.JumpToPreviousWaypoint) },
                                         )
                                         LjMapIconButton(
                                             icon = LjIcons.SkipNext,
-                                            contentDescription = "Next waypoint",
+                                            contentDescription = "下一个途经点",
                                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                             contentColor = LjSuccess,
                                             onClick = { onAction(MapAction.JumpToNextWaypoint) },
@@ -168,14 +168,14 @@ internal fun MapFabColumn(
                                 Row(horizontalArrangement = Arrangement.spacedBy(UiConstants.FAB_CONTAINER_SIZE / 4)) {
                                     LjMapIconButton(
                                         icon = LjIcons.Stop,
-                                        contentDescription = "Stop roaming",
+                                        contentDescription = "停止漫游",
                                         containerColor = LjBg,
                                         contentColor = MaterialTheme.colorScheme.error,
                                         onClick = { onAction(MapAction.StopRoaming) },
                                     )
                                     LjMapIconButton(
                                         icon = if (uiState.isRoamingPaused) LjIcons.PlayArrow else LjIcons.Pause,
-                                        contentDescription = if (uiState.isRoamingPaused) "Resume roaming" else "Pause roaming",
+                                        contentDescription = if (uiState.isRoamingPaused) "继续漫游" else "暂停漫游",
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                         onClick = {
@@ -192,9 +192,9 @@ internal fun MapFabColumn(
                                 icon = LjIcons.Explore,
                                 contentDescription =
                                     when {
-                                        uiState.isRoaming -> "Roaming active"
-                                        uiState.isRoamingSheetMinimized -> "Expand roaming sheet"
-                                        else -> "Start roaming"
+                                        uiState.isRoaming -> "漫游进行中"
+                                        uiState.isRoamingSheetMinimized -> "展开漫游面板"
+                                        else -> "开始漫游"
                                     },
                                 containerColor =
                                     when {
@@ -224,7 +224,7 @@ internal fun MapFabColumn(
                     if (enabled) {
                         LjMapIconButton(
                             icon = LjIcons.Search,
-                            contentDescription = "Search location",
+                            contentDescription = "搜索位置",
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                             onClick = onToggleSearch,
@@ -250,7 +250,7 @@ internal fun MapFabColumn(
         if (hasClearableContent) {
             LjMapIconButton(
                 icon = LjIcons.Delete,
-                contentDescription = "Clear map",
+                contentDescription = "清除地图",
                 containerColor = MaterialTheme.colorScheme.errorContainer,
                 contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 onClick = { onAction(MapAction.ClearMap) },

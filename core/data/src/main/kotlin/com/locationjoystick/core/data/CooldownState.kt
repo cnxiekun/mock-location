@@ -28,21 +28,21 @@ sealed class CooldownState {
             val seconds = remainingSeconds % AppConstants.TimeConstants.SECONDS_PER_MINUTE
             val timeLabel =
                 when {
-                    hours > 0 -> "%dh %dm".format(Locale.US, hours, minutes)
-                    minutes > 0 -> "%dm %ds".format(Locale.US, minutes, seconds)
-                    else -> "%ds".format(Locale.US, seconds)
+                    hours > 0 -> "%d小时 %d分".format(Locale.US, hours, minutes)
+                    minutes > 0 -> "%d分 %d秒".format(Locale.US, minutes, seconds)
+                    else -> "%d秒".format(Locale.US, seconds)
                 }
             val distKm = distanceMeters / 1000.0
             val distLabel =
                 if (distKm >= 1.0) {
-                    "%.1f km".format(
+                    "%.1f 公里".format(
                         Locale.US,
                         distKm,
                     )
                 } else {
-                    "%.0f m".format(Locale.US, distanceMeters)
+                    "%.0f 米".format(Locale.US, distanceMeters)
                 }
-            return "$timeLabel · $distLabel teleport"
+            return "$timeLabel · $distLabel 传送"
         }
     }
 }
@@ -51,12 +51,12 @@ fun CooldownState.toBadgeText(
     currentPosition: LatLng?,
     targetPosition: LatLng,
 ): String =
-    (this as? CooldownState.Cooling)?.run { "Suggested wait: ${toAdvisoryLabel()}" }
+    (this as? CooldownState.Cooling)?.run { "建议等待：${toAdvisoryLabel()}" }
         ?: currentPosition?.let { pos ->
             val m = haversineDistance(pos, targetPosition)
             if (m >= 1000.0) {
-                "%.1f km away".format(Locale.US, m / 1000.0)
+                "距离 %.1f 公里".format(Locale.US, m / 1000.0)
             } else {
-                "%.0f m away".format(Locale.US, m)
+                "距离 %.0f 米".format(Locale.US, m)
             }
-        } ?: "No wait needed"
+        } ?: "无需等待"

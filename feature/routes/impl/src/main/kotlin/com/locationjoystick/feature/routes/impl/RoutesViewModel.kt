@@ -213,11 +213,11 @@ class RoutesViewModel
                             addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         }
                     withContext(Dispatchers.Main) {
-                        context.startActivity(android.content.Intent.createChooser(intent, "Share GPX"))
+                        context.startActivity(android.content.Intent.createChooser(intent, "分享 GPX"))
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Export GPX failed", e)
-                    _errorMessage.value = "Export failed: ${e.message}"
+                    _errorMessage.value = "导出失败：${e.message}"
                 }
             }
         }
@@ -247,16 +247,16 @@ class RoutesViewModel
                     withContext(Dispatchers.Main) {
                         val message =
                             if (routes.size == 1) {
-                                "Route imported: ${routes.first().name}"
+                                "路线已导入：${routes.first().name}"
                             } else {
-                                "${routes.size} routes imported"
+                                "已导入 ${routes.size} 条路线"
                             }
                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "GPX import failed", e)
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Import failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "导入失败：${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -267,7 +267,7 @@ class RoutesViewModel
             withContext(Dispatchers.IO) {
                 val gpxContent = readGpxContent(uri)
                 val gpxRoutes = parseGpxRoutes(gpxContent)
-                if (gpxRoutes.isEmpty()) throw IllegalArgumentException("No routes found in GPX file")
+                if (gpxRoutes.isEmpty()) throw IllegalArgumentException("GPX 文件中未找到路线")
                 gpxRoutes.map { gpxRoute ->
                     val waypoints =
                         gpxRoute.waypoints.mapIndexed { index, latLng ->
@@ -295,13 +295,13 @@ class RoutesViewModel
                 val fileSize = descriptor?.use { it.length }
                 if (fileSize != null && fileSize > AppConstants.ExportConstants.MAX_GPX_IMPORT_SIZE_BYTES) {
                     throw IllegalArgumentException(
-                        "GPX file is too large (${fileSize / 1024 / 1024} MB). Maximum allowed is " +
-                            "${AppConstants.ExportConstants.MAX_GPX_IMPORT_SIZE_BYTES / 1024 / 1024} MB.",
+                        "GPX 文件过大（${fileSize / 1024 / 1024} MB）。最大允许 " +
+                            "${AppConstants.ExportConstants.MAX_GPX_IMPORT_SIZE_BYTES / 1024 / 1024} MB。",
                     )
                 }
                 context.contentResolver.openInputStream(uri)?.use { stream ->
                     stream.bufferedReader().readText()
-                } ?: throw IllegalArgumentException("Cannot read GPX file")
+                } ?: throw IllegalArgumentException("无法读取 GPX 文件")
             }
     }
 
@@ -335,7 +335,7 @@ internal fun parseGpxRoutes(gpxContent: String): List<GpxImportedRoute> {
     return withPoints.mapIndexed { index, (name, points) ->
         val resolvedName =
             name?.takeIf { it.isNotBlank() }
-                ?: if (withPoints.size > 1) "Imported Route ${index + 1}" else "Imported Route"
+                ?: if (withPoints.size > 1) "导入的路线 ${index + 1}" else "导入的路线"
         GpxImportedRoute(resolvedName, points)
     }
 }

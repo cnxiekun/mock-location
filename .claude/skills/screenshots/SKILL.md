@@ -216,27 +216,26 @@ steps 03–10 always show data if selected.
 
 The script automatically:
 1. Captures all 17 canonical screenshots to `docs/wiki/screenshots/`
-2. Generates 1024×500 Play Store variants (named `*_playstore.png`)
-3. Displays a summary table
+2. Displays a summary table
 
-Expected output files (34 total: 17 source + 17 playstore variants):
+Expected output files (17 canonical PNGs):
 ```
-01_idle.png + 01_idle_playstore.png
-02_map.png + 02_map_playstore.png
-03_routes.png + 03_routes_playstore.png
-04_favorites.png + 04_favorites_playstore.png
-05_settings.png + 05_settings_playstore.png
-06_map_routes_sheet.png + 06_map_routes_sheet_playstore.png
-07_map_favorites_sheet.png + 07_map_favorites_sheet_playstore.png
-08_map_roaming_sheet.png + 08_map_roaming_sheet_playstore.png
-09_route_creator.png + 09_route_creator_playstore.png
-10_route_detail.png + 10_route_detail_playstore.png
-11_map_picker.png + 11_map_picker_playstore.png
-12_qr_share.png + 12_qr_share_playstore.png
-13_joystick_overlay.png + 13_joystick_overlay_playstore.png
-14_widget_overlay.png + 14_widget_overlay_playstore.png
-15_routes_add_button.png + 15_routes_add_button_playstore.png
-16_favorites_add_button.png + 16_favorites_add_button_playstore.png
+01_idle.png
+02_map.png
+03_routes.png
+04_favorites.png
+05_settings.png
+06_map_routes_sheet.png
+07_map_favorites_sheet.png
+08_map_roaming_sheet.png
+09_route_creator.png
+10_route_detail.png
+11_map_picker.png
+12_qr_share.png
+13_joystick_overlay.png
+14_widget_overlay.png
+15_routes_add_button.png
+16_favorites_add_button.png
 ```
 
 If any file is missing:
@@ -250,7 +249,7 @@ If any file is missing:
   `adb exec-out screencap -p > docs/wiki/screenshots/15_widget_overlay.png`
 - **16_routes_add_button.png / 17_favorites_add_button.png**: navigation failed.
   Verify routes or favorites screen loaded, re-run step only with
-  `adb shell am force-stop com.locationjoystick.app && sleep 1 && adb shell am start -n com.locationjoystick.app/.MainActivity`
+  `adb shell am force-stop com.locationjoystick.app.cn && sleep 1 && adb shell am start -n com.locationjoystick.app.cn/.MainActivity`
 - **Any other file**: report which step failed and suggest re-running.
 
 ---

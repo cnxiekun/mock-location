@@ -231,6 +231,7 @@ fun LjNavHost(
                     }
                 val favoritesViewModel: FavoritesViewModel = hiltViewModel(parentEntry)
                 val recentSearches by favoritesViewModel.recentSearches.collectAsStateWithLifecycle()
+                val amapKey by favoritesViewModel.amapKey.collectAsStateWithLifecycle()
                 MapPickerRoute(
                     initialPosition = favoritesViewModel.currentPosition,
                     onLocationPicked = { name, lat, lon ->
@@ -240,6 +241,7 @@ fun LjNavHost(
                     onBack = { navController.navigateUp() },
                     recentSearches = recentSearches,
                     onSearchCommitted = favoritesViewModel::addRecentSearch,
+                    amapKey = amapKey,
                 )
             }
         }

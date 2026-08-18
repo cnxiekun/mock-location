@@ -45,8 +45,8 @@ internal fun HotItemTreeSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(headerLabel, style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
-        TextButton(onClick = { onSelectionChange(emptySet()) }) { Text("Uncheck all") }
-        TextButton(onClick = { onSelectionChange(tree.allIds) }) { Text("Check all") }
+        TextButton(onClick = { onSelectionChange(emptySet()) }) { Text("全部取消勾选") }
+        TextButton(onClick = { onSelectionChange(tree.allIds) }) { Text("全部勾选") }
     }
 
     tree.byCountry.forEach { (country, citiesMap) ->
@@ -82,7 +82,7 @@ internal fun HotItemTreeSection(
             }) {
                 Icon(
                     imageVector = if (isCountryExpanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
-                    contentDescription = if (isCountryExpanded) "Collapse" else "Expand",
+                    contentDescription = if (isCountryExpanded) "收起" else "展开",
                 )
             }
         }
@@ -120,7 +120,7 @@ internal fun HotItemTreeSection(
                         }) {
                             Icon(
                                 imageVector = if (isCityExpanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
-                                contentDescription = if (isCityExpanded) "Collapse" else "Expand",
+                                contentDescription = if (isCityExpanded) "收起" else "展开",
                             )
                         }
                     }

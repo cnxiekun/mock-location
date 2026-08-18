@@ -182,7 +182,7 @@ class RoamingWaypointPlannerTest {
             assertEquals(1, received.size)
             assertTrue(
                 "expected a fallback-count summary, got: ${received.first()}",
-                received.first().contains("partially unavailable"),
+                received.first().contains("不可用"),
             )
         }
 

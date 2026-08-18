@@ -159,12 +159,12 @@ fun classifyOsrmFailure(e: Throwable): OsrmFailureReason =
 /** Short, user-facing description of [reason] (no trailing punctuation — callers append their own context). */
 fun osrmFailureMessage(reason: OsrmFailureReason): String =
     when (reason) {
-        is OsrmFailureReason.Timeout -> "Routing server timed out"
-        is OsrmFailureReason.ServerError -> "Routing server unavailable"
-        is OsrmFailureReason.RateLimited -> "Routing server is rate-limiting requests"
-        is OsrmFailureReason.NoRouteFound -> "No road route found"
-        is OsrmFailureReason.NetworkUnavailable -> "No network connection"
-        is OsrmFailureReason.Unknown -> "Road routing unavailable"
+        is OsrmFailureReason.Timeout -> "路由服务器超时"
+        is OsrmFailureReason.ServerError -> "路由服务器不可用"
+        is OsrmFailureReason.RateLimited -> "路由服务器正在限制请求频率"
+        is OsrmFailureReason.NoRouteFound -> "未找到道路路线"
+        is OsrmFailureReason.NetworkUnavailable -> "无网络连接"
+        is OsrmFailureReason.Unknown -> "道路路由不可用"
     }
 
 /** Parses a numeric (seconds-form) `Retry-After` header into milliseconds; null if absent or an HTTP-date. */

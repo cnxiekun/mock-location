@@ -667,6 +667,15 @@ class MockLocationService : Service() {
         if (locationRepository.currentMode.value == MockMode.FOLLOWER) return
         writeCurrentPosition(lat, lon)
         locationRepository.setPositionInternal(LatLng(lat, lon))
+        // 立即推送新位置，避免传送后等待下一个 tick 期间 mock 信号“停顿”、
+        // 导致消费方（如高德）短暂回退到真实 GPS。
+        if (providerAdded) {
+            try {
+                pushLocationUpdate()
+            } catch (e: Exception) {
+                Log.e(TAG, "Immediate position push failed", e)
+            }
+        }
     }
 
     // Callers: JoystickOverlayService (direct call) and the WalkCoordinator position callback

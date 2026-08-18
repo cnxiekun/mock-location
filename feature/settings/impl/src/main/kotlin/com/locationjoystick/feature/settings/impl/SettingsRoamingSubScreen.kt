@@ -43,7 +43,7 @@ internal fun SettingsRoamingSubScreen(
     snackbarHost: @Composable () -> Unit,
 ) {
     LjScaffold(
-        title = "Roaming",
+        title = "漫游",
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -83,10 +83,10 @@ private fun RoamingSection(
     isMph: Boolean,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Roaming", style = MaterialTheme.typography.headlineSmall)
+    Text("漫游", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Default settings used when starting a roaming session from the map.",
+        "从地图开始漫游会话时使用的默认设置。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -110,7 +110,7 @@ private fun RoamingSection(
                 onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(radiusMeters = meters.coerceIn(1_000.0, 100_000.0))))
             }
         },
-        label = { Text(if (isMph) "Radius (mi)" else "Radius (m)") },
+        label = { Text(if (isMph) "半径（英里）" else "半径（米）") },
         keyboardOptions = KeyboardOptions(keyboardType = if (isMph) KeyboardType.Decimal else KeyboardType.Number),
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
@@ -136,7 +136,7 @@ private fun RoamingSection(
                 onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(distanceMeters = meters.coerceIn(50.0, 50_000.0))))
             }
         },
-        label = { Text(if (isMph) "Route distance (mi)" else "Route distance (m)") },
+        label = { Text(if (isMph) "路线距离（英里）" else "路线距离（米）") },
         keyboardOptions = KeyboardOptions(keyboardType = if (isMph) KeyboardType.Decimal else KeyboardType.Number),
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
@@ -144,16 +144,16 @@ private fun RoamingSection(
 
     Spacer(modifier = Modifier.height(4.dp))
 
-    Text("Speed profile", style = MaterialTheme.typography.labelLarge)
+    Text("速度方案", style = MaterialTheme.typography.labelLarge)
     Spacer(modifier = Modifier.height(4.dp))
     LjSegmentedControl(
         options =
             listOf(
-                "slow_walk" to "Slow Walk",
-                "walk" to "Walk",
-                "run" to "Run",
-                "bike" to "Bike",
-                "drive" to "Drive",
+                "slow_walk" to "慢走",
+                "walk" to "步行",
+                "run" to "跑步",
+                "bike" to "骑行",
+                "drive" to "驾车",
             ),
         selected = roamingDefaults.speedProfileId,
         onSelect = { onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(speedProfileId = it))) },
@@ -163,13 +163,13 @@ private fun RoamingSection(
     LjCheckboxRow(
         checked = roamingDefaults.followRoads,
         onCheckedChange = { onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(followRoads = it))) },
-        title = "Follow roads",
-        description = "Follows actual roads and paths instead of cutting straight across. May not be available in all areas.",
+        title = "沿道路行走",
+        description = "沿真实道路和小径行走，而不是直线穿越。可能并非所有区域都可用。",
     )
     LjCheckboxRow(
         checked = roamingDefaults.returnToInitialLocation,
         onCheckedChange = { onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(returnToInitialLocation = it))) },
-        title = "Return to start",
-        description = "Walks back to the starting position after the roaming session completes.",
+        title = "返回起点",
+        description = "漫游会话结束后走回起始位置。",
     )
 }

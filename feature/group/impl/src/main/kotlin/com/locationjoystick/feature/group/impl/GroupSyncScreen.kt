@@ -153,7 +153,7 @@ internal fun GroupSyncScreen(
     cooldownState: CooldownState = CooldownState.Ready,
 ) {
     LjScaffold(
-        title = "Group Sync",
+        title = "群组同步",
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -233,11 +233,11 @@ private fun NoGroupContent(
             tint = MaterialTheme.colorScheme.primary,
         )
         Text(
-            text = "Group Sync",
+            text = "群组同步",
             style = MaterialTheme.typography.headlineSmall,
         )
         Text(
-            text = "Sync your fake location across multiple devices on the same Wi-Fi network. No account needed.",
+            text = "在同一 Wi-Fi 网络的多台设备之间同步你的模拟位置。无需账号。",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -248,11 +248,11 @@ private fun NoGroupContent(
             onClick = onCreateGroup,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Create group — I'm the leader")
+            Text("创建群组——我是队长")
         }
 
         Text(
-            text = "— or join an existing group —",
+            text = "——或加入已有群组——",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -268,7 +268,7 @@ private fun NoGroupContent(
             ) {
                 Icon(Icons.Rounded.QrCodeScanner, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.size(6.dp))
-                Text("Scan QR")
+                Text("扫码")
             }
             OutlinedButton(
                 onClick = { showCodeDialog = true },
@@ -278,7 +278,7 @@ private fun NoGroupContent(
                 if (isDiscovering) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Enter code")
+                    Text("输入代码")
                 }
             }
         }
@@ -304,18 +304,18 @@ private fun EnterCodeDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Enter group code") },
+        title = { Text("输入群组代码") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Ask the leader for their 6-character group code.",
+                    text = "向队长获取他们的 6 位群组代码。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 OutlinedTextField(
                     value = code,
                     onValueChange = { code = it.uppercase().take(6) },
-                    label = { Text("Code") },
+                    label = { Text("代码") },
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Monospace),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -329,11 +329,11 @@ private fun EnterCodeDialog(
                 onClick = { onConfirm(code) },
                 enabled = code.length == 6,
             ) {
-                Text("Join")
+                Text("加入")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text("取消") }
         },
     )
 }
@@ -353,7 +353,7 @@ private fun LeaderContent(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
-            text = "Role: Leader",
+            text = "角色：队长",
             style = MaterialTheme.typography.titleMedium,
         )
 
@@ -367,7 +367,7 @@ private fun LeaderContent(
                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
             ) {
                 Text(
-                    text = "Group code",
+                    text = "群组代码",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
@@ -379,14 +379,14 @@ private fun LeaderContent(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
                 Text(
-                    text = "Followers can scan the QR or type this code",
+                    text = "跟随者可以扫码或输入此代码",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     textAlign = TextAlign.Center,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = if (followerCount == 1) "1 follower connected" else "$followerCount followers connected",
+                    text = if (followerCount == 1) "已连接 1 位跟随者" else "已连接 $followerCount 位跟随者",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
@@ -403,19 +403,19 @@ private fun LeaderContent(
                 ) {
                     Image(
                         bitmap = qrBitmap.asImageBitmap(),
-                        contentDescription = "Group invite QR code",
+                        contentDescription = "群组邀请二维码",
                         modifier = Modifier.size(200.dp),
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.QrCode, contentDescription = null, modifier = Modifier.size(16.dp))
                         Text(
-                            text = " Scan to join",
+                            text = " 扫码加入",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(onClick = onRegenerateQr) {
-                            Icon(Icons.Rounded.Refresh, contentDescription = "Regenerate QR")
+                            Icon(Icons.Rounded.Refresh, contentDescription = "重新生成二维码")
                         }
                     }
                 }
@@ -423,8 +423,8 @@ private fun LeaderContent(
         }
 
         SwitchRow(
-            label = "Sharing",
-            description = "sends your location to followers",
+            label = "共享",
+            description = "将你的位置发送给跟随者",
             checked = groupState.sharingEnabled,
             onCheckedChange = onSetSharingEnabled,
         )
@@ -439,7 +439,7 @@ private fun LeaderContent(
                     containerColor = MaterialTheme.colorScheme.error,
                 ),
         ) {
-            Text("Leave group")
+            Text("离开群组")
         }
     }
 }
@@ -462,33 +462,33 @@ private fun FollowerContent(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
-            text = "Role: Follower",
+            text = "角色：跟随者",
             style = MaterialTheme.typography.titleMedium,
         )
 
         Text(
-            text = "Connected to group ${groupState.groupId ?: "—"}",
+            text = "已连接到群组 ${groupState.groupId ?: "—"}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         if (followerCount > 0) {
             Text(
-                text = if (followerCount == 1) "1 follower in this group" else "$followerCount followers in this group",
+                text = if (followerCount == 1) "本群组有 1 位跟随者" else "本群组有 $followerCount 位跟随者",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
         SwitchRow(
-            label = "Follow leader",
-            description = "walks toward the leader's location",
+            label = "跟随队长",
+            description = "朝队长的位置行走",
             checked = groupState.followerModeEnabled,
             onCheckedChange = onSetFollowerModeEnabled,
         )
 
         Text(
-            text = "Follower mode resumes when you open the app after a reboot.",
+            text = "重启后打开应用时，跟随模式会自动恢复。",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -501,7 +501,7 @@ private fun FollowerContent(
                 onClick = onTeleportToLeaderNow,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Teleport to leader now")
+                Text("立即传送到队长位置")
             }
         }
 
@@ -515,7 +515,7 @@ private fun FollowerContent(
                     containerColor = MaterialTheme.colorScheme.error,
                 ),
         ) {
-            Text("Leave group")
+            Text("离开群组")
         }
     }
 }

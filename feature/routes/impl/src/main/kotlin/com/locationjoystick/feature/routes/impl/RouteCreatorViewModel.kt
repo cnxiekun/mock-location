@@ -74,6 +74,8 @@ class RouteCreatorViewModel
                 .getRecentSearches()
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+        val amapKey: StateFlow<String> = settingsRepository.getAmapWebKey().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "")
+
         fun addRecentSearch(
             displayName: String,
             lat: Double,

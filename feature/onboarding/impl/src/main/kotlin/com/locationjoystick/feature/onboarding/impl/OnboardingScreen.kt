@@ -144,7 +144,7 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Set up locationjoystick",
+                text = "设置定位模拟",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -162,7 +162,7 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Complete the steps below to start simulating your GPS location.",
+                text = "完成以下步骤，开始模拟你的 GPS 定位。",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -175,7 +175,7 @@ internal fun OnboardingScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Trouble setting up?",
+                    text = "设置遇到问题？",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -187,7 +187,7 @@ internal fun OnboardingScreen(
                     },
                 ) {
                     Text(
-                        text = "Getting Started",
+                        text = "入门指南",
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
@@ -204,7 +204,7 @@ internal fun OnboardingScreen(
                     },
                 ) {
                     Text(
-                        text = "Troubleshooting",
+                        text = "故障排除",
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
@@ -213,11 +213,11 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             OnboardingStepCard(
-                title = "Location permission",
-                description = "Required to read your real position for map centering and route recording.",
+                title = "定位权限",
+                description = "用于读取你的真实位置，以便地图居中显示和路线录制。",
                 isGranted = uiState.locationPermissionGranted,
                 icon = LjIcons.LocationOn,
-                actionLabel = "Grant Permission",
+                actionLabel = "授予权限",
                 isOptional = false,
                 onAction = { locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) },
             )
@@ -225,11 +225,11 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OnboardingStepCard(
-                title = "Display over other apps",
-                description = "Required for the floating joystick and quick-access widget while other apps are open.",
+                title = "在其他应用上层显示",
+                description = "在其他应用打开时，悬浮摇杆和快捷悬浮球需要此权限。",
                 isGranted = uiState.overlayPermissionGranted,
                 icon = LjIcons.Layers,
-                actionLabel = "Open Settings",
+                actionLabel = "打开设置",
                 isOptional = false,
                 onAction = {
                     context.startActivity(
@@ -244,13 +244,13 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OnboardingStepCard(
-                title = "Set as fake GPS app",
+                title = "设置为模拟 GPS 应用",
                 description =
-                    "In Developer Options, find 'Select mock location app' and choose locationjoystick. " +
-                        "This lets the app replace your real GPS.",
+                    "在开发者选项中，找到“选择模拟位置信息应用”，然后选择定位模拟。 " +
+                        "这样应用就能替换你的真实 GPS。",
                 isGranted = uiState.mockLocationEnabled,
                 icon = LjIcons.DeveloperMode,
-                actionLabel = "Open Developer Options",
+                actionLabel = "打开开发者选项",
                 isOptional = false,
                 onAction = {
                     context.startActivity(
@@ -263,7 +263,7 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             LjPrimaryButton(
-                text = "Start using locationjoystick",
+                text = "开始使用定位模拟",
                 onClick = onSetupComplete,
                 enabled = uiState.canProceed || uiState.isDebugBuild,
                 modifier = Modifier.fillMaxWidth(),
@@ -272,7 +272,7 @@ internal fun OnboardingScreen(
             if (uiState.isDebugBuild && !uiState.canProceed) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Debug build — permissions optional",
+                    text = "调试版本——权限可选",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -354,7 +354,7 @@ private fun OnboardingStepCard(
                             onClick = {},
                             label = {
                                 Text(
-                                    text = "Optional",
+                                    text = "可选",
                                     style = MaterialTheme.typography.labelSmall,
                                 )
                             },

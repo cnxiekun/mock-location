@@ -60,14 +60,14 @@ fun FavoritesList(
             Text(title, style = MaterialTheme.typography.headlineSmall)
             if (onSaveCurrentLocation != null) {
                 IconButton(onClick = onSaveCurrentLocation) {
-                    Icon(Icons.Default.Add, contentDescription = "Save current location")
+                    Icon(Icons.Default.Add, contentDescription = "保存当前位置")
                 }
             }
         }
 
         if (favorites.isEmpty()) {
             Text(
-                "No saved favorites yet",
+                "暂无已收藏的位置",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 16.dp),
             )
@@ -100,7 +100,7 @@ fun FavoritesList(
                         if (cooldownLabel != null) {
                             Spacer(Modifier.height(6.dp))
                             CooldownAdvisoryBadge(
-                                cooldownLabel.invoke(favorite)?.let { "Suggested wait: $it" } ?: "No wait needed",
+                                cooldownLabel.invoke(favorite)?.let { "建议等待：$it" } ?: "无需等待",
                             )
                         }
                     }
@@ -132,7 +132,7 @@ fun CooldownAdvisoryBadge(
 @Composable
 private fun FavoritesListEmptyPreview() {
     FavoritesList(
-        title = "Favorites",
+        title = "收藏",
         favorites = emptyList(),
         onSelect = {},
     )
@@ -142,18 +142,18 @@ private fun FavoritesListEmptyPreview() {
 @Composable
 private fun FavoritesListWithItemsPreview() {
     FavoritesList(
-        title = "Favorites",
+        title = "收藏",
         favorites =
             listOf(
                 FavoriteLocation(
                     id = "1",
-                    name = "Home",
+                    name = "家",
                     position = LatLng(48.8566, 2.3522),
                     createdAt = 0L,
                 ),
                 FavoriteLocation(
                     id = "2",
-                    name = "Work",
+                    name = "公司",
                     position = LatLng(48.8606, 2.3376),
                     createdAt = 0L,
                 ),

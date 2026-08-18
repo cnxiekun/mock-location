@@ -61,6 +61,7 @@ import com.locationjoystick.core.map.geojson.buildPointsGeoJson
 import com.locationjoystick.core.map.geojson.buildPositionGeoJson
 import com.locationjoystick.core.map.geojson.buildRouteTraceGeoJson
 import com.locationjoystick.core.map.geojson.emptyGeoJson
+import com.locationjoystick.core.common.util.Gcj02Converter
 import com.locationjoystick.core.map.maplibre.MapLibreLayerIds
 import com.locationjoystick.core.map.maplibre.MapLibreSourceIds
 import com.locationjoystick.core.map.maplibre.addEphemeralRouteLayers
@@ -122,6 +123,7 @@ internal fun MapFloatingView(
     ephemeralWaypoints: List<LatLng>? = null,
     recentSearches: List<RecentSearch> = emptyList(),
     onSearchCommitted: ((String, Double, Double) -> Unit)? = null,
+    amapKey: String = "",
     cooldownForPosition: ((LatLng) -> Flow<CooldownState>)? = null,
     onSaveCurrentLocation: ((String) -> Unit)? = null,
     quickWalk: Boolean = false,
@@ -217,16 +219,18 @@ internal fun MapFloatingView(
                         map.uiSettings.isAttributionEnabled = false
                         map.uiSettings.isLogoEnabled = false
                         map.uiSettings.isScrollGesturesEnabled = true
+                        val initialDisplay =
+                            initialPosition?.let {
+                                Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude)
+                            } ?: Gcj02Converter.wgs84ToGcj02(
+                                AppConstants.MapConstants.DEFAULT_LAT,
+                                AppConstants.MapConstants.DEFAULT_LON,
+                            )
                         map.cameraPosition =
                             CameraPosition
                                 .Builder()
-                                .target(
-                                    if (initialPosition != null) {
-                                        MapLatLng(initialPosition.latitude, initialPosition.longitude)
-                                    } else {
-                                        MapLatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
-                                    },
-                                ).zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
+                                .target(MapLatLng(initialDisplay.latitude, initialDisplay.longitude))
+                                .zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
                                 .build()
 
                         map.setStyle(Style.Builder().fromUri("asset://empty.json")) { style ->
@@ -247,7 +251,9 @@ internal fun MapFloatingView(
                         }
 
                         map.addOnMapClickListener { latLng ->
-                            val pos = LatLng(latLng.latitude, latLng.longitude)
+                            // 底图为 GCJ-02，转回 WGS-84 存储
+                            val wgs = Gcj02Converter.gcj02ToWgs84(latLng.latitude, latLng.longitude)
+                            val pos = LatLng(wgs.latitude, wgs.longitude)
                             if (quickWalkState.value) {
                                 onWalkToState.value(pos)
                             } else {
@@ -273,24 +279,33 @@ internal fun MapFloatingView(
                 val ephemeralEndpointsSrc = ephemeralEndpointsSource.value ?: return@AndroidView
                 val position = currentPosition
 
-                src.setGeoJson(buildPositionGeoJson(position))
+                src.setGeoJson(
+                    buildPositionGeoJson(
+                        position?.let { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) },
+                    ),
+                )
 
                 val waypoints = routeWaypoints
                 val walkStartSnap = walkStart
                 val target = walkTarget
                 if (waypoints != null && position != null) {
-                    val (tracedGeoJson, remainingGeoJson) = buildRouteTraceGeoJson(waypoints, position)
+                    val displayPos = Gcj02Converter.wgs84ToGcj02(position.latitude, position.longitude)
+                    val displayWaypoints = waypoints.map { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) }
+                    val (tracedGeoJson, remainingGeoJson) = buildRouteTraceGeoJson(displayWaypoints, displayPos)
                     tracedSrc.setGeoJson(tracedGeoJson)
                     remainingSrc.setGeoJson(remainingGeoJson)
-                    endpointsSrc.setGeoJson(buildPointsGeoJson(waypoints))
+                    endpointsSrc.setGeoJson(buildPointsGeoJson(displayWaypoints))
                 } else if (ephemeralWaypoints != null && position != null) {
-                    val (tracedGeoJson, remainingGeoJson) = buildRouteTraceGeoJson(ephemeralWaypoints, position)
+                    val displayPos = Gcj02Converter.wgs84ToGcj02(position.latitude, position.longitude)
+                    val displayWaypoints = ephemeralWaypoints.map { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) }
+                    val (tracedGeoJson, remainingGeoJson) = buildRouteTraceGeoJson(displayWaypoints, displayPos)
                     tracedSrc.setGeoJson(tracedGeoJson)
                     remainingSrc.setGeoJson(remainingGeoJson)
-                    endpointsSrc.setGeoJson(buildPointsGeoJson(ephemeralWaypoints))
+                    endpointsSrc.setGeoJson(buildPointsGeoJson(displayWaypoints))
                 } else if (walkStartSnap != null && target != null && position != null) {
-                    val walkPoints = listOf(walkStartSnap, target)
-                    val (tracedGeoJson, remainingGeoJson) = buildRouteTraceGeoJson(walkPoints, position)
+                    val displayPos = Gcj02Converter.wgs84ToGcj02(position.latitude, position.longitude)
+                    val walkPoints = listOf(walkStartSnap, target).map { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) }
+                    val (tracedGeoJson, remainingGeoJson) = buildRouteTraceGeoJson(walkPoints, displayPos)
                     tracedSrc.setGeoJson(tracedGeoJson)
                     remainingSrc.setGeoJson(remainingGeoJson)
                     endpointsSrc.setGeoJson(buildPointsGeoJson(walkPoints))
@@ -304,11 +319,16 @@ internal fun MapFloatingView(
                 ephemeralRouteSrc.setGeoJson(emptyGeoJson())
                 ephemeralEndpointsSrc.setGeoJson(emptyGeoJson())
 
-                pendingTapSource.value?.setGeoJson(buildPositionGeoJson(pendingTap))
+                pendingTapSource.value?.setGeoJson(
+                    buildPositionGeoJson(
+                        pendingTap?.let { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) },
+                    ),
+                )
 
                 if (isFollowingCamera.value && position != null) {
+                    val display = Gcj02Converter.wgs84ToGcj02(position.latitude, position.longitude)
                     mapRef.value?.animateCamera(
-                        CameraUpdateFactory.newLatLng(MapLatLng(position.latitude, position.longitude)),
+                        CameraUpdateFactory.newLatLng(MapLatLng(display.latitude, display.longitude)),
                         500,
                     )
                 }
@@ -320,8 +340,12 @@ internal fun MapFloatingView(
             NominatimSearchBar(
                 onLocationSelected = { lat, lon, _ ->
                     val position = LatLng(latitude = lat, longitude = lon)
+                    val display = Gcj02Converter.wgs84ToGcj02(lat, lon)
                     mapRef.value?.animateCamera(
-                        CameraUpdateFactory.newLatLngZoom(MapLatLng(lat, lon), AppConstants.MapConstants.DEFAULT_ZOOM),
+                        CameraUpdateFactory.newLatLngZoom(
+                            MapLatLng(display.latitude, display.longitude),
+                            AppConstants.MapConstants.DEFAULT_ZOOM,
+                        ),
                         500,
                     )
                     showSearch = false
@@ -329,6 +353,7 @@ internal fun MapFloatingView(
                 },
                 recentSearches = recentSearches,
                 onSearchCommitted = onSearchCommitted,
+                amapKey = amapKey,
                 modifier =
                     Modifier
                         .align(Alignment.TopCenter)
@@ -345,7 +370,7 @@ internal fun MapFloatingView(
                     .padding(8.dp)
                     .background(LjBg, CircleShape),
         ) {
-            Icon(LjIcons.Close, contentDescription = "Close", tint = LjText)
+            Icon(LjIcons.Close, contentDescription = "关闭", tint = LjText)
         }
 
         // FAB column — bottom-right, mirrors main map layout
@@ -360,7 +385,7 @@ internal fun MapFloatingView(
             if (!isFollowingCamera.value) {
                 LjMapIconButton(
                     icon = LjIcons.MyLocation,
-                    contentDescription = "Re-center on location",
+                    contentDescription = "重新定位到当前位置",
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     onClick = {
@@ -379,7 +404,7 @@ internal fun MapFloatingView(
             }
             LjMapIconButton(
                 icon = LjIcons.Favorite,
-                contentDescription = "Open favorites",
+                contentDescription = "打开收藏夹",
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 onClick = { showFavoritesPicker = true },
@@ -393,7 +418,7 @@ internal fun MapFloatingView(
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             LjMapIconButton(
                                 icon = LjIcons.Stop,
-                                contentDescription = "Stop route",
+                                contentDescription = "停止路线",
                                 containerColor = MaterialTheme.colorScheme.error,
                                 contentColor = MaterialTheme.colorScheme.onError,
                                 onClick = {
@@ -403,7 +428,7 @@ internal fun MapFloatingView(
                             )
                             LjMapIconButton(
                                 icon = if (isRoutePaused) LjIcons.PlayArrow else LjIcons.Pause,
-                                contentDescription = if (isRoutePaused) "Resume route" else "Pause route",
+                                contentDescription = if (isRoutePaused) "继续路线" else "暂停路线",
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 onClick = { if (isRoutePaused) onResumeRouteReplay() else onPauseRouteReplay() },
@@ -411,14 +436,14 @@ internal fun MapFloatingView(
                             if (!hideTeleportFeatures && showRouteJumpButtons) {
                                 LjMapIconButton(
                                     icon = LjIcons.SkipPrevious,
-                                    contentDescription = "Previous waypoint",
+                                    contentDescription = "上一个途经点",
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                     contentColor = LjSuccess,
                                     onClick = onJumpToPreviousWaypoint,
                                 )
                                 LjMapIconButton(
                                     icon = LjIcons.SkipNext,
-                                    contentDescription = "Next waypoint",
+                                    contentDescription = "下一个途经点",
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                     contentColor = LjSuccess,
                                     onClick = onJumpToNextWaypoint,
@@ -428,7 +453,7 @@ internal fun MapFloatingView(
                     }
                     LjMapIconButton(
                         icon = LjIcons.Route,
-                        contentDescription = if (isRouteReplay) "Route active" else "Open routes",
+                        contentDescription = if (isRouteReplay) "路线进行中" else "打开路线",
                         containerColor = if (isRouteReplay) LjSuccess else MaterialTheme.colorScheme.primaryContainer,
                         contentColor = if (isRouteReplay) LjBg else MaterialTheme.colorScheme.onPrimaryContainer,
                         onClick = {
@@ -446,14 +471,14 @@ internal fun MapFloatingView(
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         LjMapIconButton(
                             icon = LjIcons.Stop,
-                            contentDescription = "Stop roaming",
+                            contentDescription = "停止漫游",
                             containerColor = MaterialTheme.colorScheme.error,
                             contentColor = MaterialTheme.colorScheme.onError,
                             onClick = { onStopRoaming() },
                         )
                         LjMapIconButton(
                             icon = if (isRoamingPaused) LjIcons.PlayArrow else LjIcons.Pause,
-                            contentDescription = if (isRoamingPaused) "Resume roaming" else "Pause roaming",
+                            contentDescription = if (isRoamingPaused) "继续漫游" else "暂停漫游",
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             onClick = { if (isRoamingPaused) onResumeRoaming() else onPauseRoaming() },
@@ -462,7 +487,7 @@ internal fun MapFloatingView(
                 }
                 LjMapIconButton(
                     icon = LjIcons.Explore,
-                    contentDescription = if (isRoaming) "Roaming active" else "Start roaming",
+                    contentDescription = if (isRoaming) "漫游进行中" else "开始漫游",
                     containerColor = if (isRoaming) LjSuccess else MaterialTheme.colorScheme.tertiaryContainer,
                     contentColor = if (isRoaming) LjBg else MaterialTheme.colorScheme.onTertiaryContainer,
                     onClick = { if (!isRoaming) showRoamingSheet = true },
@@ -470,7 +495,7 @@ internal fun MapFloatingView(
             }
             LjMapIconButton(
                 icon = LjIcons.Search,
-                contentDescription = "Search location",
+                contentDescription = "搜索位置",
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 onClick = { showSearch = !showSearch },
@@ -647,7 +672,7 @@ private fun BoxScope.TapActionPanel(
                 .padding(16.dp),
     ) {
         if (isRouteReplay && !isEphemeralReplay) {
-            Text("Route in progress", style = MaterialTheme.typography.titleMedium, color = LjText)
+            Text("路线进行中", style = MaterialTheme.typography.titleMedium, color = LjText)
             Spacer(Modifier.height(16.dp))
             if (!hideTeleportFeatures) {
                 Button(
@@ -656,7 +681,7 @@ private fun BoxScope.TapActionPanel(
                         onDismiss()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Stop route and teleport") }
+                ) { Text("停止路线并传送") }
                 Spacer(Modifier.height(8.dp))
             }
             OutlinedButton(
@@ -665,7 +690,7 @@ private fun BoxScope.TapActionPanel(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Stop route and walk here") }
+            ) { Text("停止路线并走到这里") }
             Spacer(Modifier.height(8.dp))
             OutlinedButton(
                 onClick = {
@@ -673,15 +698,15 @@ private fun BoxScope.TapActionPanel(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Finish route and walk here") }
+            ) { Text("结束路线并走到这里") }
         } else {
-            Text("Move to this location?", style = MaterialTheme.typography.titleMedium, color = LjText)
+            Text("移动到该位置？", style = MaterialTheme.typography.titleMedium, color = LjText)
             val cooldownState by remember(tap) {
                 cooldownForPosition?.invoke(tap) ?: flowOf(CooldownState.Ready)
             }.collectAsStateWithLifecycle(initialValue = CooldownState.Ready)
             Spacer(Modifier.height(8.dp))
             CooldownAdvisoryBadge(
-                (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel() ?: "No wait needed",
+                (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel() ?: "无需等待",
             )
             Spacer(Modifier.height(16.dp))
             if (!hideTeleportFeatures) {
@@ -691,7 +716,7 @@ private fun BoxScope.TapActionPanel(
                         onDismiss()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Teleport here") }
+                ) { Text("传送到这里") }
                 Spacer(Modifier.height(8.dp))
             }
             OutlinedButton(
@@ -700,7 +725,7 @@ private fun BoxScope.TapActionPanel(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Walk here") }
+            ) { Text("走到这里") }
             Spacer(Modifier.height(8.dp))
             OutlinedButton(
                 onClick = {
@@ -708,7 +733,7 @@ private fun BoxScope.TapActionPanel(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Walk here via roads") }
+            ) { Text("沿道路走到这里") }
             if (isWalkActive) {
                 Spacer(Modifier.height(8.dp))
                 OutlinedButton(
@@ -717,13 +742,13 @@ private fun BoxScope.TapActionPanel(
                         onDismiss()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Add next point") }
+                ) { Text("添加下一点") }
             }
         }
         Spacer(Modifier.height(4.dp))
         TextButton(
             onClick = { onDismiss() },
             modifier = Modifier.fillMaxWidth(),
-        ) { Text("Do nothing") }
+        ) { Text("不做任何操作") }
     }
 }

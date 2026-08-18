@@ -215,6 +215,18 @@ class SettingsViewModel
                 initialValue = SettingsUiState(isLoading = true),
             )
 
+        /** 高德 Web 服务 API key（地理编码搜索用），由用户在设置中填写。 */
+        val amapKey: StateFlow<String> =
+            settingsRepository.getAmapWebKey().stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = "",
+            )
+
+        fun setAmapWebKey(key: String) {
+            viewModelScope.launch { settingsRepository.setAmapWebKey(key) }
+        }
+
         fun setSpeed(
             id: String,
             displaySpeed: Double,
@@ -468,10 +480,10 @@ class SettingsViewModel
                         }
                     }
                     mutableDraft.value = DraftState()
-                    userFeedback.emit(UserFeedback("Settings saved"))
+                    userFeedback.emit(UserFeedback("设置已保存"))
                 } catch (e: Exception) {
                     Log.e(TAG, "Save failed", e)
-                    userFeedback.emit(UserFeedback("Failed to save settings", isError = true))
+                    userFeedback.emit(UserFeedback("保存设置失败", isError = true))
                 }
             }
         }
@@ -490,10 +502,10 @@ class SettingsViewModel
                     }
                     settingsRepository.resetAllData()
                     mutableDraft.value = DraftState()
-                    userFeedback.emit(UserFeedback("All data reset"))
+                    userFeedback.emit(UserFeedback("所有数据已重置"))
                 } catch (e: Exception) {
                     Log.e(TAG, "Reset all data failed", e)
-                    userFeedback.emit(UserFeedback("Failed to reset data", isError = true))
+                    userFeedback.emit(UserFeedback("重置数据失败", isError = true))
                 }
             }
         }
@@ -564,10 +576,10 @@ class SettingsViewModel
                 try {
                     val json = SettingsExportCodec.serializeExportData(buildCurrentExportData())
                     importExportRepository.writeToUri(uri, json)
-                    userFeedback.emit(UserFeedback("Export complete"))
+                    userFeedback.emit(UserFeedback("导出完成"))
                 } catch (e: Exception) {
                     Log.e(TAG, "Export failed", e)
-                    userFeedback.emit(UserFeedback("Failed to export", isError = true))
+                    userFeedback.emit(UserFeedback("导出失败", isError = true))
                 }
             }
         }
@@ -581,14 +593,14 @@ class SettingsViewModel
                     val json = withContext(Dispatchers.IO) { importExportRepository.readTextFromUri(uri) }
                     if (json.isEmpty()) {
                         Log.e(TAG, "Import failed: empty file")
-                        userFeedback.emit(UserFeedback("Failed to import: empty file", isError = true))
+                        userFeedback.emit(UserFeedback("导入失败：文件为空", isError = true))
                         return@launch
                     }
                     applyExportData(SettingsExportCodec.parseExportData(json), replace)
-                    userFeedback.emit(UserFeedback("Import complete"))
+                    userFeedback.emit(UserFeedback("导入完成"))
                 } catch (e: Exception) {
                     Log.e(TAG, "Import failed", e)
-                    userFeedback.emit(UserFeedback("Failed to import", isError = true))
+                    userFeedback.emit(UserFeedback("导入失败", isError = true))
                 }
             }
         }
@@ -610,7 +622,7 @@ class SettingsViewModel
                     qrExportReady.emit(QrExportSession(qrText = "locationjoystick://export?host=$host&port=$port&token=$code", code = code))
                 } catch (e: Exception) {
                     Log.e(TAG, "QR export preparation failed", e)
-                    userFeedback.emit(UserFeedback("Failed to prepare QR export — ensure Wi-Fi is connected", isError = true))
+                    userFeedback.emit(UserFeedback("准备二维码导出失败——请确保 Wi-Fi 已连接", isError = true))
                 }
             }
         }
@@ -628,7 +640,7 @@ class SettingsViewModel
             viewModelScope.launch {
                 if (host == null || port == null || token == null) {
                     Log.e(TAG, "Unrecognized QR code: $url")
-                    userFeedback.emit(UserFeedback("Invalid QR code — not a Location Joystick export", isError = true))
+                    userFeedback.emit(UserFeedback("无效的二维码——不是定位模拟的导出数据", isError = true))
                     return@launch
                 }
                 fetchAndImportExport(host, port, token)
@@ -641,13 +653,13 @@ class SettingsViewModel
             viewModelScope.launch {
                 if (normalized.length != AppConstants.SyncConstants.GROUP_CODE_LENGTH) {
                     userFeedback.emit(
-                        UserFeedback("Code must be ${AppConstants.SyncConstants.GROUP_CODE_LENGTH} characters", isError = true),
+                        UserFeedback("代码必须是 ${AppConstants.SyncConstants.GROUP_CODE_LENGTH} 个字符", isError = true),
                     )
                     return@launch
                 }
                 val resolved = nsdCodeManager.discoverByCode(normalized)
                 if (resolved == null) {
-                    userFeedback.emit(UserFeedback("No sender found for code $normalized", isError = true))
+                    userFeedback.emit(UserFeedback("未找到代码 $normalized 对应的发送方", isError = true))
                     return@launch
                 }
                 val (host, port) = resolved
@@ -669,7 +681,7 @@ class SettingsViewModel
             } catch (e: Exception) {
                 Log.e(TAG, "QR import fetch failed", e)
                 userFeedback.emit(
-                    UserFeedback("Failed to fetch export — ensure both devices are on the same Wi-Fi", isError = true),
+                    UserFeedback("获取导出数据失败——请确保两台设备处于同一 Wi-Fi", isError = true),
                 )
             } finally {
                 _qrImportFetching.value = false
@@ -683,10 +695,10 @@ class SettingsViewModel
             viewModelScope.launch {
                 try {
                     applyExportData(exportData, replace)
-                    userFeedback.emit(UserFeedback("Import complete"))
+                    userFeedback.emit(UserFeedback("导入完成"))
                 } catch (e: Exception) {
                     Log.e(TAG, "Import from ExportData failed", e)
-                    userFeedback.emit(UserFeedback("Failed to import", isError = true))
+                    userFeedback.emit(UserFeedback("导入失败", isError = true))
                 }
             }
         }
@@ -770,13 +782,13 @@ class SettingsViewModel
                     val bytes = withContext(Dispatchers.IO) { importExportRepository.readBytesFromUri(uri) }
                     if (bytes.isEmpty()) {
                         Log.e(TAG, "GPS Joystick import failed: empty file")
-                        userFeedback.emit(UserFeedback("Failed to import from GPS Joystick", isError = true))
+                        userFeedback.emit(UserFeedback("从 GPS Joystick 导入失败", isError = true))
                         return@launch
                     }
                     val result = GpsJoystickMigrator.parse(bytes)
                     if (result.isFailure) {
                         Log.e(TAG, "GPS Joystick import failed: ${result.exceptionOrNull()?.message}")
-                        userFeedback.emit(UserFeedback("Failed to import from GPS Joystick", isError = true))
+                        userFeedback.emit(UserFeedback("从 GPS Joystick 导入失败", isError = true))
                         return@launch
                     }
                     val migration = result.getOrNull() ?: return@launch
@@ -797,11 +809,11 @@ class SettingsViewModel
                     }
                     Log.i(TAG, "GPS Joystick import complete: ${migration.favorites.size} favorites, ${migration.routes.size} routes")
                     userFeedback.emit(
-                        UserFeedback("Imported ${migration.favorites.size} favorites, ${migration.routes.size} routes from GPS Joystick"),
+                        UserFeedback("已从 GPS Joystick 导入 ${migration.favorites.size} 个收藏和 ${migration.routes.size} 条路线"),
                     )
                 } catch (e: Exception) {
                     Log.e(TAG, "GPS Joystick import failed", e)
-                    userFeedback.emit(UserFeedback("Failed to import from GPS Joystick", isError = true))
+                    userFeedback.emit(UserFeedback("从 GPS Joystick 导入失败", isError = true))
                 }
             }
         }
@@ -815,13 +827,13 @@ class SettingsViewModel
                     val json = withContext(Dispatchers.IO) { importExportRepository.readTextFromUri(uri) }
                     if (json.isBlank()) {
                         Log.e(TAG, "YAMLA import failed: empty file")
-                        userFeedback.emit(UserFeedback("Failed to import from YAMLA", isError = true))
+                        userFeedback.emit(UserFeedback("从 YAMLA 导入失败", isError = true))
                         return@launch
                     }
                     val result = YamlaMigrator.parse(json)
                     if (result.isFailure) {
                         Log.e(TAG, "YAMLA import failed: ${result.exceptionOrNull()?.message}")
-                        userFeedback.emit(UserFeedback("Failed to import from YAMLA", isError = true))
+                        userFeedback.emit(UserFeedback("从 YAMLA 导入失败", isError = true))
                         return@launch
                     }
                     val migration = result.getOrNull() ?: return@launch
@@ -841,12 +853,12 @@ class SettingsViewModel
                     migration.walkSpeed?.let { settingsRepository.setWalkSpeed(it) }
                     migration.runSpeed?.let { settingsRepository.setRunSpeed(it) }
                     migration.bikeSpeed?.let { settingsRepository.setBikeSpeed(it) }
-                    val speedsMsg = if (migration.walkSpeed != null) ", speeds updated" else ""
+                    val speedsMsg = if (migration.walkSpeed != null) "，速度已更新" else ""
                     Log.i(TAG, "YAMLA import complete: ${migration.favorites.size} favorites$speedsMsg")
-                    userFeedback.emit(UserFeedback("Imported ${migration.favorites.size} favorites from YAMLA$speedsMsg"))
+                    userFeedback.emit(UserFeedback("已从 YAMLA 导入 ${migration.favorites.size} 个收藏$speedsMsg"))
                 } catch (e: Exception) {
                     Log.e(TAG, "YAMLA import failed", e)
-                    userFeedback.emit(UserFeedback("Failed to import from YAMLA", isError = true))
+                    userFeedback.emit(UserFeedback("从 YAMLA 导入失败", isError = true))
                 }
             }
         }

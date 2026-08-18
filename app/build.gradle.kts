@@ -11,7 +11,28 @@ android {
         buildConfig = true
     }
     defaultConfig {
+        // 独立包名：与作者原版（com.locationjoystick.app）可同时安装
+        applicationId = "com.locationjoystick.app.cn"
         testInstrumentationRunner = "com.locationjoystick.app.HiltTestRunner"
+        ndk {
+            // 只保留真机架构，去掉 x86/x86_64 模拟器架构以显著减小体积
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
+        // 只保留中文字符串资源
+        resourceConfigurations += listOf("zh")
+    }
+    signingConfigs {
+        create("release") {
+            storeFile = rootProject.file("xiekun-location-release.keystore")
+            storePassword = "xiekun123"
+            keyAlias = "xiekun"
+            keyPassword = "xiekun123"
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
+        }
     }
 }
 

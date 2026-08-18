@@ -174,7 +174,7 @@ private fun TapToWalkOverlayContent(
         )
         // Hint label
         Text(
-            text = "Tap anywhere to walk there",
+            text = "点击任意位置走到那里",
             style = MaterialTheme.typography.bodyMedium,
             color = Color.White,
             textAlign = TextAlign.Center,
@@ -200,7 +200,7 @@ private fun TapToWalkOverlayContent(
         ) {
             Icon(
                 imageVector = LjIcons.Close,
-                contentDescription = "Cancel tap-to-walk",
+                contentDescription = "取消点按行走",
                 tint = Color.White,
             )
         }

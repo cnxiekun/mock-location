@@ -1184,6 +1184,7 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
 
     private val routesSortNewestFirstFlow = MutableStateFlow(true)
     private val favoritesSortNewestFirstFlow = MutableStateFlow(true)
+    private val amapWebKeyFlow = MutableStateFlow("")
 
     override fun getRoutesSortNewestFirst(): Flow<Boolean> = routesSortNewestFirstFlow
 
@@ -1195,6 +1196,12 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
 
     override suspend fun setFavoritesSortNewestFirst(newestFirst: Boolean) {
         favoritesSortNewestFirstFlow.value = newestFirst
+    }
+
+    override fun getAmapWebKey(): Flow<String> = amapWebKeyFlow
+
+    override suspend fun setAmapWebKey(key: String) {
+        amapWebKeyFlow.value = key
     }
 
     private val jitterSpeedIdleVariationPctFlow =

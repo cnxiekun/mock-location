@@ -179,7 +179,7 @@ fun RouteDetailScreen(
     }
 
     LjScaffold(
-        title = "Route Details",
+        title = "路线详情",
         isSpoofing = spoofToggle.isSpoofing,
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,
@@ -190,7 +190,7 @@ fun RouteDetailScreen(
                 TextButton(
                     onClick = { editedName = route!!.name },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
-                ) { Text("Discard") }
+                ) { Text("放弃") }
                 TextButton(
                     onClick = {
                         coroutineScope.launch {
@@ -202,7 +202,7 @@ fun RouteDetailScreen(
                             onNavigateBack()
                         }
                     },
-                ) { Text("Save") }
+                ) { Text("保存") }
             }
         },
     ) { paddingValues ->
@@ -222,14 +222,14 @@ fun RouteDetailScreen(
                             OutlinedTextField(
                                 value = editedName,
                                 onValueChange = { editedName = it },
-                                label = { Text("Route name") },
+                                label = { Text("路线名称") },
                                 isError = nameError,
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                             )
                             if (nameError) {
                                 Text(
-                                    "Name cannot be empty",
+                                    "名称不能为空",
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.labelSmall,
                                     modifier = Modifier.padding(top = 4.dp),
@@ -242,7 +242,7 @@ fun RouteDetailScreen(
                     item {
                         Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
                             Text(
-                                "Speed profile",
+                                "速度配置",
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
@@ -257,7 +257,7 @@ fun RouteDetailScreen(
                                         onClick = { viewModel.setSpeedProfile(profile?.id) },
                                         shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                                     ) {
-                                        Text(profile?.name ?: "None")
+                                        Text(profile?.name ?: "无")
                                     }
                                 }
                             }
@@ -275,7 +275,7 @@ fun RouteDetailScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    "Waypoint ${waypoint.orderIndex + 1}",
+                                    "途经点 ${waypoint.orderIndex + 1}",
                                     color = MaterialTheme.colorScheme.onSurface,
                                     style = MaterialTheme.typography.bodySmall,
                                 )
@@ -287,7 +287,7 @@ fun RouteDetailScreen(
                                 )
                             }
                             IconButton(onClick = { viewModel.removeWaypoint(waypoint.id) }) {
-                                Icon(LjIcons.Delete, contentDescription = "Remove waypoint")
+                                Icon(LjIcons.Delete, contentDescription = "删除途经点")
                             }
                         }
                     }

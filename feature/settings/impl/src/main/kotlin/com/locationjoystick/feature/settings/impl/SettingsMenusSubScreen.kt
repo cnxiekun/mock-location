@@ -97,7 +97,7 @@ internal fun SettingsMenusSubScreen(
     }
 
     LjScaffold(
-        title = "Menus",
+        title = "菜单",
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -142,10 +142,10 @@ private fun ThemeSection(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Appearance", style = MaterialTheme.typography.headlineSmall)
+    Text("外观", style = MaterialTheme.typography.headlineSmall)
     Spacer(Modifier.height(4.dp))
     Text(
-        "Switch to a light theme for better readability in bright/sunny conditions.",
+        "切换到浅色主题，在明亮/阳光充足的条件下更清晰易读。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -155,7 +155,7 @@ private fun ThemeSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            "Light mode",
+            "浅色模式",
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
         )
@@ -177,7 +177,7 @@ private fun TapToWalkSection(
     val enabled = uiState.floatingMapQuickWalk || uiState.tapToWalkOverlayEnabled
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Tap to Walk", style = MaterialTheme.typography.headlineSmall)
+        Text("点击行走", style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.width(8.dp))
         Box(
             modifier =
@@ -194,7 +194,7 @@ private fun TapToWalkSection(
     }
     Spacer(Modifier.height(4.dp))
     Text(
-        "Walk to a location by tapping it — no confirmation needed.",
+        "点击地图上的位置即可行走——无需确认。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -204,7 +204,7 @@ private fun TapToWalkSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            "Enable Tap to Walk",
+            "启用点击行走",
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
         )
@@ -223,7 +223,7 @@ private fun TapToWalkSection(
     if (enabled) {
         Spacer(Modifier.height(12.dp))
         Text(
-            "Map scale (%.2f m/px) — zoom the game fully out for best accuracy".format(uiState.tapToWalkScaleMpx),
+            "地图比例（%.2f 米/像素）——请将游戏完全缩小以获得最佳精度".format(uiState.tapToWalkScaleMpx),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -251,11 +251,11 @@ private fun TapToWalkSection(
     if (showWarning) {
         AlertDialog(
             onDismissRequest = { showWarning = false },
-            title = { Text("Enable Tap to Walk?") },
+            title = { Text("启用点击行走？") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("A screen overlay that intercepts taps may increase detection chance in some games. Use at your own risk.")
-                    Text("Accuracy depends on the scale setting — zoom out in the game for better results.")
+                    Text("拦截触摸的屏幕覆盖层可能会增加在某些游戏中被检测的风险。请自行承担使用风险。")
+                    Text("精度取决于比例设置——请在游戏中缩小以获得更好的效果。")
                 }
             },
             confirmButton = {
@@ -263,10 +263,10 @@ private fun TapToWalkSection(
                     showWarning = false
                     onAction(SettingsAction.SetFloatingMapQuickWalk(true))
                     onAction(SettingsAction.SetTapToWalkOverlayEnabled(true))
-                }) { Text("Enable anyway") }
+                }) { Text("仍然启用") }
             },
             dismissButton = {
-                TextButton(onClick = { showWarning = false }) { Text("Cancel") }
+                TextButton(onClick = { showWarning = false }) { Text("取消") }
             },
         )
     }
@@ -277,31 +277,31 @@ private fun PrivacySection(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Privacy", style = MaterialTheme.typography.headlineSmall)
+    Text("隐私", style = MaterialTheme.typography.headlineSmall)
     Spacer(Modifier.height(4.dp))
     LjCheckboxRow(
         checked = uiState.hideTeleportFeatures,
         onCheckedChange = { onAction(SettingsAction.SetHideTeleportFeatures(it)) },
-        title = "Hide teleport features",
+        title = "隐藏传送功能",
         description =
-            "Removes every teleport option across the app — map, favorites, " +
-                "routes, group sync, and the widget. Only walking and route replay remain available.",
+            "移除应用中所有传送选项——地图、收藏、" +
+                "路线、群组同步和小部件。仅保留行走和路线回放。",
     )
     Spacer(Modifier.height(8.dp))
     LjCheckboxRow(
         checked = uiState.hideWidgetOverlay,
         onCheckedChange = { onAction(SettingsAction.SetHideWidgetOverlay(it)) },
-        title = "Hide floating widget",
-        description = "Keeps the floating widget button from appearing while spoofing is active.",
+        title = "隐藏悬浮小部件",
+        description = "在模拟定位运行期间，不显示悬浮小部件按钮。",
     )
     Spacer(Modifier.height(8.dp))
     LjCheckboxRow(
         checked = uiState.showRouteJumpButtons,
         onCheckedChange = { onAction(SettingsAction.SetShowRouteJumpButtons(it)) },
-        title = "Show route jump buttons",
+        title = "显示路线跳转按钮",
         description =
-            "Adds Previous waypoint / Next waypoint buttons to route replay controls, " +
-                "for instantly teleporting between waypoints. Off by default.",
+            "在路线回放控件中添加“上一个航点 / 下一个航点”按钮，" +
+                "用于在航点之间即时传送。默认关闭。",
     )
 }
 
@@ -313,11 +313,11 @@ private fun CompassOrientationSection(
     val context = LocalContext.current
     var showCalibration by rememberSaveable { mutableStateOf(false) }
 
-    Text("Compass orientation", style = MaterialTheme.typography.headlineSmall)
+    Text("指南针方向", style = MaterialTheme.typography.headlineSmall)
     Spacer(Modifier.height(4.dp))
     Text(
-        "When enabled, the app detects the map's north direction before each walk to correct the target position. " +
-            "Requires an Accessibility Service. Note: some games detect accessibility services.",
+        "启用后，应用会在每次行走前检测地图的北方方向以校正目标位置。" +
+            "需要无障碍服务。注意：某些游戏会检测无障碍服务。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -328,9 +328,9 @@ private fun CompassOrientationSection(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text("Accessibility Service", style = MaterialTheme.typography.bodyLarge)
+            Text("无障碍服务", style = MaterialTheme.typography.bodyLarge)
             Text(
-                if (uiState.isCompassServiceGranted) "Enabled" else "Not enabled — tap to open Android Settings",
+                if (uiState.isCompassServiceGranted) "已启用" else "未启用——点击打开安卓设置",
                 style = MaterialTheme.typography.bodySmall,
                 color =
                     if (uiState.isCompassServiceGranted) {
@@ -348,7 +348,7 @@ private fun CompassOrientationSection(
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     },
                 )
-            }) { Text("Open Settings") }
+            }) { Text("打开设置") }
         }
     }
     if (uiState.isCompassServiceGranted) {
@@ -356,8 +356,8 @@ private fun CompassOrientationSection(
         LjCheckboxRow(
             checked = uiState.compassTrackingEnabled,
             onCheckedChange = { onAction(SettingsAction.SetCompassTrackingEnabled(it)) },
-            title = "Detect compass orientation",
-            description = "Reads the red north arrow before each walk to correct the target position.",
+            title = "检测指南针方向",
+            description = "在每次行走前读取红色指北针，以校正目标位置。",
         )
         if (uiState.compassTrackingEnabled) {
             Spacer(Modifier.height(8.dp))
@@ -367,7 +367,7 @@ private fun CompassOrientationSection(
             ) {
                 Icon(LjIcons.Settings, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Calibrate compass region")
+                Text("校准指南针区域")
             }
         }
     }
@@ -399,11 +399,11 @@ private fun CompassCalibrationDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Calibrate compass region") },
+        title = { Text("校准指南针区域") },
         text = {
             Column {
                 Text(
-                    "Drag the circle over where the compass appears on your game screen.",
+                    "将圆圈拖到游戏屏幕中指南针出现的位置。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -418,7 +418,7 @@ private fun CompassCalibrationDialog(
                     },
                 )
                 Spacer(Modifier.height(8.dp))
-                Text("Circle size", style = MaterialTheme.typography.bodySmall)
+                Text("圆圈大小", style = MaterialTheme.typography.bodySmall)
                 Slider(
                     value = currentRadius,
                     onValueChange = { currentRadius = it },
@@ -427,10 +427,10 @@ private fun CompassCalibrationDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(currentCx, currentCy, currentRadius) }) { Text("Done") }
+            TextButton(onClick = { onConfirm(currentCx, currentCy, currentRadius) }) { Text("完成") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text("取消") }
         },
     )
 }
@@ -496,39 +496,39 @@ private data class FeatureMeta(
 private fun featureMeta(feature: AppFeature): FeatureMeta =
     when (feature) {
         AppFeature.MAP_FLOATING -> {
-            FeatureMeta("Map shortcut", "Opens a compact map view without switching to the main app.", LjIcons.LocationOn)
+            FeatureMeta("地图快捷方式", "打开一个紧凑的地图视图，无需切换到主应用。", LjIcons.LocationOn)
         }
 
         AppFeature.JOYSTICK_TOGGLE -> {
-            FeatureMeta("Show/hide joystick", "Toggles the floating joystick overlay on or off.", LjIcons.Visibility)
+            FeatureMeta("显示/隐藏摇杆", "打开或关闭悬浮摇杆覆盖层。", LjIcons.Visibility)
         }
 
         AppFeature.JOYSTICK_LOCK -> {
             FeatureMeta(
-                "Lock joystick",
-                "Keeps the joystick moving in the last held direction after you release.",
+                "锁定摇杆",
+                "松开后摇杆会继续朝最后按住的方向移动。",
                 LjIcons.Lock,
             )
         }
 
         AppFeature.FAVORITES -> {
-            FeatureMeta("Favorites", "Teleport or walk to a saved location.", LjIcons.Favorite)
+            FeatureMeta("收藏", "传送到已保存的位置或走过去。", LjIcons.Favorite)
         }
 
         AppFeature.ROUTES -> {
-            FeatureMeta("Routes", "Lists saved routes and starts replay.", LjIcons.Route)
+            FeatureMeta("路线", "列出已保存的路线并开始回放。", LjIcons.Route)
         }
 
         AppFeature.ROAMING -> {
-            FeatureMeta("Roaming", "Configure and start random walking within a radius.", LjIcons.Explore)
+            FeatureMeta("漫游", "配置并开始在一定半径内随机行走。", LjIcons.Explore)
         }
 
         AppFeature.SEARCH -> {
-            FeatureMeta("Search", "Find and jump to a place by name.", LjIcons.Search)
+            FeatureMeta("搜索", "按名称查找并跳转到某个地点。", LjIcons.Search)
         }
 
         AppFeature.SPEED_CYCLE -> {
-            FeatureMeta("Speed cycle", "Cycles through all speed profiles with a single tap.", LjIcons.Speed)
+            FeatureMeta("速度循环", "一键在所有速度方案之间循环切换。", LjIcons.Speed)
         }
     }
 
@@ -541,19 +541,19 @@ private fun AppFeaturesSection(
     isRooted: Boolean,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("App Features", style = MaterialTheme.typography.headlineSmall)
+    Text("应用功能", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Choose which quick-access features appear in the floating widget and on the map screen, " +
-            "and drag to reorder them. Both surfaces share the same order by default.",
+        "选择哪些快捷功能出现在悬浮小部件和地图屏幕中，" +
+            "并可拖拽重新排序。两个界面默认共享相同顺序。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Spacer(modifier = Modifier.height(8.dp))
 
     Row(modifier = Modifier.fillMaxWidth().padding(start = 48.dp), horizontalArrangement = Arrangement.End) {
-        Text("Widget", style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(56.dp), textAlign = TextAlign.Center)
-        Text("Map", style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(56.dp), textAlign = TextAlign.Center)
+        Text("小部件", style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(56.dp), textAlign = TextAlign.Center)
+        Text("地图", style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(56.dp), textAlign = TextAlign.Center)
     }
 
     val order = uiState.featureOrder
@@ -624,10 +624,10 @@ private fun SpeedCycleSection(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Speed Cycle", style = MaterialTheme.typography.headlineSmall)
+    Text("速度循环", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Choose which speed profiles the widget's Speed Cycle button cycles through.",
+        "选择小部件“速度循环”按钮循环切换哪些速度方案。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -665,7 +665,7 @@ private fun FeatureRow(
     ) {
         Icon(
             imageVector = LjIcons.DragHandle,
-            contentDescription = "Drag to reorder ${meta.label}",
+            contentDescription = "拖拽以重新排序${meta.label}",
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = dragModifier.size(24.dp),
         )
@@ -692,7 +692,7 @@ private fun FeatureRow(
             Checkbox(
                 checked = feature in uiState.enabledWidgetFeatures,
                 enabled = rowEnabled,
-                modifier = Modifier.width(56.dp).semantics { contentDescription = "${meta.label} on widget" },
+                modifier = Modifier.width(56.dp).semantics { contentDescription = "${meta.label}（小部件）" },
                 onCheckedChange = { checked ->
                     val updated = uiState.enabledWidgetFeatures.toMutableSet()
                     if (checked) {
@@ -714,7 +714,7 @@ private fun FeatureRow(
         if (FeatureSurface.MAP in feature.surfaces) {
             Checkbox(
                 checked = feature in uiState.enabledMapFeatures,
-                modifier = Modifier.width(56.dp).semantics { contentDescription = "${meta.label} on map" },
+                modifier = Modifier.width(56.dp).semantics { contentDescription = "${meta.label}（地图）" },
                 onCheckedChange = { checked ->
                     val updated = uiState.enabledMapFeatures.toMutableSet()
                     if (checked) updated.add(feature) else updated.remove(feature)

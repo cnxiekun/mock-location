@@ -45,6 +45,7 @@ import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.map.geojson.buildPositionGeoJson
 import com.locationjoystick.core.map.geojson.buildSegmentsGeoJson
 import com.locationjoystick.core.map.geojson.buildWaypointsGeoJson
+import com.locationjoystick.core.common.util.Gcj02Converter
 import com.locationjoystick.core.map.maplibre.addCreatorLayers
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
@@ -71,6 +72,7 @@ fun RouteCreatorRoute(
     val favorites by viewModel.favorites.collectAsStateWithLifecycle()
     val livePosition by viewModel.livePosition.collectAsStateWithLifecycle()
     val recentSearches by viewModel.recentSearches.collectAsStateWithLifecycle()
+    val amapKey by viewModel.amapKey.collectAsStateWithLifecycle()
 
     RouteCreatorScreen(
         state = state,
@@ -78,6 +80,7 @@ fun RouteCreatorRoute(
         favorites = favorites,
         currentPosition = livePosition,
         recentSearches = recentSearches,
+        amapKey = amapKey,
         onAddWaypoint = viewModel::addWaypoint,
         onUndo = viewModel::undoLastWaypoint,
         onSaveRoute = { name ->
@@ -114,6 +117,7 @@ internal fun RouteCreatorScreen(
     favorites: List<FavoriteLocation> = emptyList(),
     currentPosition: LatLng? = null,
     recentSearches: List<RecentSearch> = emptyList(),
+    amapKey: String = "",
     onAddWaypoint: (LatLng) -> Unit,
     onUndo: () -> Unit,
     onSaveRoute: (String) -> Unit,
@@ -171,7 +175,7 @@ internal fun RouteCreatorScreen(
     }
 
     LjScaffold(
-        title = "Create Route",
+        title = "创建路线",
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -187,7 +191,7 @@ internal fun RouteCreatorScreen(
             ) {
                 LjMapIconButton(
                     icon = LjIcons.Search,
-                    contentDescription = "Search location",
+                    contentDescription = "搜索位置",
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     onClick = { showSearch = !showSearch },
@@ -195,29 +199,32 @@ internal fun RouteCreatorScreen(
                 if (currentPosition != null) {
                     LjMapIconButton(
                         icon = LjIcons.MyLocation,
-                        contentDescription = "Center on location",
+                        contentDescription = "居中到当前位置",
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                         onClick = {
-                            mapRef.value?.animateCamera(
-                                CameraUpdateFactory.newLatLng(
-                                    MapLatLng(currentPosition.latitude, currentPosition.longitude),
-                                ),
-                                500,
-                            )
+                            currentPosition?.let { pos ->
+                                val display = Gcj02Converter.wgs84ToGcj02(pos.latitude, pos.longitude)
+                                mapRef.value?.animateCamera(
+                                    CameraUpdateFactory.newLatLng(
+                                        MapLatLng(display.latitude, display.longitude),
+                                    ),
+                                    500,
+                                )
+                            }
                         },
                     )
                 }
                 LjMapIconButton(
                     icon = LjIcons.Favorite,
-                    contentDescription = "Pick from favorites",
+                    contentDescription = "从收藏夹选择",
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     onClick = { showFavoritesSheet = true },
                 )
                 LjMapIconButton(
                     icon = LjIcons.Undo,
-                    contentDescription = "Undo last waypoint",
+                    contentDescription = "撤销最后一个途经点",
                     containerColor =
                         if (state.waypoints.isNotEmpty()) {
                             MaterialTheme.colorScheme.secondaryContainer
@@ -235,7 +242,7 @@ internal fun RouteCreatorScreen(
                 if (state.waypoints.size >= 2) {
                     LjMapIconButton(
                         icon = LjIcons.Save,
-                        contentDescription = "Save route",
+                        contentDescription = "保存路线",
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         onClick = { showSaveDialog = true },
@@ -258,29 +265,37 @@ internal fun RouteCreatorScreen(
                             mapRef.value = map
                             map.uiSettings.isAttributionEnabled = false
                             map.uiSettings.isLogoEnabled = false
+                            val initialDisplay =
+                                initialPosition?.let {
+                                    Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude)
+                                } ?: Gcj02Converter.wgs84ToGcj02(
+                                    AppConstants.MapConstants.DEFAULT_LAT,
+                                    AppConstants.MapConstants.DEFAULT_LON,
+                                )
                             map.cameraPosition =
                                 CameraPosition
                                     .Builder()
-                                    .target(
-                                        if (initialPosition != null) {
-                                            MapLatLng(initialPosition.latitude, initialPosition.longitude)
-                                        } else {
-                                            MapLatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
-                                        },
-                                    ).zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
+                                    .target(MapLatLng(initialDisplay.latitude, initialDisplay.longitude))
+                                    .zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
                                     .build()
 
                             map.setStyle(Style.Builder().fromUri(AppConstants.MapConstants.EMPTY_MAP_STYLE_URI)) { style ->
                                 val layers =
                                     style.addCreatorLayers(
-                                        currentPosGeoJson = initialPosition?.let { buildPositionGeoJson(it) },
+                                        currentPosGeoJson =
+                                            initialPosition?.let {
+                                                val display = Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude)
+                                                buildPositionGeoJson(display)
+                                            },
                                     )
                                 segmentsSource.value = layers.segmentsSource
                                 waypointsSource.value = layers.waypointsSource
                             }
 
                             map.addOnMapClickListener { latLng ->
-                                onAddWaypoint(LatLng(latLng.latitude, latLng.longitude))
+                                // 底图为 GCJ-02，转回 WGS-84 存储
+                                val wgs = Gcj02Converter.gcj02ToWgs84(latLng.latitude, latLng.longitude)
+                                onAddWaypoint(LatLng(wgs.latitude, wgs.longitude))
                                 true
                             }
                         }
@@ -290,8 +305,10 @@ internal fun RouteCreatorScreen(
                     val segSrc = segmentsSource.value ?: return@AndroidView
                     val wpSrc = waypointsSource.value ?: return@AndroidView
 
-                    segSrc.setGeoJson(buildSegmentsGeoJson(state.segments))
-                    wpSrc.setGeoJson(buildWaypointsGeoJson(state.waypoints))
+                    val displaySegments = state.segments.map { seg -> seg.map { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) } }
+                    val displayWaypoints = state.waypoints.map { Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude) }
+                    segSrc.setGeoJson(buildSegmentsGeoJson(displaySegments))
+                    wpSrc.setGeoJson(buildWaypointsGeoJson(displayWaypoints))
                 },
                 modifier = Modifier.fillMaxSize(),
             )
@@ -306,14 +323,19 @@ internal fun RouteCreatorScreen(
                     onLocationSelected = { lat, lon, _ ->
                         onAddWaypoint(LatLng(lat, lon))
                         showSearch = false
+                        val display = Gcj02Converter.wgs84ToGcj02(lat, lon)
                         val map = mapRef.value ?: return@NominatimSearchBar
                         map.animateCamera(
-                            CameraUpdateFactory.newLatLngZoom(MapLatLng(lat, lon), AppConstants.MapConstants.DEFAULT_ZOOM),
+                            CameraUpdateFactory.newLatLngZoom(
+                                MapLatLng(display.latitude, display.longitude),
+                                AppConstants.MapConstants.DEFAULT_ZOOM,
+                            ),
                             500,
                         )
                     },
                     recentSearches = recentSearches,
                     onSearchCommitted = onSearchCommitted,
+                    amapKey = amapKey,
                     modifier =
                         Modifier
                             .align(Alignment.TopCenter)
@@ -342,8 +364,9 @@ internal fun RouteCreatorScreen(
             favorites = favorites,
             onSelect = { position ->
                 showFavoritesSheet = false
+                val display = Gcj02Converter.wgs84ToGcj02(position.latitude, position.longitude)
                 mapRef.value?.animateCamera(
-                    CameraUpdateFactory.newLatLng(MapLatLng(position.latitude, position.longitude)),
+                    CameraUpdateFactory.newLatLng(MapLatLng(display.latitude, display.longitude)),
                     500,
                 )
             },
@@ -361,7 +384,7 @@ private fun CreatorFavoritesSheet(
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         FavoritesList(
-            title = "Jump to Favorite",
+            title = "跳转到收藏",
             favorites = favorites,
             onSelect = { onSelect(it.position) },
         )
@@ -377,12 +400,12 @@ private fun SaveRouteDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Save Route") },
+        title = { Text("保存路线") },
         text = {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Route name") },
+                label = { Text("路线名称") },
                 modifier = Modifier,
                 singleLine = true,
             )
@@ -395,12 +418,12 @@ private fun SaveRouteDialog(
                     }
                 },
             ) {
-                Text("Save")
+                Text("保存")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("取消")
             }
         },
     )

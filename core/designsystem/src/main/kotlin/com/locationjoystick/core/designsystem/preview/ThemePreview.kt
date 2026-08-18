@@ -39,7 +39,7 @@ private fun ThemePreview() {
                     color = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = "Design System Preview",
+                    text = "设计系统预览",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -47,7 +47,7 @@ private fun ThemePreview() {
                 LjCard(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Mock Location Active",
+                            text = "位置模拟已开启",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.secondary,
                         )
@@ -66,19 +66,19 @@ private fun ThemePreview() {
                         onClick = {},
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text("Start")
+                        Text("开始")
                     }
                     LjOutlinedButton(
                         onClick = {},
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text("Stop")
+                        Text("停止")
                     }
                 }
                 EmptyState(
-                    message = "No routes yet",
+                    message = "暂无路线",
                     icon = LjIcons.Route,
-                    description = "Tap + to create your first route",
+                    description = "点击 + 创建你的第一条路线",
                 )
             }
         }

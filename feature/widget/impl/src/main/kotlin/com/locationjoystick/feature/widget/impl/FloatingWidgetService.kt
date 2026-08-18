@@ -224,7 +224,7 @@ class FloatingWidgetService :
         lifecycleScope.launch {
             groupRepository.teleportUnavailableEvent.collect {
                 Toast
-                    .makeText(this@FloatingWidgetService, "Leader position not yet known — try again in a moment", Toast.LENGTH_SHORT)
+                    .makeText(this@FloatingWidgetService, "队长位置尚不可知——请稍后重试", Toast.LENGTH_SHORT)
                     .show()
             }
         }
@@ -492,7 +492,7 @@ class FloatingWidgetService :
                 val state = CooldownEngine.computeState(teleportTime, currentPos, leaderPos)
                 if (state is CooldownState.Cooling) {
                     Toast
-                        .makeText(this@FloatingWidgetService, "Suggested wait: ${state.toAdvisoryLabel()}", Toast.LENGTH_SHORT)
+                        .makeText(this@FloatingWidgetService, "建议等待：${state.toAdvisoryLabel()}", Toast.LENGTH_SHORT)
                         .show()
                 }
             }

@@ -113,9 +113,9 @@ fun QrScannerScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text("Camera permission required to scan QR codes")
+            Text("扫描二维码需要相机权限")
             Button(onClick = onNavigateBack) {
-                Text("Back to Settings")
+                Text("返回设置")
             }
         }
         return
@@ -183,9 +183,9 @@ fun QrScannerScreen(
         ) {
             val label =
                 if (isFetching) {
-                    "Connecting to sender — make sure both devices are on the same Wi-Fi"
+                    "正在连接发送方——请确保两台设备处于同一 Wi-Fi"
                 } else {
-                    "Point camera at QR code"
+                    "将相机对准二维码"
                 }
             Text(
                 label,
@@ -202,7 +202,7 @@ fun QrScannerScreen(
             onClick = onNavigateBack,
             modifier = Modifier.align(Alignment.TopStart),
         ) {
-            Icon(LjIcons.ArrowBack, contentDescription = "Back")
+            Icon(LjIcons.ArrowBack, contentDescription = "返回")
         }
     }
 }

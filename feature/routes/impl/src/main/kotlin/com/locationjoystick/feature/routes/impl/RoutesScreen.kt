@@ -138,7 +138,7 @@ internal fun RoutesScreen(
     var showAddMenu by remember { mutableStateOf(false) }
 
     LjScaffold(
-        title = "Routes",
+        title = "路线",
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -147,17 +147,17 @@ internal fun RoutesScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         actions = {
             IconButton(onClick = onToggleSort) {
-                Icon(LjIcons.SwapVert, contentDescription = "Sort")
+                Icon(LjIcons.SwapVert, contentDescription = "排序")
             }
             IconButton(onClick = { showAddMenu = !showAddMenu }) {
-                Icon(LjIcons.Add, contentDescription = "Add route")
+                Icon(LjIcons.Add, contentDescription = "添加路线")
             }
             DropdownMenu(
                 expanded = showAddMenu,
                 onDismissRequest = { showAddMenu = false },
             ) {
                 DropdownMenuItem(
-                    text = { Text("Draw on map") },
+                    text = { Text("在地图上绘制") },
                     onClick = {
                         onNavigateToCreate(RouteType.STRAIGHT)
                         showAddMenu = false
@@ -165,7 +165,7 @@ internal fun RoutesScreen(
                     leadingIcon = { Icon(LjIcons.Map, null) },
                 )
                 DropdownMenuItem(
-                    text = { Text("Draw on map (follow roads)") },
+                    text = { Text("在地图上绘制（沿道路）") },
                     onClick = {
                         onNavigateToCreate(RouteType.GUIDED)
                         showAddMenu = false
@@ -173,7 +173,7 @@ internal fun RoutesScreen(
                     leadingIcon = { Icon(LjIcons.Map, null) },
                 )
                 DropdownMenuItem(
-                    text = { Text("Import GPX file") },
+                    text = { Text("导入 GPX 文件") },
                     onClick = {
                         onImportGpx()
                         showAddMenu = false
@@ -197,7 +197,7 @@ internal fun RoutesScreen(
                 uiState.routes.isEmpty() -> {
                     EmptyState(
                         icon = LjIcons.PlayArrow,
-                        message = "No routes yet",
+                        message = "还没有路线",
                         modifier = Modifier.align(Alignment.Center),
                     )
                 }
@@ -300,45 +300,45 @@ private fun RouteCard(
                 val label = if (distanceText.isNotEmpty()) "${route.name} — $distanceText" else route.name
                 Text(label, style = MaterialTheme.typography.titleMedium)
                 Text(
-                    "${route.waypoints.size} waypoints",
+                    "${route.waypoints.size} 个途经点",
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
             when {
                 isPlaying -> {
                     IconButton(onClick = onPauseReplay) {
-                        Icon(LjIcons.Pause, contentDescription = "Pause")
+                        Icon(LjIcons.Pause, contentDescription = "暂停")
                     }
                     IconButton(onClick = onStopReplay) {
-                        Icon(LjIcons.Stop, contentDescription = "Stop")
+                        Icon(LjIcons.Stop, contentDescription = "停止")
                     }
                 }
 
                 isPaused -> {
                     IconButton(onClick = onResumeReplay) {
-                        Icon(LjIcons.PlayArrow, contentDescription = "Resume")
+                        Icon(LjIcons.PlayArrow, contentDescription = "继续")
                     }
                     IconButton(onClick = onStopReplay) {
-                        Icon(LjIcons.Stop, contentDescription = "Stop")
+                        Icon(LjIcons.Stop, contentDescription = "停止")
                     }
                 }
 
                 else -> {
                     IconButton(onClick = { showStartDialog = true }) {
-                        Icon(LjIcons.PlayArrow, contentDescription = "Start route")
+                        Icon(LjIcons.PlayArrow, contentDescription = "开始路线")
                     }
                 }
             }
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
-                    Icon(LjIcons.MoreVert, contentDescription = "Menu")
+                    Icon(LjIcons.MoreVert, contentDescription = "菜单")
                 }
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Edit") },
+                        text = { Text("编辑") },
                         onClick = {
                             menuExpanded = false
                             onNavigateToEdit(route.id)
@@ -346,7 +346,7 @@ private fun RouteCard(
                         leadingIcon = { Icon(LjIcons.Edit, contentDescription = null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("Export") },
+                        text = { Text("导出") },
                         onClick = {
                             menuExpanded = false
                             onExport(route)
@@ -354,7 +354,7 @@ private fun RouteCard(
                         leadingIcon = { Icon(LjIcons.FileDownload, contentDescription = null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("Delete") },
+                        text = { Text("删除") },
                         onClick = {
                             menuExpanded = false
                             onDeleteRoute(route)
@@ -390,18 +390,18 @@ private fun StartRouteDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Start route") },
+        title = { Text("开始路线") },
         text = {
             Column {
                 CheckboxRow(
-                    label = "Loop (restart when done)",
+                    label = "循环（完成后重新开始）",
                     checked = loop,
                     enabled = !returnToLocation,
                     onCheckedChange = { loop = it },
                 )
-                CheckboxRow(label = "Reverse (walk backwards)", checked = reverse, onCheckedChange = { reverse = it })
+                CheckboxRow(label = "反向（倒序行走）", checked = reverse, onCheckedChange = { reverse = it })
                 CheckboxRow(
-                    label = "Return to location",
+                    label = "返回起点",
                     checked = returnToLocation,
                     enabled = !loop,
                     onCheckedChange = { returnToLocation = it },
@@ -412,19 +412,19 @@ private fun StartRouteDialog(
                         onClick = { onStart(loop, reverse, returnToLocation && !loop, true) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Teleport and start")
+                        Text("传送并开始")
                     }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = { onStart(loop, reverse, returnToLocation && !loop, false) }) {
-                Text("Walk and start")
+                Text("行走并开始")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("取消")
             }
         },
     )
@@ -461,16 +461,16 @@ private fun DeleteConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Delete \"$name\"?") },
-        text = { Text("This action cannot be undone.") },
+        title = { Text("删除\"$name\"？") },
+        text = { Text("此操作无法撤销。") },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Delete")
+                Text("删除")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("取消")
             }
         },
     )

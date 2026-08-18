@@ -76,7 +76,7 @@ internal class ReplayOrchestrator(
                             walkToPosition(returnPosition, speedMs)
                         }
                         locationRepository.setMockMode(MockMode.TELEPORT)
-                        locationRepository.emitCompletion("Route complete")
+                        locationRepository.emitCompletion("路线完成")
                     },
                 )
             }
@@ -128,7 +128,7 @@ internal class ReplayOrchestrator(
                 // Forcing IDLE here previously killed a group-sync leader's broadcast on completion.
                 locationRepository.setRouteWaypoints(null)
                 locationRepository.setMockMode(MockMode.TELEPORT)
-                locationRepository.emitCompletion("Route complete")
+                locationRepository.emitCompletion("路线完成")
             },
         )
         Log.i(TAG, "Replay resumed at ${speedMs}m/s")
@@ -143,7 +143,7 @@ internal class ReplayOrchestrator(
         val onReplayComplete: () -> Unit = {
             locationRepository.setRouteWaypoints(null)
             locationRepository.setMockMode(MockMode.TELEPORT)
-            locationRepository.emitCompletion("Route complete")
+            locationRepository.emitCompletion("路线完成")
         }
         val target =
             if (forward) {
@@ -223,7 +223,7 @@ internal class ReplayOrchestrator(
         onComplete: suspend () -> Unit = {
             locationRepository.setRouteWaypoints(null)
             locationRepository.setMockMode(MockMode.TELEPORT)
-            locationRepository.emitCompletion("Route complete")
+            locationRepository.emitCompletion("路线完成")
         },
     ) {
         if (locationRepository.currentMode.value == MockMode.ROAMING) roamingRepository.stopRoaming()

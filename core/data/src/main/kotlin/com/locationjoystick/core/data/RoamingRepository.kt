@@ -65,7 +65,7 @@ class RoamingRepository
                     _isRoamingPaused.value = false
                     locationRepository.setMockMode(MockMode.TELEPORT)
                     locationRepository.setRouteWaypoints(null)
-                    locationRepository.emitCompletion("Roaming complete")
+                    locationRepository.emitCompletion("漫游完成")
                     Log.d(TAG, "Roaming completed or cancelled")
                 },
             )

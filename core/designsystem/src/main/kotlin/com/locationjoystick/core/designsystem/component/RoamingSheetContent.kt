@@ -35,7 +35,7 @@ import com.locationjoystick.core.model.SpeedUnit
 import kotlin.math.roundToInt
 
 private val SPEED_PROFILES = listOf("walk", "run", "bike")
-private val SPEED_PROFILE_LABELS = mapOf("walk" to "Walk", "run" to "Run", "bike" to "Bike")
+private val SPEED_PROFILE_LABELS = mapOf("walk" to "步行", "run" to "跑步", "bike" to "骑行")
 
 private const val RADIUS_MIN_METERS = 1_000.0
 private const val RADIUS_MAX_METERS = 100_000.0
@@ -86,7 +86,7 @@ fun RoamingSheetContent(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 24.dp),
     ) {
-        Text("Roaming", style = MaterialTheme.typography.headlineSmall, color = LjText)
+        Text("漫游", style = MaterialTheme.typography.headlineSmall, color = LjText)
 
         Spacer(Modifier.height(8.dp))
 
@@ -99,7 +99,7 @@ fun RoamingSheetContent(
                     .fillMaxWidth()
                     .then(if (!hasPreview) Modifier.alpha(0.4f) else Modifier),
         ) {
-            Text("View on map")
+            Text("在地图上查看")
         }
 
         Spacer(Modifier.height(12.dp))
@@ -123,7 +123,7 @@ fun RoamingSheetContent(
                         )
                     }
                 },
-                label = { Text(if (isMph) "Radius (mi)" else "Radius (m)") },
+                label = { Text(if (isMph) "半径（英里）" else "半径（米）") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.weight(1f).padding(end = 4.dp),
@@ -145,7 +145,7 @@ fun RoamingSheetContent(
                         )
                     }
                 },
-                label = { Text(if (isMph) "Distance (mi)" else "Distance (m)") },
+                label = { Text(if (isMph) "距离（英里）" else "距离（米）") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.weight(1f).padding(start = 4.dp),
@@ -155,7 +155,7 @@ fun RoamingSheetContent(
         Spacer(Modifier.height(12.dp))
 
         // Speed profile selector
-        Text("Speed profile", style = MaterialTheme.typography.labelLarge, color = LjText)
+        Text("速度配置", style = MaterialTheme.typography.labelLarge, color = LjText)
         Spacer(Modifier.height(4.dp))
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
             SPEED_PROFILES.forEachIndexed { index, id ->
@@ -181,7 +181,7 @@ fun RoamingSheetContent(
                     checked = draft.followRoads,
                     onCheckedChange = { onDraftChange(draft.copy(followRoads = it)) },
                 )
-                Text("Follow roads", style = MaterialTheme.typography.bodyMedium, color = LjText)
+                Text("沿道路行进", style = MaterialTheme.typography.bodyMedium, color = LjText)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -191,7 +191,7 @@ fun RoamingSheetContent(
                     checked = draft.returnToInitialLocation,
                     onCheckedChange = { onDraftChange(draft.copy(returnToInitialLocation = it)) },
                 )
-                Text("Return to start", style = MaterialTheme.typography.bodyMedium, color = LjText)
+                Text("返回起点", style = MaterialTheme.typography.bodyMedium, color = LjText)
             }
         }
 
@@ -210,7 +210,7 @@ fun RoamingSheetContent(
                         strokeWidth = 2.dp,
                     )
                 } else {
-                    Text("Generate")
+                    Text("生成")
                 }
             }
             LjButton(
@@ -218,13 +218,13 @@ fun RoamingSheetContent(
                 enabled = hasCurrentPosition && isSpoofingActive && !isPreviewLoading,
                 modifier = Modifier.weight(1f).padding(start = 4.dp),
             ) {
-                Text("Start")
+                Text("开始")
             }
         }
 
         if (!hasCurrentPosition || !isSpoofingActive) {
             Text(
-                "Start location spoofing first to enable roaming",
+                "请先开始位置模拟以启用漫游",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp),

@@ -139,7 +139,7 @@ internal fun FavoritesScreen(
     var searchQuery by remember { mutableStateOf("") }
 
     LjScaffold(
-        title = "Favorites",
+        title = "收藏",
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -148,17 +148,17 @@ internal fun FavoritesScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         actions = {
             IconButton(onClick = onToggleSort) {
-                Icon(LjIcons.SwapVert, contentDescription = "Sort")
+                Icon(LjIcons.SwapVert, contentDescription = "排序")
             }
             IconButton(onClick = { showAddMenu = !showAddMenu }) {
-                Icon(LjIcons.Add, contentDescription = "Add favorite")
+                Icon(LjIcons.Add, contentDescription = "添加收藏")
             }
             DropdownMenu(
                 expanded = showAddMenu,
                 onDismissRequest = { showAddMenu = false },
             ) {
                 DropdownMenuItem(
-                    text = { Text("from map") },
+                    text = { Text("从地图添加") },
                     onClick = {
                         onNavigateToMapPicker()
                         showAddMenu = false
@@ -166,7 +166,7 @@ internal fun FavoritesScreen(
                     leadingIcon = { Icon(LjIcons.Map, null) },
                 )
                 DropdownMenuItem(
-                    text = { Text("from coordinates") },
+                    text = { Text("从坐标添加") },
                     onClick = {
                         prefillLat = ""
                         prefillLon = ""
@@ -176,7 +176,7 @@ internal fun FavoritesScreen(
                     leadingIcon = { Icon(LjIcons.Add, null) },
                 )
                 DropdownMenuItem(
-                    text = { Text("from current location") },
+                    text = { Text("从当前位置添加") },
                     onClick = {
                         val pos = getCurrentPosition()
                         prefillLat = pos?.latitude?.toString() ?: ""
@@ -199,7 +199,7 @@ internal fun FavoritesScreen(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    label = { Text("Search favorites") },
+                    label = { Text("搜索收藏") },
                     leadingIcon = { Icon(LjIcons.Search, contentDescription = null) },
                     singleLine = true,
                     modifier =
@@ -223,7 +223,7 @@ internal fun FavoritesScreen(
                     uiState.favorites.isEmpty() -> {
                         EmptyState(
                             icon = LjIcons.LocationOn,
-                            message = "No saved locations yet",
+                            message = "还没有保存的地点",
                             modifier = Modifier.align(Alignment.Center),
                         )
                     }
@@ -231,7 +231,7 @@ internal fun FavoritesScreen(
                     filteredFavorites.isEmpty() -> {
                         EmptyState(
                             icon = LjIcons.Search,
-                            message = "No favorites match your search",
+                            message = "没有匹配搜索的收藏",
                             modifier = Modifier.align(Alignment.Center),
                         )
                     }
@@ -355,14 +355,14 @@ private fun FavoriteCard(
         }
         Box {
             IconButton(onClick = { menuExpanded = true }) {
-                Icon(LjIcons.MoreVert, contentDescription = "More options")
+                Icon(LjIcons.MoreVert, contentDescription = "更多选项")
             }
             DropdownMenu(
                 expanded = menuExpanded,
                 onDismissRequest = { menuExpanded = false },
             ) {
                 DropdownMenuItem(
-                    text = { Text("Edit") },
+                    text = { Text("编辑") },
                     onClick = {
                         onEdit(favorite)
                         menuExpanded = false
@@ -370,7 +370,7 @@ private fun FavoriteCard(
                     leadingIcon = { Icon(LjIcons.Edit, null) },
                 )
                 DropdownMenuItem(
-                    text = { Text("Share") },
+                    text = { Text("分享") },
                     onClick = {
                         onShare(favorite)
                         menuExpanded = false
@@ -378,7 +378,7 @@ private fun FavoriteCard(
                     leadingIcon = { Icon(LjIcons.Share, null) },
                 )
                 DropdownMenuItem(
-                    text = { Text("Delete") },
+                    text = { Text("删除") },
                     onClick = {
                         onDelete(favorite)
                         menuExpanded = false
@@ -409,7 +409,7 @@ private fun AddFavoriteSheet(
                 .imePadding(),
     ) {
         Text(
-            "Add Favorite Location",
+            "添加收藏地点",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -417,7 +417,7 @@ private fun AddFavoriteSheet(
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Name") },
+            label = { Text("名称") },
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -434,7 +434,7 @@ private fun AddFavoriteSheet(
             OutlinedTextField(
                 value = lat,
                 onValueChange = { lat = it },
-                label = { Text("Latitude") },
+                label = { Text("纬度") },
                 modifier = Modifier.weight(1f),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -442,7 +442,7 @@ private fun AddFavoriteSheet(
             OutlinedTextField(
                 value = lon,
                 onValueChange = { lon = it },
-                label = { Text("Longitude") },
+                label = { Text("经度") },
                 modifier = Modifier.weight(1f),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -457,7 +457,7 @@ private fun AddFavoriteSheet(
             horizontalArrangement = Arrangement.End,
         ) {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("取消")
             }
             TextButton(
                 onClick = {
@@ -468,7 +468,7 @@ private fun AddFavoriteSheet(
                     }
                 },
             ) {
-                Text("Save")
+                Text("保存")
             }
         }
     }
@@ -486,13 +486,13 @@ private fun EditFavoriteDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Edit Favorite") },
+        title = { Text("编辑收藏") },
         text = {
             Column {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Name") },
+                    label = { Text("名称") },
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -501,7 +501,7 @@ private fun EditFavoriteDialog(
                 OutlinedTextField(
                     value = lat,
                     onValueChange = { lat = it },
-                    label = { Text("Latitude") },
+                    label = { Text("纬度") },
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -510,7 +510,7 @@ private fun EditFavoriteDialog(
                 OutlinedTextField(
                     value = lon,
                     onValueChange = { lon = it },
-                    label = { Text("Longitude") },
+                    label = { Text("经度") },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -525,12 +525,12 @@ private fun EditFavoriteDialog(
                     }
                 },
             ) {
-                Text("Save")
+                Text("保存")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("取消")
             }
         },
     )
@@ -544,16 +544,16 @@ private fun DeleteConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Delete \"$name\"?") },
-        text = { Text("This action cannot be undone.") },
+        title = { Text("删除“$name”？") },
+        text = { Text("此操作无法撤销。") },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Delete")
+                Text("删除")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("取消")
             }
         },
     )

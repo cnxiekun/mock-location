@@ -177,7 +177,7 @@ internal fun WidgetPanel(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_app_launcher),
-                    contentDescription = if (isPanelExpanded) "Collapse widget" else "Expand widget",
+                    contentDescription = if (isPanelExpanded) "收起悬浮球" else "展开悬浮球",
                     modifier = Modifier.fillMaxSize().clip(CircleShape),
                 )
             }
@@ -206,7 +206,7 @@ internal fun WidgetPanel(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         WidgetIconButton(
                             icon = LjIcons.Route,
-                            contentDescription = "Routes picker",
+                            contentDescription = "路线选择器",
                             tint = routeIconTint,
                             onClick = onRouteClicked,
                         )
@@ -222,27 +222,27 @@ internal fun WidgetPanel(
                                     val pauseResumeTint = if (isActivityPaused) LjSuccess else LjInactive
                                     WidgetIconButton(
                                         icon = pauseResumeIcon,
-                                        contentDescription = if (isActivityPaused) "Resume" else "Pause",
+                                        contentDescription = if (isActivityPaused) "继续" else "暂停",
                                         tint = pauseResumeTint,
                                         onClick = onRoutePauseResume,
                                     )
                                 }
                                 WidgetIconButton(
                                     icon = LjIcons.Stop,
-                                    contentDescription = "Stop",
+                                    contentDescription = "停止",
                                     tint = MaterialTheme.colorScheme.error,
                                     onClick = onRouteStop,
                                 )
                                 if (isRouteReplay && !hideTeleportFeatures && showRouteJumpButtons) {
                                     WidgetIconButton(
                                         icon = LjIcons.SkipPrevious,
-                                        contentDescription = "Previous waypoint",
+                                        contentDescription = "上一个途经点",
                                         tint = LjSuccess,
                                         onClick = onJumpToPreviousWaypoint,
                                     )
                                     WidgetIconButton(
                                         icon = LjIcons.SkipNext,
-                                        contentDescription = "Next waypoint",
+                                        contentDescription = "下一个途经点",
                                         tint = LjSuccess,
                                         onClick = onJumpToNextWaypoint,
                                     )
@@ -271,7 +271,7 @@ internal fun WidgetPanel(
                 val crosshairTint = if (isTapToWalkActive) MaterialTheme.colorScheme.primary else LjInactive
                 WidgetIconButton(
                     icon = LjIcons.MyLocation,
-                    contentDescription = if (isTapToWalkActive) "Cancel tap-to-walk" else "Tap to walk",
+                    contentDescription = if (isTapToWalkActive) "取消点按行走" else "点按行走",
                     tint = crosshairTint,
                     onClick = onTapToWalkClicked,
                 )
@@ -280,7 +280,7 @@ internal fun WidgetPanel(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     WidgetIconButton(
                         icon = LjIcons.Group,
-                        contentDescription = "Group sync",
+                        contentDescription = "群组同步",
                         tint = MaterialTheme.colorScheme.primary,
                         onClick = onGroupSyncClicked,
                     )
@@ -291,7 +291,7 @@ internal fun WidgetPanel(
                     ) {
                         WidgetIconButton(
                             icon = LjIcons.MyLocation,
-                            contentDescription = "Teleport to leader now",
+                            contentDescription = "立即传送到队长位置",
                             tint = LjSuccess,
                             onClick = onTeleportToLeaderClicked,
                         )
@@ -338,7 +338,7 @@ private fun FloatingPickerShell(
                 ) {
                     if (hasBack) {
                         IconButton(onClick = onBack) {
-                            Icon(LjIcons.ArrowBack, contentDescription = "Back", tint = LjText)
+                            Icon(LjIcons.ArrowBack, contentDescription = "返回", tint = LjText)
                         }
                     }
                     Text(
@@ -349,7 +349,7 @@ private fun FloatingPickerShell(
                     )
                     if (!hasBack) {
                         IconButton(onClick = onDismiss) {
-                            Icon(LjIcons.Close, contentDescription = "Close", tint = LjText)
+                            Icon(LjIcons.Close, contentDescription = "关闭", tint = LjText)
                         }
                     }
                 }
@@ -377,7 +377,7 @@ internal fun FavoritesFloatingView(
     var selectedFavorite by remember { mutableStateOf<FavoriteLocation?>(null) }
 
     FloatingPickerShell(
-        title = selectedFavorite?.name ?: "Favorites",
+        title = selectedFavorite?.name ?: "收藏夹",
         onDismiss = onDismiss,
         hasBack = selectedFavorite != null,
         onBack = { selectedFavorite = null },
@@ -392,7 +392,7 @@ internal fun FavoritesFloatingView(
                         onDismiss()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Teleport") }
+                ) { Text("传送") }
                 Spacer(Modifier.height(8.dp))
             }
             OutlinedButton(
@@ -402,7 +402,7 @@ internal fun FavoritesFloatingView(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Walk", color = LjText) }
+            ) { Text("行走", color = LjText) }
             Spacer(Modifier.height(8.dp))
             OutlinedButton(
                 onClick = {
@@ -411,12 +411,12 @@ internal fun FavoritesFloatingView(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Via roads", color = LjText) }
+            ) { Text("沿道路", color = LjText) }
         } else {
             Box(modifier = Modifier.weight(1f)) {
                 if (favorites.isEmpty()) {
                     Text(
-                        text = "No favorites saved",
+                        text = "未保存任何收藏",
                         style = MaterialTheme.typography.bodyMedium,
                         color = LjText.copy(alpha = 0.6f),
                     )
@@ -477,7 +477,7 @@ internal fun FavoritesFloatingView(
                     OutlinedTextField(
                         value = newFavName,
                         onValueChange = { newFavName = it },
-                        label = { Text("Name", color = LjText) },
+                        label = { Text("名称", color = LjText) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         keyboardActions =
@@ -501,7 +501,7 @@ internal fun FavoritesFloatingView(
                             showAddForm = false
                             newFavName = ""
                         }) {
-                            Text("Cancel", color = LjText)
+                            Text("取消", color = LjText)
                         }
                         Spacer(Modifier.width(8.dp))
                         Button(
@@ -513,7 +513,7 @@ internal fun FavoritesFloatingView(
                                 }
                             },
                         ) {
-                            Text("Save")
+                            Text("保存")
                         }
                     }
                 } else {
@@ -523,7 +523,7 @@ internal fun FavoritesFloatingView(
                     ) {
                         Icon(LjIcons.Add, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Add from current location")
+                        Text("从当前位置添加")
                     }
                 }
             }
@@ -541,7 +541,7 @@ internal fun RoutesFloatingView(
     var selectedRouteId by remember { mutableStateOf<String?>(null) }
 
     FloatingPickerShell(
-        title = if (selectedRouteId != null) routes.find { it.id == selectedRouteId }?.name ?: "Routes" else "Routes",
+        title = if (selectedRouteId != null) routes.find { it.id == selectedRouteId }?.name ?: "路线" else "路线",
         onDismiss = onDismiss,
         hasBack = selectedRouteId != null,
         onBack = { selectedRouteId = null },
@@ -552,9 +552,9 @@ internal fun RoutesFloatingView(
             var reverse by remember(routeId) { mutableStateOf(false) }
             var returnToLocation by remember(routeId) { mutableStateOf(false) }
 
-            LjCheckboxRow(title = "Loop", checked = loop, onCheckedChange = { loop = it }, enabled = !returnToLocation, textColor = LjText)
-            LjCheckboxRow(title = "Reverse", checked = reverse, onCheckedChange = { reverse = it }, textColor = LjText)
-            LjCheckboxRow(title = "Return to location", checked = returnToLocation, onCheckedChange = {
+            LjCheckboxRow(title = "循环", checked = loop, onCheckedChange = { loop = it }, enabled = !returnToLocation, textColor = LjText)
+            LjCheckboxRow(title = "反向", checked = reverse, onCheckedChange = { reverse = it }, textColor = LjText)
+            LjCheckboxRow(title = "返回起点", checked = returnToLocation, onCheckedChange = {
                 returnToLocation = it
             }, enabled = !loop, textColor = LjText)
 
@@ -568,7 +568,7 @@ internal fun RoutesFloatingView(
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Walk and start", color = LjText)
+                Text("行走并开始", color = LjText)
             }
             if (!hideTeleport) {
                 Spacer(Modifier.height(8.dp))
@@ -580,14 +580,14 @@ internal fun RoutesFloatingView(
                     },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Teleport and start", color = LjText)
+                    Text("传送并开始", color = LjText)
                 }
             }
         } else {
             Box(modifier = Modifier.weight(1f)) {
                 if (routes.isEmpty()) {
                     Text(
-                        text = "No routes saved",
+                        text = "未保存任何路线",
                         style = MaterialTheme.typography.bodyMedium,
                         color = LjText.copy(alpha = 0.6f),
                     )
@@ -612,7 +612,7 @@ internal fun RoutesFloatingView(
                                         color = LjText,
                                     )
                                     Text(
-                                        text = "${route.waypoints.size} waypoints",
+                                        text = "${route.waypoints.size} 个途经点",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = LjText.copy(alpha = 0.7f),
                                     )
@@ -679,11 +679,11 @@ private fun featureIconAndState(
 
 private fun AppFeature.toContentDescription(): String =
     when (this) {
-        AppFeature.JOYSTICK_TOGGLE -> "Show/hide joystick"
-        AppFeature.JOYSTICK_LOCK -> "Lock joystick position"
-        AppFeature.ROUTES -> "Routes picker"
-        AppFeature.FAVORITES -> "Favorites picker"
-        AppFeature.SPEED_CYCLE -> "Speed cycle"
-        AppFeature.MAP_FLOATING -> "Open map"
+        AppFeature.JOYSTICK_TOGGLE -> "显示/隐藏摇杆"
+        AppFeature.JOYSTICK_LOCK -> "锁定摇杆位置"
+        AppFeature.ROUTES -> "路线选择器"
+        AppFeature.FAVORITES -> "收藏选择器"
+        AppFeature.SPEED_CYCLE -> "速度循环"
+        AppFeature.MAP_FLOATING -> "打开地图"
         AppFeature.ROAMING, AppFeature.SEARCH -> error("$this is map-only and never appears in the widget panel")
     }

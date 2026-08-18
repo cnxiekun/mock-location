@@ -53,7 +53,7 @@ internal fun IdleScreen(
     val spoofToggle = rememberSpoofToggleState()
 
     LjScaffold(
-        title = "Home",
+        title = "主页",
         isSpoofing = spoofToggle.isSpoofing,
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,
@@ -81,7 +81,7 @@ internal fun IdleScreen(
                         AppIcon()
                         Spacer(modifier = Modifier.height(24.dp))
                         Text(
-                            text = "locationjoystick",
+                            text = "定位模拟",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onBackground,
                             textAlign = TextAlign.Center,
@@ -98,33 +98,33 @@ internal fun IdleScreen(
                 item {
                     IdleDestinationCard(
                         LjIcons.Map,
-                        "Map",
-                        "Spoof your GPS location and control movement on the map.",
+                        "地图",
+                        "模拟你的 GPS 位置并在地图上控制移动。",
                         onNavigateToMap,
                     )
                 }
-                item { IdleDestinationCard(LjIcons.Route, "Routes", "Replay saved routes.", onNavigateToRoutes) }
+                item { IdleDestinationCard(LjIcons.Route, "路线", "回放已保存的路线。", onNavigateToRoutes) }
                 item {
                     IdleDestinationCard(
                         LjIcons.Favorite,
-                        "Favorites",
-                        "Teleport or walk to saved locations.",
+                        "收藏",
+                        "传送到或步行至已保存的位置。",
                         onNavigateToFavorites,
                     )
                 }
                 item {
                     IdleDestinationCard(
                         LjIcons.Share,
-                        "Group Sync",
-                        "Mirror your location to other devices on the same Wi-Fi.",
+                        "群组同步",
+                        "将你的位置同步到同一 Wi-Fi 下的其他设备。",
                         onNavigateToGroup,
                     )
                 }
                 item {
                     IdleDestinationCard(
                         LjIcons.Settings,
-                        "Settings",
-                        "Configure locationjoystick and spoof preferences.",
+                        "设置",
+                        "配置定位模拟的偏好设置。",
                         onNavigateToSettings,
                     )
                 }
@@ -146,7 +146,7 @@ internal fun IdleScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "locationjoystick",
+                    text = "定位模拟",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
@@ -165,36 +165,36 @@ internal fun IdleScreen(
 
                 IdleDestinationCard(
                     icon = LjIcons.Map,
-                    title = "Map",
-                    description = "Spoof your GPS location and control movement on the map.",
+                    title = "地图",
+                    description = "模拟你的 GPS 位置并在地图上控制移动。",
                     onClick = onNavigateToMap,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 IdleDestinationCard(
                     icon = LjIcons.Route,
-                    title = "Routes",
-                    description = "Replay saved routes.",
+                    title = "路线",
+                    description = "回放已保存的路线。",
                     onClick = onNavigateToRoutes,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 IdleDestinationCard(
                     icon = LjIcons.Favorite,
-                    title = "Favorites",
-                    description = "Teleport or walk to saved locations.",
+                    title = "收藏",
+                    description = "传送到或步行至已保存的位置。",
                     onClick = onNavigateToFavorites,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 IdleDestinationCard(
                     icon = LjIcons.Share,
-                    title = "Group Sync",
-                    description = "Mirror your location to other devices on the same Wi-Fi.",
+                    title = "群组同步",
+                    description = "将你的位置同步到同一 Wi-Fi 下的其他设备。",
                     onClick = onNavigateToGroup,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 IdleDestinationCard(
                     icon = LjIcons.Settings,
-                    title = "Settings",
-                    description = "Configure locationjoystick and spoof preferences.",
+                    title = "设置",
+                    description = "配置定位模拟的偏好设置。",
                     onClick = onNavigateToSettings,
                 )
                 Spacer(modifier = Modifier.height(24.dp))

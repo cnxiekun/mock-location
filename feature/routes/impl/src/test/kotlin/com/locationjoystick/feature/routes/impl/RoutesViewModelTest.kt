@@ -261,7 +261,7 @@ class RoutesViewModelTest {
         val routes = parseGpxRoutes(gpxContent)
 
         assertEquals(1, routes.size)
-        assertEquals("Imported Route", routes[0].name)
+        assertEquals("导入的路线", routes[0].name)
         val waypoints = routes[0].waypoints
         assertEquals(3, waypoints.size)
         assertEquals(40.761299, waypoints[0].latitude, 0.0000001)
@@ -285,7 +285,7 @@ class RoutesViewModelTest {
         val routes = parseGpxRoutes(gpxContent)
 
         assertEquals(1, routes.size)
-        assertEquals("Imported Route", routes[0].name)
+        assertEquals("导入的路线", routes[0].name)
     }
 
     @Test
@@ -344,8 +344,8 @@ class RoutesViewModelTest {
         val routes = parseGpxRoutes(gpxContent)
 
         assertEquals(2, routes.size)
-        assertEquals("Imported Route 1", routes[0].name)
-        assertEquals("Imported Route 2", routes[1].name)
+        assertEquals("导入的路线 1", routes[0].name)
+        assertEquals("导入的路线 2", routes[1].name)
     }
 
     @Test

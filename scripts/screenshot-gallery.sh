@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # screenshot-gallery.sh
 #
-# Captures wiki / Play Store gallery screenshots from a connected Android device.
+# Captures wiki gallery screenshots from a connected Android device.
 # Re-run any time the app updates. Saves PNGs to ./screenshots/ (or --output DIR).
 #
 # Usage:
@@ -11,8 +11,6 @@
 #   ./scripts/screenshot-gallery.sh --steps 16,17
 #   ./scripts/screenshot-gallery.sh --steps 14-17
 #   ./scripts/screenshot-gallery.sh --auto --steps 16-17
-#   ./scripts/screenshot-gallery.sh --playstore-only   (no device needed — regenerates
-#                                                        *_playstore.png from existing screenshots)
 #
 # Prerequisites:
 #   - adb in PATH, device connected with USB debugging on
@@ -45,14 +43,13 @@ set -euo pipefail
 
 # ── Config ───────────────────────────────────────────────────────────────────
 
-PACKAGE="com.locationjoystick.app"
+PACKAGE="com.locationjoystick.app.cn"
 ACTIVITY=".MainActivity"
 OUTPUT_DIR="docs/wiki/screenshots"
 ADB_DEVICE=""
 AUTO=false
 STEPS_FILTER=""  # Comma-separated or range, e.g. "16,17" or "14-17"
 ENABLED_STEPS=" "  # Space-separated list of enabled step numbers (01 02 03 etc)
-PLAYSTORE_ONLY=false
 
 # ── Arg parsing ──────────────────────────────────────────────────────────────
 
@@ -62,7 +59,6 @@ while [[ $# -gt 0 ]]; do
     --device)          ADB_DEVICE="-s $2"; shift 2 ;;
     --auto)            AUTO=true; shift ;;
     --steps)           STEPS_FILTER="$2"; shift 2 ;;
-    --playstore-only)  PLAYSTORE_ONLY=true; shift ;;
     *) echo "Unknown arg: $1"; exit 1 ;;
   esac
 done
@@ -440,48 +436,6 @@ collapse_widget_panel() {
   wait_s 1 "Panel collapsing"
 }
 
-# Generate 1024×500 Play Store variants for all captured screenshots.
-# Each source screenshot is scaled to fit within 500 px height and centered
-# on a 1024×500 canvas with Material dark surface background (#1C1B1F).
-generate_playstore_variants() {
-  log "Generating Play Store variants..."
-  if ! python3 -c "import PIL" >/dev/null 2>&1; then
-    warn "Pillow not installed — skipping Play Store variants."
-    warn "Install with: python3 -m pip install --user --break-system-packages Pillow"
-    return 0
-  fi
-  python3 << 'PYTHON_EOF'
-from PIL import Image
-import os
-import sys
-
-src_dir = "docs/wiki/screenshots"
-canvas_w, canvas_h = 1024, 500
-bg_color = (28, 27, 31)
-
-if not os.path.isdir(src_dir):
-  print(f"  Error: {src_dir} not found", file=sys.stderr)
-  sys.exit(1)
-
-files = sorted(f for f in os.listdir(src_dir) if f.endswith(".png") and "_playstore" not in f)
-if not files:
-  print(f"  No source PNG files found in {src_dir}", file=sys.stderr)
-  sys.exit(1)
-
-for fname in files:
-  src_path = os.path.join(src_dir, fname)
-  name, ext = os.path.splitext(fname)
-  dst_path = os.path.join(src_dir, f"{name}_playstore{ext}")
-  img = Image.open(src_path)
-  img.thumbnail((canvas_w, canvas_h), Image.LANCZOS)
-  canvas = Image.new("RGB", (canvas_w, canvas_h), bg_color)
-  x = (canvas_w - img.width) // 2
-  y = (canvas_h - img.height) // 2
-  canvas.paste(img, (x, y), img if img.mode == "RGBA" else None)
-  canvas.save(dst_path, "PNG", optimize=True)
-  print(f"  {fname} → {os.path.basename(dst_path)}")
-PYTHON_EOF
-}
 
 # Expand widget panel (same tap — toggles).
 expand_widget_panel() { collapse_widget_panel; }
@@ -522,13 +476,6 @@ go_idle() {
   wait_s 4 "App starting"
 }
 
-# ── Playstore-only mode: skip device entirely ─────────────────────────────────
-
-if [[ "$PLAYSTORE_ONLY" == true ]]; then
-  mkdir -p "$OUTPUT_DIR"
-  generate_playstore_variants
-  exit 0
-fi
 
 # ── Setup ────────────────────────────────────────────────────────────────────
 
@@ -870,8 +817,6 @@ fi
 demo_mode_exit
 trap - EXIT
 
-# Generate Play Store variants for all captured screenshots
-generate_playstore_variants
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

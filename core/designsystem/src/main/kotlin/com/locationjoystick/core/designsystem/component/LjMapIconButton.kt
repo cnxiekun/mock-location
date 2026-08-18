@@ -66,7 +66,7 @@ fun LjMapIconButton(
 private fun LjMapIconButtonPreview() {
     LjMapIconButton(
         icon = LjIcons.MyLocation,
-        contentDescription = "My location",
+        contentDescription = "我的位置",
         containerColor = Color(0xFF1976D2),
         contentColor = Color.White,
         onClick = {},

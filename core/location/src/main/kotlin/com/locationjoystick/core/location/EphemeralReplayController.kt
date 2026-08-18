@@ -149,6 +149,6 @@ class EphemeralReplayController
         }
 
         private fun reportFallback(reason: OsrmFailureReason) {
-            routingErrorReporter.report("${osrmFailureMessage(reason)} — using straight line for part of the route")
+            routingErrorReporter.report("${osrmFailureMessage(reason)} — 部分路段使用直线行走")
         }
     }

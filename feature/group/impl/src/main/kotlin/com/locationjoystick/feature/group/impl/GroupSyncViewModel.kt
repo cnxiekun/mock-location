@@ -169,12 +169,12 @@ class GroupSyncViewModel
             }
             viewModelScope.launch {
                 groupRepository.groupLostEvent.collect {
-                    _errorMessage.value = "Disconnected from group — leader is no longer reachable"
+                    _errorMessage.value = "已断开群组连接——队长不再可达"
                 }
             }
             viewModelScope.launch {
                 groupRepository.teleportUnavailableEvent.collect {
-                    _errorMessage.value = "Leader position not yet known — try again in a moment"
+                    _errorMessage.value = "队长位置尚不可知——请稍后重试"
                 }
             }
         }
@@ -190,7 +190,7 @@ class GroupSyncViewModel
         fun joinByCode(code: String) {
             val normalized = code.uppercase().trim()
             if (normalized.length != AppConstants.SyncConstants.GROUP_CODE_LENGTH) {
-                _errorMessage.value = "Code must be ${AppConstants.SyncConstants.GROUP_CODE_LENGTH} characters"
+                _errorMessage.value = "代码必须是 ${AppConstants.SyncConstants.GROUP_CODE_LENGTH} 个字符"
                 return
             }
             viewModelScope.launch {
@@ -201,7 +201,7 @@ class GroupSyncViewModel
                     val (host, port) = result
                     handlePendingInvite(GroupInvite(host = host, port = port, groupId = normalized))
                 } else {
-                    _errorMessage.value = "No group found for code $normalized"
+                    _errorMessage.value = "未找到代码 $normalized 对应的群组"
                 }
             }
         }
@@ -209,7 +209,7 @@ class GroupSyncViewModel
         fun joinViaScannedUrl(url: String) {
             val invite = parseGroupUrl(url)
             if (invite == null) {
-                _errorMessage.value = "Invalid group QR code"
+                _errorMessage.value = "无效的群组二维码"
                 return
             }
             viewModelScope.launch { handlePendingInvite(invite) }
@@ -241,7 +241,7 @@ class GroupSyncViewModel
                     val resolved = groupNsdManager.discoverByCode(id)
                     _isDiscovering.value = false
                     if (resolved == null) {
-                        _errorMessage.value = "No group found for code $id"
+                        _errorMessage.value = "未找到代码 $id 对应的群组"
                         groupRepository.setFollowerModeEnabled(false)
                         return@launch
                     }

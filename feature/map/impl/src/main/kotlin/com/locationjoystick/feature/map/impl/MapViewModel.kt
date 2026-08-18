@@ -55,6 +55,13 @@ class MapViewModel
                 .map { it.recentSearches }
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+        val amapKey: StateFlow<String> =
+            settingsRepository.getAmapWebKey().stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                "",
+            )
+
         val roamingDefaults: StateFlow<RoamingDefaults> =
             mapController.sharedState
                 .map { it.roamingDefaults }

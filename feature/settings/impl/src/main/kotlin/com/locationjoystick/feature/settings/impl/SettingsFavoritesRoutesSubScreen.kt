@@ -36,7 +36,7 @@ internal fun SettingsFavoritesRoutesSubScreen(
     snackbarHost: @Composable () -> Unit,
 ) {
     LjScaffold(
-        title = "Favorites & Routes",
+        title = "收藏与路线",
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -78,10 +78,10 @@ private fun FavoritesSection(
     hotLocationTree: HotItemTree,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Favorites", style = MaterialTheme.typography.headlineSmall)
+    Text("收藏", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Options for the favorites list.",
+        "收藏列表的选项。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -89,13 +89,13 @@ private fun FavoritesSection(
     LjCheckboxRow(
         checked = uiState.hotLocationsEnabled,
         onCheckedChange = { onAction(SettingsAction.SetHotLocationsEnabled(it)) },
-        title = "Show hot locations",
-        description = "Adds a curated list of popular locations to your favorites. Select which ones to include below.",
+        title = "显示热门地点",
+        description = "向你的收藏中添加一组精选的热门地点。在下方选择要包含的条目。",
     )
     if (uiState.hotLocationsEnabled && hotLocationTree.allIds.isNotEmpty()) {
         Spacer(modifier = Modifier.height(8.dp))
         HotItemTreeSection(
-            headerLabel = "Locations",
+            headerLabel = "地点",
             tree = hotLocationTree,
             selectedIds = uiState.selectedHotLocationIds,
             onSelectionChange = { onAction(SettingsAction.SetSelectedHotLocationIds(it)) },
@@ -109,10 +109,10 @@ private fun RoutesSection(
     hotRouteTree: HotItemTree,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Routes", style = MaterialTheme.typography.headlineSmall)
+    Text("路线", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Options for the routes list.",
+        "路线列表的选项。",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -120,13 +120,13 @@ private fun RoutesSection(
     LjCheckboxRow(
         checked = uiState.hotRoutesEnabled,
         onCheckedChange = { onAction(SettingsAction.SetHotRoutesEnabled(it)) },
-        title = "Show hot routes",
-        description = "Adds a curated set of pre-built routes to your routes list. Select which ones to include below.",
+        title = "显示热门路线",
+        description = "向你的路线列表中添加一组精选的预置路线。在下方选择要包含的条目。",
     )
     if (uiState.hotRoutesEnabled && hotRouteTree.allIds.isNotEmpty()) {
         Spacer(modifier = Modifier.height(8.dp))
         HotItemTreeSection(
-            headerLabel = "Routes",
+            headerLabel = "路线",
             tree = hotRouteTree,
             selectedIds = uiState.selectedHotRouteIds,
             onSelectionChange = { onAction(SettingsAction.SetSelectedHotRouteIds(it)) },

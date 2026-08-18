@@ -85,6 +85,7 @@ fun SettingsRoute(
     bottomBar: @Composable () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val amapKey by viewModel.amapKey.collectAsStateWithLifecycle()
     val roamingDefaults by viewModel.roamingDefaults.collectAsStateWithLifecycle()
     val isRooted by viewModel.isRooted.collectAsStateWithLifecycle()
     val spoofToggle = rememberSpoofToggleState()
@@ -103,7 +104,7 @@ fun SettingsRoute(
                 val result =
                     snackbarHostState.showSnackbar(
                         message = feedback.message,
-                        actionLabel = "Report",
+                        actionLabel = "报告",
                         duration = androidx.compose.material3.SnackbarDuration.Long,
                     )
                 if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
@@ -238,6 +239,7 @@ fun SettingsRoute(
     SettingsScreen(
         uiState = uiState,
         roamingDefaults = roamingDefaults,
+        amapKey = amapKey,
         isRooted = isRooted,
         hotLocationTree = viewModel.hotLocationTree,
         hotRouteTree = viewModel.hotRouteTree,
@@ -418,6 +420,10 @@ fun SettingsRoute(
                     viewModel.discardChanges()
                 }
 
+                is SettingsAction.SetAmapWebKey -> {
+                    viewModel.setAmapWebKey(action.key)
+                }
+
                 SettingsAction.ResetAllData -> {
                     showResetConfirm = true
                 }
@@ -453,6 +459,7 @@ internal fun SettingsScreen(
     onCheckCompassService: () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
+    amapKey: String = "",
 ) {
     var currentSection by remember { mutableStateOf<SettingsSection?>(null) }
 
@@ -478,6 +485,7 @@ internal fun SettingsScreen(
         SettingsSection.GPS -> {
             SettingsGpsSubScreen(
                 uiState = uiState,
+                amapKey = amapKey,
                 onNavigateBack = { currentSection = null },
                 isSpoofing = isSpoofing,
                 onToggleSpoofing = onToggleSpoofing,
@@ -547,7 +555,7 @@ private fun SettingsHubScreen(
     snackbarHost: @Composable () -> Unit,
 ) {
     LjScaffold(
-        title = "Settings",
+        title = "设置",
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -558,18 +566,18 @@ private fun SettingsHubScreen(
             var showDownloadMenu by remember { mutableStateOf(false) }
             Box {
                 IconButton(onClick = { showDownloadMenu = true }) {
-                    Icon(LjIcons.FileUpload, contentDescription = "Export")
+                    Icon(LjIcons.FileUpload, contentDescription = "导出")
                 }
                 DropdownMenu(expanded = showDownloadMenu, onDismissRequest = { showDownloadMenu = false }) {
                     DropdownMenuItem(
-                        text = { Text("Export via QR code") },
+                        text = { Text("通过二维码导出") },
                         onClick = {
                             showDownloadMenu = false
                             onAction(SettingsAction.QrShare)
                         },
                     )
                     DropdownMenuItem(
-                        text = { Text("Export settings") },
+                        text = { Text("导出设置") },
                         onClick = {
                             showDownloadMenu = false
                             onAction(SettingsAction.Export)
@@ -580,39 +588,39 @@ private fun SettingsHubScreen(
             var showUploadMenu by remember { mutableStateOf(false) }
             Box {
                 IconButton(onClick = { showUploadMenu = true }) {
-                    Icon(LjIcons.FileDownload, contentDescription = "Import")
+                    Icon(LjIcons.FileDownload, contentDescription = "导入")
                 }
                 DropdownMenu(expanded = showUploadMenu, onDismissRequest = { showUploadMenu = false }) {
                     DropdownMenuItem(
-                        text = { Text("Import from QR code") },
+                        text = { Text("从二维码导入") },
                         onClick = {
                             showUploadMenu = false
                             onAction(SettingsAction.QrScan)
                         },
                     )
                     DropdownMenuItem(
-                        text = { Text("Import via code") },
+                        text = { Text("通过代码导入") },
                         onClick = {
                             showUploadMenu = false
                             onAction(SettingsAction.QrEnterCode)
                         },
                     )
                     DropdownMenuItem(
-                        text = { Text("Import from file") },
+                        text = { Text("从文件导入") },
                         onClick = {
                             showUploadMenu = false
                             onAction(SettingsAction.Import)
                         },
                     )
                     DropdownMenuItem(
-                        text = { Text("Import from GPS Joystick") },
+                        text = { Text("从 GPS Joystick 导入") },
                         onClick = {
                             showUploadMenu = false
                             onAction(SettingsAction.ImportGpsJoystick)
                         },
                     )
                     DropdownMenuItem(
-                        text = { Text("Import from YAMLA") },
+                        text = { Text("从 YAMLA 导入") },
                         onClick = {
                             showUploadMenu = false
                             onAction(SettingsAction.ImportYamla)
@@ -623,7 +631,7 @@ private fun SettingsHubScreen(
             IconButton(onClick = { onAction(SettingsAction.ResetAllData) }) {
                 Icon(
                     LjIcons.Delete,
-                    contentDescription = "Reset all data",
+                    contentDescription = "重置所有数据",
                     tint = MaterialTheme.colorScheme.error,
                 )
             }
@@ -631,11 +639,11 @@ private fun SettingsHubScreen(
                 TextButton(
                     onClick = { onAction(SettingsAction.DiscardChanges) },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
-                ) { Text("Discard") }
+                ) { Text("放弃") }
                 TextButton(
                     onClick = { onAction(SettingsAction.SaveChanges) },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                ) { Text("Save") }
+                ) { Text("保存") }
             }
         },
     ) { paddingValues ->
@@ -652,7 +660,7 @@ private fun SettingsHubScreen(
             AppIcon()
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "locationjoystick",
+                text = "定位模拟",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -667,29 +675,29 @@ private fun SettingsHubScreen(
             Spacer(modifier = Modifier.height(28.dp))
             SettingsDestinationCard(
                 icon = LjIcons.Speed,
-                title = "Movement & GPS",
-                description = "Speed presets, signal realism, and location randomness for all movement modes.",
+                title = "移动与 GPS",
+                description = "所有移动模式的速度预设、信号真实度和位置随机性。",
                 onClick = { onNavigate(SettingsSection.GPS) },
             )
             Spacer(modifier = Modifier.height(12.dp))
             SettingsDestinationCard(
                 icon = LjIcons.Joystick,
-                title = "Menus",
-                description = "Which features appear in the floating widget and map buttons, and how to trigger walks by tapping.",
+                title = "菜单",
+                description = "控制悬浮小部件和地图按钮中显示的功能，以及如何通过点击触发行走。",
                 onClick = { onNavigate(SettingsSection.MENUS) },
             )
             Spacer(modifier = Modifier.height(12.dp))
             SettingsDestinationCard(
                 icon = LjIcons.Favorite,
-                title = "Favorites & Routes",
-                description = "Curated hot locations and pre-built routes to populate your library.",
+                title = "收藏与路线",
+                description = "精选热门地点和预置路线，快速填充你的收藏库。",
                 onClick = { onNavigate(SettingsSection.FAVORITES_ROUTES) },
             )
             Spacer(modifier = Modifier.height(12.dp))
             SettingsDestinationCard(
                 icon = LjIcons.Explore,
-                title = "Roaming",
-                description = "Default area, distance, speed, and routing style for random walks.",
+                title = "漫游",
+                description = "随机漫步的默认区域、距离、速度和路线方式。",
                 onClick = { onNavigate(SettingsSection.ROAMING) },
             )
 
@@ -748,11 +756,11 @@ internal fun SubScreenActions(
         TextButton(
             onClick = { onAction(SettingsAction.DiscardChanges) },
             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
-        ) { Text("Discard") }
+        ) { Text("放弃") }
         TextButton(
             onClick = { onAction(SettingsAction.SaveChanges) },
             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-        ) { Text("Save") }
+        ) { Text("保存") }
     }
 }
 
@@ -764,13 +772,13 @@ private fun ImportConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Import data") },
-        text = { Text("How would you like to handle existing data?") },
+        title = { Text("导入数据") },
+        text = { Text("如何处理现有数据？") },
         confirmButton = {
             Row {
-                TextButton(onClick = onDismiss) { Text("Cancel") }
-                TextButton(onClick = onAdd) { Text("Add") }
-                TextButton(onClick = onReplace) { Text("Replace") }
+                TextButton(onClick = onDismiss) { Text("取消") }
+                TextButton(onClick = onAdd) { Text("合并") }
+                TextButton(onClick = onReplace) { Text("替换") }
             }
         },
         dismissButton = {},
@@ -784,15 +792,15 @@ private fun ResetAllDataConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Reset all data?") },
-        text = { Text("All favorites, routes, and settings will be permanently deleted. This cannot be undone.") },
+        title = { Text("重置所有数据？") },
+        text = { Text("所有收藏、路线和设置都将被永久删除。此操作无法撤销。") },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Reset", color = MaterialTheme.colorScheme.error)
+                Text("重置", color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text("取消") }
         },
     )
 }
@@ -806,18 +814,18 @@ private fun EnterExportCodeDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Enter export code") },
+        title = { Text("输入导出代码") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Ask the sender for their 6-character code shown in the QR share dialog.",
+                    text = "向发送方询问其在二维码分享对话框中显示的 6 位代码。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 OutlinedTextField(
                     value = code,
                     onValueChange = { code = it.uppercase().take(6) },
-                    label = { Text("Code") },
+                    label = { Text("代码") },
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Monospace),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -827,10 +835,10 @@ private fun EnterExportCodeDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(code) }, enabled = code.length == 6) { Text("Import") }
+            TextButton(onClick = { onConfirm(code) }, enabled = code.length == 6) { Text("导入") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text("取消") }
         },
     )
 }

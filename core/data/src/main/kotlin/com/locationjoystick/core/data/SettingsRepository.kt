@@ -232,6 +232,10 @@ class SettingsRepository
                 newestFirst,
             )
 
+        fun getAmapWebKey(): Flow<String> = dataSource.getAmapWebKey()
+
+        suspend fun setAmapWebKey(key: String) = dataSource.setAmapWebKey(key)
+
         fun getRecentSearches(): Flow<List<RecentSearch>> = dataSource.getRecentSearches()
 
         suspend fun addRecentSearch(

@@ -228,6 +228,7 @@ internal class WidgetPanelPresenter(
             val quickWalk by settingsRepository.getFloatingMapQuickWalk().collectAsStateWithLifecycle(initialValue = false)
             val hideTeleportFeatures by settingsRepository.getHideTeleportFeatures().collectAsStateWithLifecycle(initialValue = false)
             val showRouteJumpButtons by settingsRepository.getShowRouteJumpButtons().collectAsStateWithLifecycle(initialValue = false)
+            val amapKey by settingsRepository.getAmapWebKey().collectAsStateWithLifecycle(initialValue = "")
             val routeControlsExpanded by mapRouteControlsExpanded.collectAsStateWithLifecycle()
             MapFloatingView(
                 currentPosition = shared.currentPosition,
@@ -275,6 +276,7 @@ internal class WidgetPanelPresenter(
                 onOpenRoutes = { showRoutesFloatingView() },
                 onDismiss = { hidePanelView() },
                 onSearchCommitted = { name, lat, lon -> mapController.addRecentSearch(name, lat, lon) },
+                amapKey = amapKey,
                 cooldownForPosition = { pos -> mapController.cooldownForPosition(pos) },
                 onSaveCurrentLocation = { name -> callbacks.saveCurrentLocation(name) },
                 quickWalk = quickWalk,

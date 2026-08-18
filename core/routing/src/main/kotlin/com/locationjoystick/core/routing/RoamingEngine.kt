@@ -132,7 +132,7 @@ class RoamingEngine
 
             if (fallbackCount > 0) {
                 routingErrorReporter.report(
-                    "Road-following partially unavailable — $fallbackCount of $totalSegments legs used straight-line paths",
+                    "道路跟随部分不可用 — $fallbackCount/$totalSegments 条路段使用了直线路径",
                 )
             }
 
