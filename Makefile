@@ -49,13 +49,6 @@ coverage:
 coverage-open:
 	open build/reports/kover/html/index.html
 
-screenshot:
-	./scripts/screenshot-gallery.sh --auto
-
-wiki-serve:
-	lsof -ti:8080 | xargs kill -9 || true
-	python3 -m http.server 8080 --directory docs/wiki
-
 SMOKE_TEST_CLASS = $(subst /,.,$(patsubst app/src/androidTest/kotlin/%,%,$(patsubst %.kt,%,$(TEST_FILE))))
 
 smoke-test:
