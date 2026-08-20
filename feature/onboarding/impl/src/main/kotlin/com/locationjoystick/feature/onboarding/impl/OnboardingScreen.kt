@@ -197,46 +197,6 @@ internal fun OnboardingScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "设置遇到问题？",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                TextButton(
-                    onClick = {
-                        context.startActivity(
-                            Intent(Intent.ACTION_VIEW, Uri.parse(AppConstants.AppInfo.DOCS_URL)),
-                        )
-                    },
-                ) {
-                    Text(
-                        text = "入门指南",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-                Text(
-                    text = "·",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                TextButton(
-                    onClick = {
-                        context.startActivity(
-                            Intent(Intent.ACTION_VIEW, Uri.parse(AppConstants.AppInfo.TROUBLESHOOTING_URL)),
-                        )
-                    },
-                ) {
-                    Text(
-                        text = "故障排除",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-            }
-
             Spacer(modifier = Modifier.height(24.dp))
 
             OnboardingStepCard(

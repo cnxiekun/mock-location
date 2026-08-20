@@ -35,7 +35,7 @@ class LjApplicationConventionPlugin : Plugin<Project> {
                     targetSdk = 36
                     // 系统「应用信息」显示的版本号，并据此计算 versionCode。
                     // 发版时必须与 AppConstants.AppInfo.VERSION_NAME（界面显示）同步修改。
-                    val versionName = "1.1.0"
+                    val versionName = "1.1.1"
                     val (maj, min, pat) = versionName.split(".").map { it.toInt() }
                     this.versionName = versionName
                     versionCode = maj * 10000 + min * 100 + pat

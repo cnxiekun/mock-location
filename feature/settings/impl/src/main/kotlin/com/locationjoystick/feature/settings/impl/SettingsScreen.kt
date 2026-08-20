@@ -38,8 +38,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -96,6 +99,7 @@ fun SettingsRoute(
     var showEnterCodeDialog by remember { mutableStateOf(false) }
     var showResetConfirm by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.userFeedback.collect { feedback ->
@@ -115,10 +119,16 @@ fun SettingsRoute(
                     context.startActivity(intent)
                 }
             } else {
-                snackbarHostState.showSnackbar(
-                    message = feedback.message,
-                    duration = androidx.compose.material3.SnackbarDuration.Short,
-                )
+                // 成功提示短暂闪烁约 1.5 秒即消失，避免长时间停留
+                scope.launch {
+                    withTimeoutOrNull(1_500) {
+                        snackbarHostState.showSnackbar(
+                            message = feedback.message,
+                            duration = androidx.compose.material3.SnackbarDuration.Indefinite,
+                        )
+                    }
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                }
             }
         }
     }
@@ -461,9 +471,15 @@ internal fun SettingsScreen(
     amapKey: String = "",
 ) {
     var currentSection by remember { mutableStateOf<SettingsSection?>(null) }
+    var showUnsavedDialog by remember { mutableStateOf(false) }
+
+    // 返回：有未保存改动时先弹确认（保存 / 放弃 / 继续编辑）
+    val navigateBack: () -> Unit = {
+        if (uiState.isDirty) showUnsavedDialog = true else currentSection = null
+    }
 
     BackHandler(enabled = currentSection != null) {
-        currentSection = null
+        navigateBack()
     }
 
     when (currentSection) {
@@ -485,7 +501,7 @@ internal fun SettingsScreen(
             SettingsGpsSubScreen(
                 uiState = uiState,
                 amapKey = amapKey,
-                onNavigateBack = { currentSection = null },
+                onNavigateBack = navigateBack,
                 isSpoofing = isSpoofing,
                 onToggleSpoofing = onToggleSpoofing,
                 locationLabel = locationLabel,
@@ -499,7 +515,7 @@ internal fun SettingsScreen(
             SettingsMenusSubScreen(
                 uiState = uiState,
                 isRooted = isRooted,
-                onNavigateBack = { currentSection = null },
+                onNavigateBack = navigateBack,
                 isSpoofing = isSpoofing,
                 onToggleSpoofing = onToggleSpoofing,
                 locationLabel = locationLabel,
@@ -515,7 +531,7 @@ internal fun SettingsScreen(
                 uiState = uiState,
                 hotLocationTree = hotLocationTree,
                 hotRouteTree = hotRouteTree,
-                onNavigateBack = { currentSection = null },
+                onNavigateBack = navigateBack,
                 isSpoofing = isSpoofing,
                 onToggleSpoofing = onToggleSpoofing,
                 locationLabel = locationLabel,
@@ -529,7 +545,7 @@ internal fun SettingsScreen(
             SettingsRoamingSubScreen(
                 uiState = uiState,
                 roamingDefaults = roamingDefaults,
-                onNavigateBack = { currentSection = null },
+                onNavigateBack = navigateBack,
                 isSpoofing = isSpoofing,
                 onToggleSpoofing = onToggleSpoofing,
                 locationLabel = locationLabel,
@@ -538,6 +554,32 @@ internal fun SettingsScreen(
                 snackbarHost = snackbarHost,
             )
         }
+    }
+
+    if (showUnsavedDialog) {
+        AlertDialog(
+            onDismissRequest = { showUnsavedDialog = false },
+            title = { Text("未保存的更改") },
+            text = { Text("是否保存你对设置的更改？") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showUnsavedDialog = false
+                        onAction(SettingsAction.SaveChanges)
+                        currentSection = null
+                    },
+                ) { Text("保存") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showUnsavedDialog = false
+                        onAction(SettingsAction.DiscardChanges)
+                        currentSection = null
+                    },
+                ) { Text("放弃") }
+            },
+        )
     }
 }
 

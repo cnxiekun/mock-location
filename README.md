@@ -70,6 +70,8 @@
 
 ### 调试包
 
+> 说明：`make` 命令是对 Gradle 的简写封装——`make build` 等价于 `./gradlew assembleRelease`，`make build-debug` 等价于 `./gradlew assembleDebug`，直接执行 `./gradlew ...` 效果相同。
+
 ```bash
 make build-debug
 ```

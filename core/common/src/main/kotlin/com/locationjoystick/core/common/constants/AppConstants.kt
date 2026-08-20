@@ -304,10 +304,8 @@ object AppConstants {
     }
 
     object AppInfo {
-        const val VERSION_NAME = "1.1.0"
-        const val GITHUB_ISSUES_URL = "https://github.com/shortcuts/locationjoystick/issues/new?template=bug_report.yml"
-        const val DOCS_URL = "https://shortcuts.github.io/locationjoystick/"
-        const val TROUBLESHOOTING_URL = "https://shortcuts.github.io/locationjoystick/troubleshooting.html"
+        const val VERSION_NAME = "1.1.1"
+        const val GITHUB_ISSUES_URL = "https://github.com/cnxiekun/mock-location/issues/new"
         const val DEEP_LINK_HOST = "locationjoystick.shrtcts.fr"
 
         fun buildDeepLink(

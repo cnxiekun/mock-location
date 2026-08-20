@@ -131,6 +131,60 @@ class SettingsViewModel
             val amapKey: String? = null,
         )
 
+        /** 草稿相对当前已保存设置的真实差异：某字段改回原值即视为未改动。 */
+        private fun DraftState.hasChanges(
+            snapshot: SettingsSnapshot,
+            amapKeyRepo: String,
+        ): Boolean {
+            fun <T> changed(
+                override: T?,
+                current: T,
+            ) = override != null && override != current
+
+            val speedChanged =
+                speedOverrides.any { (id, v) ->
+                    when (id) {
+                        AppConstants.ProfileConstants.PROFILE_ID_SLOW_WALK -> v != snapshot.slowWalkSpeedMs
+                        AppConstants.ProfileConstants.PROFILE_ID_WALK -> v != snapshot.walkSpeedMs
+                        AppConstants.ProfileConstants.PROFILE_ID_RUN -> v != snapshot.runSpeedMs
+                        AppConstants.ProfileConstants.PROFILE_ID_BIKE -> v != snapshot.bikeSpeedMs
+                        AppConstants.ProfileConstants.PROFILE_ID_DRIVE -> v != snapshot.driveSpeedMs
+                        else -> false
+                    }
+                }
+            return speedChanged ||
+                changed(speedUnit, snapshot.speedUnit) ||
+                changed(featureOrder, snapshot.featureOrder) ||
+                changed(widgetFeatures, snapshot.enabledWidgetFeatures) ||
+                changed(enabledSpeedProfileIds, snapshot.enabledSpeedProfileIds) ||
+                changed(mapFeatures, snapshot.enabledMapFeatures) ||
+                changed(rememberLastLocation, snapshot.rememberLastLocation) ||
+                changed(mapFollowsLocation, snapshot.mapFollowsLocation) ||
+                changed(jitterIdleRadius, snapshot.jitterIdleRadius) ||
+                changed(jitterMovingRadius, snapshot.jitterMovingRadius) ||
+                changed(jitterIntervalSeconds, snapshot.jitterIntervalSeconds) ||
+                changed(jitterIdleIntervalSeconds, snapshot.jitterIdleIntervalSeconds) ||
+                changed(roamingDefaults, snapshot.roamingDefaults) ||
+                changed(realismBearingHoldIdle, snapshot.realismBearingHoldIdle) ||
+                changed(realismAltitudeEnabled, snapshot.realismAltitudeEnabled) ||
+                changed(realismWarmupEnabled, snapshot.realismWarmupEnabled) ||
+                changed(realismSatelliteExtrasEnabled, snapshot.realismSatelliteExtrasEnabled) ||
+                changed(realismSuspendedMockingEnabled, snapshot.realismSuspendedMockingEnabled) ||
+                changed(jitterSpeedIdleVariationPct, snapshot.jitterSpeedIdleVariationPct) ||
+                changed(jitterSpeedMovingVariationPct, snapshot.jitterSpeedMovingVariationPct) ||
+                changed(hotLocationsEnabled, snapshot.hotLocationsEnabled) ||
+                changed(selectedHotLocationIds, snapshot.selectedHotLocationIds) ||
+                changed(hotRoutesEnabled, snapshot.hotRoutesEnabled) ||
+                changed(selectedHotRouteIds, snapshot.selectedHotRouteIds) ||
+                changed(floatingMapQuickWalk, snapshot.floatingMapQuickWalk) ||
+                changed(tapToWalkOverlayEnabled, snapshot.tapToWalkOverlayEnabled) ||
+                changed(tapToWalkScaleMpx, snapshot.tapToWalkScaleMpx) ||
+                changed(hideTeleportFeatures, snapshot.hideTeleportFeatures) ||
+                changed(hideWidgetOverlay, snapshot.hideWidgetOverlay) ||
+                changed(showRouteJumpButtons, snapshot.showRouteJumpButtons) ||
+                changed(amapKey, amapKeyRepo)
+        }
+
         private val mutableDraft = MutableStateFlow(DraftState())
 
         private val snapshotFlow = settingsRepository.getSettingsSnapshot()
@@ -171,7 +225,7 @@ class SettingsViewModel
                 settingsRepository.getThemeMode(),
                 settingsRepository.getAmapWebKey(),
             ) { (snapshot, draftState), compass, isServiceGranted, themeMode, amapKey ->
-                val isDirty = draftState != DraftState()
+                val isDirty = draftState.hasChanges(snapshot, amapKey)
                 SettingsUiState(
                     isLoading = false,
                     speeds = snapshotSpeeds(snapshot) + draftState.speedOverrides,
@@ -477,7 +531,7 @@ class SettingsViewModel
                     }
                     d.amapKey?.let { settingsRepository.setAmapWebKey(it) }
                     mutableDraft.value = DraftState()
-                    // 保存成功不再弹「设置已保存」提示——保存按钮消失本身即是反馈
+                    userFeedback.emit(UserFeedback("设置已保存"))
                 } catch (e: Exception) {
                     Log.e(TAG, "Save failed", e)
                     userFeedback.emit(UserFeedback("保存设置失败", isError = true))
