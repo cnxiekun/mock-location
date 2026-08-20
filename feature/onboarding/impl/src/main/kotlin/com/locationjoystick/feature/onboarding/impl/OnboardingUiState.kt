@@ -4,6 +4,7 @@ data class OnboardingUiState(
     val locationPermissionGranted: Boolean = false,
     val overlayPermissionGranted: Boolean = false,
     val mockLocationEnabled: Boolean = false,
+    val notificationPermissionGranted: Boolean = false,
     val isDebugBuild: Boolean = false,
 )
 

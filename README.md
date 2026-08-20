@@ -1,4 +1,4 @@
-# 定位模拟（locationjoystick 个人改造版）
+# 模拟定位（Location Joystick 个人改造版）
 
 ![minSdk](https://img.shields.io/badge/minSdk-28%20(Android%209)-green?style=flat-square)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.2-purple?style=flat-square)
@@ -6,17 +6,16 @@
 
 在 Android 上模拟你的 GPS 位置。通过悬浮摇杆、保存的路线或自动漫游，把手机「挪」到地图上任意一点，其他 App 照常运行。
 
-本仓库是对开源项目 [locationjoystick](https://github.com/shortcuts/locationjoystick) 的个人改造版，功能与原作者一致，针对国内使用环境做了适配（见下方「个人定制」）。
+本仓库是对 [@shortcuts](https://github.com/shortcuts/locationjoystick) 的开源项目 **Location Joystick** 的个人改造版，功能与原作者一致，针对国内使用环境做了适配（见下方「个人定制」）。
 
 ## 个人定制
 
 | 项目 | 说明 |
 |------|------|
-| 应用名称 | **定位模拟** |
-| 包名 | `com.cnxiekun.mocklocation`（与原版 `com.locationjoystick.app` 可共存安装） |
+| 应用名称 | **模拟定位** |
+| 应用 ID | `com.cnxiekun.mocklocation`（与原版 `com.locationjoystick.app` 可共存安装） |
 | 地图瓦片 | 高德地图（国内可达，代码内做 WGS-84 ↔ GCJ-02 坐标转换对齐） |
 | 地图搜索 | 高德地理编码，**API Key 由用户在设置中填写**（设置 → 定位与 GPS → 高德地图 API Key），不写进代码 |
-| 版本号 | `1.0.0` |
 | 发布 | 本地构建 + 手动上传 GitHub Releases（不依赖原作者的 release-please 自动发布） |
 
 ## 功能
@@ -34,9 +33,10 @@
 | **点击移动** | 长按地图 → 「走到这里」或「传送到这里」。行走按当前速度推进，传送瞬间到达。 |
 | **二维码传输** | 同一 Wi-Fi 下通过扫一个二维码（或输入 6 位代码）在两台设备间共享/导入配置。 |
 | **GPS 拟真** | 让模拟 GPS 看起来接近真实芯片：静止时保持朝向、海拔漂移、启动精度收敛、卫星数量、信号自然中断等，全部可选开关。 |
+| **位置模拟** | 将 GPS 位置模拟到地图任意地点，**在技术层面实现了“远程位置签到”的可行性**。 |
 | **导入/导出** | 全部数据（路线、收藏、速度档位、控件配置、漫游默认、抖动设置）以 JSON 导出/导入。路线还支持 GPX、GPS Joystick、YAMLA 格式。「重置所有数据」一键清空。 |
 | **后台服务** | 前台服务保持模拟运行，即使最小化或锁屏也不中断，低优先级通知。 |
-| **新手引导** | 首次运行多步引导：定位权限、悬浮窗权限、启用模拟位置。 |
+| **新手引导** | 首次运行自动弹出定位 + 通知权限请求，并引导设置悬浮窗、模拟 GPS。 |
 | **组队同步** | 同一 Wi-Fi 下多台设备同步模拟位置，无需账号。一台为主（通过二维码加入的会话分享位置），其他为从（跟随主的位置）。 |
 | **点按行走** | 两个快捷方式：悬浮地图点按直接行走（跳过确认弹窗）；屏幕点按覆盖层——在游戏或地图 App 内点任意位置即行走过去。可调米/像素比例。 |
 | **深链接** | 把任意坐标或收藏分享为链接，点开即进入 App 并居中到该点，带确认弹窗（传送 / 行走 / 沿路行走）。也注册为 Google 地图和 `geo:` 链接的处理方。 |
@@ -45,28 +45,20 @@
 
 ## 下载
 
-正式版 APK 在 [GitHub Releases](https://github.com/cnxiekun/mock-location/releases) 页面发布。
-
-侧载安装：
-
-```bash
-adb install mock-location-v1.0.0.apk
-```
-
-或把 APK 传到手机后用文件管理器打开安装（允许安装未知来源应用）。
+正式版 APK 在 [GitHub Releases](https://github.com/cnxiekun/mock-location/releases) 页面发布，下载最新版后安装即可（允许安装未知来源应用）。
 
 > 说明：`com.cnxiekun.mocklocation` 与原版 `com.locationjoystick.app` 是独立应用，可以同时安装，互不影响。
 
 ## 使用步骤
 
 1. **开启开发者选项**：设置 → 关于手机 → 连点「版本号」7 次。
-2. **选择模拟位置应用**：设置 → 系统 → 开发者选项 → **选择模拟位置应用** → 选择「定位模拟」。
-3. **授予悬浮窗权限**：打开「定位模拟」→ 按引导授予悬浮窗权限。
-4. **开始模拟**：打开「定位模拟」→ 点地图传送，或用摇杆/路线/漫游移动 → 切到目标 App，模拟保持后台运行。
+2. **选择模拟位置应用**：设置 → 系统 → 开发者选项 → 「选择模拟位置信息应用」→ 选择「模拟定位」。
+3. **完成首次引导**：首次打开 App 会自动弹出定位和通知权限请求，按提示允许；再按引导设置悬浮窗权限和模拟 GPS 应用。
+4. **开始模拟**：打开「模拟定位」→ 点地图传送，或用摇杆/路线/漫游移动 → 切到目标 App，模拟保持后台运行。
 
-> **提示**：部分 App 能检测到模拟位置。请查阅对应 App 社区的现有规避方案。全部核心功能均不需要 root。
+> **提示**：部分 App 能检测到模拟位置。请查阅对应 App 社区的现有规避方案。全部核心功能均不需要 root。**本工具仅用于学习和开发测试，请勿用于违反平台规则或公司规定的场景。**
 
-> **关于搜索**：地图搜索走高德地理编码，需要在 **设置 → 定位与 GPS → 高德地图 API Key** 填写你自己的高德 Web 服务 key 后才能使用（不填写时搜索框会提示）。
+> **关于搜索**：地图搜索走高德地理编码，需要在 **设置 → 定位与 GPS → 高德地图 API Key** 填写你自己的高德 Web 服务 key 后才能使用。不填也能用——可直接在地图上点选或长按定位，只是没有文字搜索。
 
 ## 构建
 
@@ -79,8 +71,6 @@ adb install mock-location-v1.0.0.apk
 ### 调试包
 
 ```bash
-./gradlew assembleDebug
-# 或
 make build-debug
 ```
 
@@ -91,8 +81,6 @@ make build-debug
 本项目使用专属签名文件 `cnxiekun-mock-location.keystore`（在项目根目录，已被 `.gitignore` 忽略，不要提交）。签名信息（别名 / 密码）记录在 `cnxiekun-mock-location-密钥备忘.txt`。
 
 ```bash
-./gradlew assembleRelease
-# 或
 make build
 ```
 
@@ -108,50 +96,39 @@ make test       # 单元测试（JVM）
 make coverage   # 覆盖率报告（HTML + XML）
 ```
 
-## 架构
+## 仓库结构
 
-多模块、NowInAndroid 风格。每个功能 = Gradle 模块，公共代码在 `:core:*`。
+多模块 Gradle 工程（NowInAndroid 风格）。每个功能拆成 `:api`（对外契约）+ `:impl`（实现），公共代码在 `:core:*`。
 
 ```
-feature/*        — UI + ViewModels（Compose 界面，无业务逻辑）
-  ↓ 依赖
-core/data        — 仓库（单一数据源）
-  ↓
-core/database    — Room 数据库
-core/datastore   — DataStore 偏好
-
-core/location    — 模拟 GPS 引擎（前台服务），与 UI 无关
-core/model       — 纯 Kotlin 数据类，无 Android 依赖
+mock-location/
+├── app/                        # 应用入口、Hilt 装配、导航、侧边栏
+├── build-logic/                # Gradle 约定插件
+├── core/
+│   ├── common/                 # 常量（AppConstants）、工具、坐标转换
+│   ├── data/                   # 仓库（单一数据源）
+│   ├── database/               # Room 数据库
+│   ├── datastore/              # DataStore 偏好
+│   ├── designsystem/           # 设计令牌、主题、共享组件
+│   ├── location/               # 模拟 GPS 引擎（前台服务）
+│   ├── map/                    # 地图、GeoJSON、MapLibre 桥
+│   ├── model/                  # 纯 Kotlin 领域模型
+│   ├── overlay/                # 悬浮窗工具
+│   ├── routing/                # OSRM 客户端、路线、漫游、回放
+│   └── testing/                # 共享测试工具
+├── feature/
+│   ├── favorites/              # 收藏
+│   ├── group/                  # 组队同步
+│   ├── joystick/               # 悬浮摇杆
+│   ├── map/                    # 地图界面
+│   ├── onboarding/             # 新手引导
+│   ├── routes/                 # 路线
+│   ├── settings/               # 设置
+│   └── widget/                 # 悬浮控件
+├── docs/                       # 技术参考文档（开发者用）
+├── dist/                       # 发布 APK（本地暂存，不上传仓库）
+└── *.kts / gradlew / gradle/   # 构建脚本与 Gradle Wrapper
 ```
-
-MVVM + 仓库模式。ViewModel 暴露 `StateFlow`/`SharedFlow`，Compose 通过 `collectAsStateWithLifecycle()` 收集，Hilt 依赖注入。`LjApp` 用 `ModalNavigationDrawer` 包裹 `LjNavHost`，`IdleScreen` 作为引导完成后的主入口，卡片导航到地图 / 路线 / 收藏 / 设置。
-
-### 模块
-
-每个功能拆成 `:api`（对外契约）+ `:impl`（实现）。
-
-| 模块 | 职责 |
-|------|------|
-| `:app` | 入口、Hilt 装配、`LjApp`、`LjNavHost`、侧边栏 |
-| `:core:common` | 工具、扩展、常量（`AppConstants`） |
-| `:core:data` | 仓库、DataStore 偏好 |
-| `:core:database` | Room 数据库、DAO、实体 |
-| `:core:datastore` | DataStore 偏好数据源 |
-| `:core:designsystem` | 设计令牌、主题、排版、共享组件 |
-| `:core:location` | 模拟 GPS 前台服务 + 移动引擎 |
-| `:core:model` | 纯 Kotlin 领域数据类 |
-| `:core:map` | GeoJSON 工具、MapLibre 生命周期桥、样式扩展 |
-| `:core:overlay` | WindowManager 悬浮窗工具 |
-| `:core:routing` | OSRM 客户端、路线插值、漫游引擎、回放引擎 |
-| `:core:testing` | 共享测试工具、Fake |
-| `:feature:favorites:api` / `:impl` | 收藏列表、地图拾取器、传送 |
-| `:feature:group:api` / `:impl` | 组队同步界面——主/从 Wi-Fi 位置同步 |
-| `:feature:joystick:impl` | 悬浮摇杆 |
-| `:feature:map:api` / `:impl` | MapLibre 界面、地图交互、漫游底表 |
-| `:feature:onboarding:api` / `:impl` | 多步新手引导 |
-| `:feature:routes:api` / `:impl` | 路线列表、创建、详情、回放 |
-| `:feature:settings:api` / `:impl` | 速度档位、控件配置、导入导出、二维码传输 |
-| `:feature:widget:impl` | 悬浮控件 + 面板 |
 
 ## 技术栈
 
@@ -170,6 +147,20 @@ MVVM + 仓库模式。ViewModel 暴露 `StateFlow`/`SharedFlow`，Compose 通过
 | CI | 无（个人改造版，本地构建） |
 | 最低系统 | API 28 (Android 9) |
 
+## ⚠️ 免责声明
+
+本工具仅供**学习、开发和测试**用途，旨在帮助开发者调试基于位置的应用（如地图、LBS 游戏等）。
+
+**请勿将本工具用于以下场景：**
+- 违反任何第三方平台（如社交 App、游戏）的用户协议或服务条款
+- 违反所在公司、组织的内部管理规定（如虚假打卡、考勤作弊等）
+
+用户因使用本工具产生的任何后果（包括但不限于账号封禁、数据丢失、法律责任等），均由使用者自行承担，与项目作者无关。
+
+**简单说：用之前想清楚，出了事自己兜着。**
+
 ## 许可证
 
-MIT License。见 [LICENSE](LICENSE)。
+MIT License，版权归 cnxiekun 所有。见 [LICENSE](LICENSE)。
+
+本项目基于 [@shortcuts](https://github.com/shortcuts/locationjoystick) 的开源项目 **Location Joystick** 改造，感谢原作者的出色工作。

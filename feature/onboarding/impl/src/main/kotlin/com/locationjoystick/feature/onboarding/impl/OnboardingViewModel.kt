@@ -3,6 +3,7 @@ package com.locationjoystick.feature.onboarding.impl
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,6 +43,13 @@ class OnboardingViewModel
                         ) == PackageManager.PERMISSION_GRANTED,
                     overlayPermissionGranted = isOverlayPermissionGranted(context),
                     mockLocationEnabled = isMockLocationEnabled(context),
+                    // 通知权限：API 33+ 运行时请求，拒绝也不影响使用（仅前台服务通知不显示）
+                    notificationPermissionGranted =
+                        Build.VERSION.SDK_INT < 33 ||
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS,
+                            ) == PackageManager.PERMISSION_GRANTED,
                 )
             }
         }

@@ -1,4 +1,4 @@
-# locationjoystick — Agent Reference
+# mock-location — Agent Reference
 
 > Primary reference for AI coding agents. Read before touching any file.
 
@@ -167,7 +167,7 @@ make coverage-open   # open HTML report in browser
 ## 个人定制（2026-08-18）
 
 - 全程使用简体中文回复，所有提示、报错、帮助文档都用中文。
-- 应用显示名「定位模拟」，包名 `com.cnxiekun.mocklocation`（与作者原版可共存）。
+- 应用显示名「模拟定位」，包名 `com.cnxiekun.mocklocation`（与作者原版可共存）。
 - 地图瓦片使用高德（国内可达，代码内做 WGS-84 ↔ GCJ-02 坐标转换）；地图搜索用高德地理编码，key 由用户在设置中填写（不写进代码）。
 - release 构建用 `cnxiekun-mock-location.keystore` 签名（别名/密码见 `cnxiekun-mock-location-密钥备忘.txt`）。
 - 版本号有**两处**，发版时必须同步改，否则系统显示与实际不符：

@@ -81,7 +81,7 @@ internal fun IdleScreen(
                         AppIcon()
                         Spacer(modifier = Modifier.height(24.dp))
                         Text(
-                            text = "定位模拟",
+                            text = "模拟定位",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onBackground,
                             textAlign = TextAlign.Center,
@@ -124,7 +124,7 @@ internal fun IdleScreen(
                     IdleDestinationCard(
                         LjIcons.Settings,
                         "设置",
-                        "配置定位模拟的偏好设置。",
+                        "配置模拟定位的偏好设置。",
                         onNavigateToSettings,
                     )
                 }
@@ -146,7 +146,7 @@ internal fun IdleScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "定位模拟",
+                    text = "模拟定位",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
@@ -194,7 +194,7 @@ internal fun IdleScreen(
                 IdleDestinationCard(
                     icon = LjIcons.Settings,
                     title = "设置",
-                    description = "配置定位模拟的偏好设置。",
+                    description = "配置模拟定位的偏好设置。",
                     onClick = onNavigateToSettings,
                 )
                 Spacer(modifier = Modifier.height(24.dp))

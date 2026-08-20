@@ -2,7 +2,9 @@ package com.locationjoystick.feature.onboarding.impl
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,8 +35,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -119,6 +125,27 @@ internal fun OnboardingScreen(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = { onCheckPermissions() },
         )
+    val notificationPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { onCheckPermissions() },
+        )
+
+    // 首次进入引导页：自动弹出位置 + 通知权限请求（通知可拒绝，拒绝不影响使用）
+    var autoRequested by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (autoRequested) return@LaunchedEffect
+        autoRequested = true
+        if (!uiState.locationPermissionGranted) {
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 
     LjScaffold(
         title = "",
@@ -144,7 +171,7 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "设置定位模拟",
+                text = "设置模拟定位",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -246,7 +273,7 @@ internal fun OnboardingScreen(
             OnboardingStepCard(
                 title = "设置为模拟 GPS 应用",
                 description =
-                    "在开发者选项中，找到“选择模拟位置信息应用”，然后选择定位模拟。 " +
+                    "在开发者选项中，找到“选择模拟位置信息应用”，然后选择模拟定位。 " +
                         "这样应用就能替换你的真实 GPS。",
                 isGranted = uiState.mockLocationEnabled,
                 icon = LjIcons.DeveloperMode,
@@ -263,7 +290,7 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             LjPrimaryButton(
-                text = "开始使用定位模拟",
+                text = "开始使用模拟定位",
                 onClick = onSetupComplete,
                 enabled = uiState.canProceed || uiState.isDebugBuild,
                 modifier = Modifier.fillMaxWidth(),

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">定位模拟</string>
-    <string name="accessibility_service_label">定位模拟指南针</string>
+    <string name="app_name">模拟定位</string>
+    <string name="accessibility_service_label">模拟定位指南针</string>
     <string name="accessibility_service_description">仅用于可选的「点击行走」指南针功能，当你在设置中启用它时使用。读取屏幕上的指南针方向，使你的点击映射到正确的真实世界方向。不是为残障用户提供的无障碍工具。</string>
 </resources>

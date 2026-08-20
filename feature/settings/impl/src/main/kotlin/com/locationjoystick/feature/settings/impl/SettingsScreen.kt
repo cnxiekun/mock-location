@@ -659,7 +659,7 @@ private fun SettingsHubScreen(
             AppIcon()
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "定位模拟",
+                text = "模拟定位",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,

@@ -477,7 +477,7 @@ class SettingsViewModel
                     }
                     d.amapKey?.let { settingsRepository.setAmapWebKey(it) }
                     mutableDraft.value = DraftState()
-                    userFeedback.emit(UserFeedback("设置已保存"))
+                    // 保存成功不再弹「设置已保存」提示——保存按钮消失本身即是反馈
                 } catch (e: Exception) {
                     Log.e(TAG, "Save failed", e)
                     userFeedback.emit(UserFeedback("保存设置失败", isError = true))
@@ -637,7 +637,7 @@ class SettingsViewModel
             viewModelScope.launch {
                 if (host == null || port == null || token == null) {
                     Log.e(TAG, "Unrecognized QR code: $url")
-                    userFeedback.emit(UserFeedback("无效的二维码——不是定位模拟的导出数据", isError = true))
+                    userFeedback.emit(UserFeedback("无效的二维码——不是模拟定位的导出数据", isError = true))
                     return@launch
                 }
                 fetchAndImportExport(host, port, token)

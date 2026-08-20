@@ -97,7 +97,7 @@ internal fun SettingsGpsSubScreen(
                         Text("高德地图 API Key", style = MaterialTheme.typography.headlineSmall)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "用于地图搜索（地理编码）。填入高德「Web 服务」key 后即可使用中文搜索。",
+                            "用于地图搜索（地理编码）。不填也不影响使用——可以直接在地图上点选或长按定位；填入高德「Web 服务」key 后即可用文字搜索。",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

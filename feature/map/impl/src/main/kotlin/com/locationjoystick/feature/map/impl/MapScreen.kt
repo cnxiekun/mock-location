@@ -249,6 +249,8 @@ internal fun MapScreen(
                             map.uiSettings.isAttributionEnabled = false
                             map.uiSettings.isLogoEnabled = false
                             map.uiSettings.isScrollGesturesEnabled = true
+                            // 高德路网瓦片最高 18 级，限制最大缩放级别，放大到上限即停（避免继续放大白屏/失真）
+                            map.setMaxZoomPreference(AppConstants.MapConstants.OSM_MAX_ZOOM.toDouble())
                             val initialDisplay =
                                 initialPosition?.let {
                                     Gcj02Converter.wgs84ToGcj02(it.latitude, it.longitude)

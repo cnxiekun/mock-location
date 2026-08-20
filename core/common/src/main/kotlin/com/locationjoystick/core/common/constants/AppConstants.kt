@@ -134,7 +134,8 @@ object AppConstants {
         /** 国内可达的栅格瓦片源（高德，GCJ-02 火星坐标系，代码内做 WGS-84→GCJ-02 转换对齐）。 */
         const val OSM_TILE_URL = "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}"
         const val TILESET_VERSION = "2.2.0"
-        const val OSM_MAX_ZOOM = 19f
+        /** 高德路网瓦片实际最高 18 级（19 级以上返回空白），设为 18 让 MapLibre 在此之上拉伸显示、不白屏。 */
+        const val OSM_MAX_ZOOM = 18f
         const val EMPTY_MAP_STYLE_URI = "asset://empty.json"
         const val OSM_SOURCE_ID = "osm-source"
         const val OSM_LAYER_ID = "osm-layer"
@@ -188,7 +189,7 @@ object AppConstants {
         const val TITLE_PERMISSION_ERROR = "缺少权限"
         const val TEXT_PERMISSION_ERROR = "打开应用并完成设置以开始模拟。"
         const val TITLE_ACTIVE = "位置模拟已开启"
-        const val TEXT_ACTIVE = "定位模拟正在模拟你的 GPS 位置"
+        const val TEXT_ACTIVE = "模拟定位正在模拟你的 GPS 位置"
         const val ACTION_STOP = "停止"
         const val ACTION_OPEN_MAP = "地图"
         const val ACTION_OPEN_FAVORITES = "收藏"
@@ -303,7 +304,7 @@ object AppConstants {
     }
 
     object AppInfo {
-        const val VERSION_NAME = "1.0.0"
+        const val VERSION_NAME = "1.1.0"
         const val GITHUB_ISSUES_URL = "https://github.com/shortcuts/locationjoystick/issues/new?template=bug_report.yml"
         const val DOCS_URL = "https://shortcuts.github.io/locationjoystick/"
         const val TROUBLESHOOTING_URL = "https://shortcuts.github.io/locationjoystick/troubleshooting.html"
